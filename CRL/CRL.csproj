@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{221A152B-1136-46A0-BF49-37D8E8EF19A0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CRL</RootNamespace>
+    <AssemblyName>CRL</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\CRL.xml</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="MongoDB.Bson, Version=2.4.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Bson.2.4.4\lib\net45\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver, Version=2.4.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Driver.2.4.4\lib\net45\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core, Version=2.4.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MongoDB.Driver.Core.2.4.4\lib\net45\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.9.12\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.OracleClient" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Messaging" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.0.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attribute\FieldIndexType.cs" />
+    <Compile Include="CacheServerSetting.cs" />
+    <Compile Include="CacheServer\CacheClientProxy.cs" />
+    <Compile Include="CacheServer\CacheService.cs" />
+    <Compile Include="CacheServer\Command.cs" />
+    <Compile Include="CacheServer\HttpCacheClient.cs" />
+    <Compile Include="CacheServer\TcpPoolClient.cs" />
+    <Compile Include="CacheServer\TcpServer.cs" />
+    <Compile Include="CacheServer\ResultData.cs" />
+    <Compile Include="CallContext.cs" />
+    <Compile Include="CRLDbConnectionScope.cs" />
+    <Compile Include="DBExtend\CallBackDataReader.cs" />
+    <Compile Include="CRLException.cs" />
+    <Compile Include="DBAccess\AccessHelper.cs" />
+    <Compile Include="DBAccess\DBHelper.cs" />
+    <Compile Include="DBAccess\MongoDBHelper.cs" />
+    <Compile Include="DBAccess\MySqlHelper.cs" />
+    <Compile Include="DBAccess\OracleHelper.cs" />
+    <Compile Include="DBAccess\SqlHelper.cs" />
+    <Compile Include="ExtensionMethod\IModelEx.cs" />
+    <Compile Include="ExtensionMethod\DateTime.cs" />
+    <Compile Include="ExtensionMethod\IsNull.cs" />
+    <Compile Include="ExtensionMethod\Length.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryBase\LambdaQueryMethodCreate.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryJoin\T2.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryJoin\T5.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryJoin\T4.cs" />
+    <Compile Include="LambdaQuery\Mapping\DataContainer.cs" />
+    <Compile Include="LambdaQuery\Mapping\QueryInfo.cs" />
+    <Compile Include="LambdaQuery\Query\In.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryBase\LambdaQueryBaseField.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryViewJoin.cs" />
+    <Compile Include="LambdaQuery\LambdaQueryResultSelect.cs" />
+    <Compile Include="LambdaQuery\Query\TypeQuery.cs" />
+    <Compile Include="ModelCheck.cs" />
+    <Compile Include="PropertyBuilder.cs" />
+    <Compile Include="ReflectionHelper.cs" />
+    <Compile Include="DBAdapter\MongoDBAdapter.cs" />
+    <Compile Include="DBExtend\DataBaseArchitecture.cs" />
+    <Compile Include="DBAdapter\DBAdapterBase.cs" />
+    <Compile Include="DBAdapter\MSSQLDBAdapter.cs" />
+    <Compile Include="DBAdapter\MySQLDBAdapter.cs" />
+    <Compile Include="DBAdapter\ORACLEDBAdapter.cs" />
+    <Compile Include="Base.cs" />
+    <Compile Include="BaseProvider.cs" />
+    <Compile Include="Attribute\FieldAttribute.cs" />
+    <Compile Include="DbContext.cs" />
+    <Compile Include="DBExtend\MongoDB\MongoDB.cs" />
+    <Compile Include="DBExtend\MongoDB\MongoDBDelete.cs" />
+    <Compile Include="DBExtend\MongoDB\MongoDBInsert.cs" />
+    <Compile Include="DBExtend\MongoDB\MongoDBPage.cs" />
+    <Compile Include="DBExtend\MongoDB\MongoDBQuery.cs" />
+    <Compile Include="DBExtend\MongoDB\MongoDBUpdate.cs" />
+    <Compile Include="DBExtend\MongoDB\NotSupported.cs" />
+    <Compile Include="DBExtend\RelationDB\DBExtend.cs" />
+    <Compile Include="DBExtend\RelationDB\DBExtendAutoSp.cs" />
+    <Compile Include="DBExtend\RelationDB\DBExtendDelete.cs" />
+    <Compile Include="DBExtend\RelationDB\DBExtendInsert.cs" />
+    <Compile Include="DBExtend\RelationDB\DBExtendPage.cs" />
+    <Compile Include="DBExtend\RelationDB\DBExtendQuery.cs" />
+    <Compile Include="DBExtend\DBExtendFactory.cs" />
+    <Compile Include="DBExtend\RelationDB\DBExtendUpdate.cs" />
+    <Compile Include="DBExtend\RelationDB\DynamicQuery.cs" />
+    <Compile Include="DBExtend\FunctionType.cs" />
+    <Compile Include="DBExtend\AbsDBExtend.cs" />
+    <Compile Include="Dynamic\DynamicObjConvert.cs" />
+    <Compile Include="Dynamic\DynamicViewDataDictionary.cs" />
+    <Compile Include="ExistsTableCache\ColumnBackgroundCheck.cs" />
+    <Compile Include="ExistsTableCache\DataBase.cs" />
+    <Compile Include="ExistsTableCache\Table.cs" />
+    <Compile Include="ExpressionJoin.cs" />
+    <Compile Include="ExtensionMethod\Avg.cs" />
+    <Compile Include="ExtensionMethod\Convert.cs" />
+    <Compile Include="ExtensionMethod\FieldChange.cs" />
+    <Compile Include="ExtensionMethod\In.cs" />
+    <Compile Include="ExtensionMethod\Max.cs" />
+    <Compile Include="ExtensionMethod\Min.cs" />
+    <Compile Include="ExtensionMethod\QueryExtension.cs" />
+    <Compile Include="ExtensionMethod\Sum.cs" />
+    <Compile Include="IgnoreCaseDictionary.cs" />
+    <Compile Include="LambdaQuery\CRLExpression\CRLExpression.cs" />
+    <Compile Include="LambdaQuery\CRLExpression\CRLExpressionType.cs" />
+    <Compile Include="LambdaQuery\CRLExpression\CRLExpressionVisitor.cs" />
+    <Compile Include="LambdaQuery\CRLExpression\CRLQueryExpression.cs" />
+    <Compile Include="LambdaQuery\CRLExpression\MethodCallObj.cs" />
+    <Compile Include="LambdaQuery\LambdaQueryFactory.cs" />
+    <Compile Include="LambdaQuery\MongoDBLambdaQuery.cs" />
+    <Compile Include="LambdaQuery\Query\ExecuteResult.cs" />
+    <Compile Include="LambdaQuery\ExpressionVisitor.cs" />
+    <Compile Include="LambdaQuery\Extensions.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="LambdaQuery\Query\Group.cs" />
+    <Compile Include="LambdaQuery\Query\Join.cs" />
+    <Compile Include="LambdaQuery\ConstantValueVisitor.cs" />
+    <Compile Include="LambdaQuery\LambdaCreater.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQuery.cs" />
+    <Compile Include="ExtensionMethod\ExtensionMethod.cs" />
+    <Compile Include="IModelBase.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryBase\LambdaQueryBase.cs" />
+    <Compile Include="LambdaQuery\Query\LambdaQueryJoin\T3.cs" />
+    <Compile Include="LambdaQuery\MethodAnalyze.cs" />
+    <Compile Include="LambdaQuery\ParameterRebinder.cs" />
+    <Compile Include="LambdaQuery\RelationLambdaQuery.cs" />
+    <Compile Include="MemoryDataCache\CacheService.cs" />
+    <Compile Include="MemoryDataCache\MemoryDataCacheItem.cs" />
+    <Compile Include="MemoryDataCache\QueryItem.cs" />
+    <Compile Include="MemoryDataCache\UpdateItem.cs" />
+    <Compile Include="ObjectConvert.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProviderOrigin.cs" />
+    <Compile Include="Set\EntityRelation.cs" />
+    <Compile Include="Runtime\RunTimeCache.cs" />
+    <Compile Include="Runtime\RunTimeService.cs" />
+    <Compile Include="Set\DbSet.cs" />
+    <Compile Include="SettingConfig.cs" />
+    <Compile Include="Attribute\TableAttribute.cs" />
+    <Compile Include="Sharding\BaseProvider.cs" />
+    <Compile Include="Sharding\Location.cs" />
+    <Compile Include="Sharding\UnionType.cs" />
+    <Compile Include="SqlStopWatch.cs" />
+    <Compile Include="SummaryAnalysis.cs" />
+    <Compile Include="ExistsTableCache\ExistsTableCache.cs" />
+    <Compile Include="TypeCache.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CRL.Core\CRL.Core.csproj">
+      <Project>{1255276c-756e-48aa-a09b-22e92d16d995}</Project>
+      <Name>CRL.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

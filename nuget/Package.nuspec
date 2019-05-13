@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>CRL</id>
+    <version>5.0.0</version>
+    <authors>hubro</authors>
+    <owners>hubro</owners>
+    <licenseUrl>https://github.com/hubro-xx/CRL5</licenseUrl>
+    <projectUrl>https://github.com/hubro-xx/CRL5</projectUrl>
+    <iconUrl></iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>CRL快速开发框架</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags>ORM,框架</tags>
+    <dependencies>
+
+    </dependencies>
+  </metadata>
+</package>
