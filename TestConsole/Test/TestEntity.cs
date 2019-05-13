@@ -6,7 +6,7 @@
 * 在线文档 http://crl.changqidongli.com/
 */
 using Chloe.Annotations;
-using FS.Sql.Map.Attribute;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
