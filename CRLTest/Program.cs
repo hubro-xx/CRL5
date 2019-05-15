@@ -45,6 +45,7 @@ namespace CRLTest
                     tableName = "MemberSharding1";
                     return new CRL.Sharding.Location("testdb2", tableName);
                 }
+                //返回定位库和表名
                 return new CRL.Sharding.Location("testdb", tableName);
             });
             CRL.SettingConfig.GetDbAccess = (dbLocation) =>
@@ -58,11 +59,12 @@ namespace CRLTest
             };
 
 
-        //Code.MemberManage.Instance.QueryItem(1);
-        //Code.OrderManage.Instance.QueryItem(1);
-        //Code.ProductDataManage.Instance.QueryItem(1);
+            Code.MemberManage.Instance.QueryItem(1);
+            Code.OrderManage.Instance.QueryItem(1);
+            Code.ProductDataManage.Instance.QueryItem(1);
         label1:
-            testSharding();
+            //testSharding();
+            Code.TestAll.TestAnonymousResult();
 
             //TestAll();
             Console.ReadLine();

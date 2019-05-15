@@ -249,7 +249,27 @@ namespace CRLTest.Code
             foreach (var d in resutl3)
             {
                 var a = d.GetBag().Name;
-                var a2 = d["name"];
+                var a2 = d.GetIndexData("name");
+            }
+        }
+        public static void TestAnonymousResult()
+        {
+            var instance = MemberManage.Instance;
+            var result1 = instance.GetLambdaQuery().Select(b => new { b.Name }).ToList();
+            var result2 = instance.GetLambdaQuery().Select(b => new Code.Member { Name = b.Name }).ToList();
+            var join = instance.GetLambdaQuery().Join<Order>((a, b) => a.Id == b.UserId);
+            var result3 = join.Select((a, b) => new { a.Name, b.UserId }).ToList();
+            var result4 = join.Select((a, b) => new anony1 { Name = a.Name, UserId = b.UserId }).ToList();
+        }
+        public class anony1
+        {
+            public string Name
+            {
+                get;set;
+            }
+            public int UserId
+            {
+                get; set;
             }
         }
 

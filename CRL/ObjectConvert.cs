@@ -27,7 +27,7 @@ namespace CRL
 {
     internal class ObjectConvert
     {
-        static Dictionary<Type, Func<object, object>> nullCheckMethod = new Dictionary<Type, Func<object, object>>();
+        static ConcurrentDictionaryEx<Type, Func<object, object>> nullCheckMethod = new ConcurrentDictionaryEx<Type, Func<object, object>>();
         /// <summary>
         /// 转化值,并处理默认值
         /// </summary>
@@ -47,19 +47,19 @@ namespace CRL
             }
             if (nullCheckMethod.Count == 0)
             {
-                nullCheckMethod.Add(typeof(bool), (a) =>
+                nullCheckMethod.TryAdd(typeof(bool), (a) =>
                 {
                     return Convert.ToInt32(a);
                 });
-                nullCheckMethod.Add(typeof(string), (a) =>
+                nullCheckMethod.TryAdd(typeof(string), (a) =>
                 {
                     return a + "";
                 });
-                nullCheckMethod.Add(typeof(Enum), (a) =>
+                nullCheckMethod.TryAdd(typeof(Enum), (a) =>
                 {
                     return Convert.ToInt32(a);
                 });
-                nullCheckMethod.Add(typeof(DateTime), (a) =>
+                nullCheckMethod.TryAdd(typeof(DateTime), (a) =>
                 {
                     DateTime time = (DateTime)a;
                     if (time.Year == 1)
@@ -68,13 +68,13 @@ namespace CRL
                     }
                     return a;
                 });
-                nullCheckMethod.Add(typeof(byte[]), (a) =>
+                nullCheckMethod.TryAdd(typeof(byte[]), (a) =>
                 {
                     if (a == null)
                         return 0;
                     return a;
                 });
-                nullCheckMethod.Add(typeof(Guid), (a) =>
+                nullCheckMethod.TryAdd(typeof(Guid), (a) =>
                 {
                     if (a == null)
                         return Guid.NewGuid().ToString();
@@ -96,7 +96,7 @@ namespace CRL
             }
             return value;
         }
-        static Dictionary<Type, Func<object, object>> convertMethod = new Dictionary<Type, Func<object, object>>();
+        static ConcurrentDictionaryEx<Type, Func<object, object>> convertMethod = new ConcurrentDictionaryEx<Type, Func<object, object>>();
 
         /// <summary>
         /// 转换为为强类型
@@ -116,11 +116,11 @@ namespace CRL
             }
             if (convertMethod.Count == 0)
             {
-                convertMethod.Add(typeof(byte[]), (a) =>
+                convertMethod.TryAdd(typeof(byte[]), (a) =>
                 {
                     return (byte[])a;
                 });
-                convertMethod.Add(typeof(Guid), (a) =>
+                convertMethod.TryAdd(typeof(Guid), (a) =>
                 {
                     return new Guid(a.ToString());
                 });

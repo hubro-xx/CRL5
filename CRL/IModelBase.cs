@@ -205,38 +205,54 @@ namespace CRL
         Dictionary<string, object> Datas = null;
 
 
+        ///// <summary>
+        ///// 获取关联查询的值
+        ///// 不分区大小写
+        ///// </summary>
+        ///// <param name="key"></param>
+        ///// <returns></returns>
+        //[Attribute.Field(MapingField = false)]
+        //public dynamic this[string key]
+        //{
+        //    get
+        //    {
+        //        dynamic obj = null;
+        //        Datas = Datas ?? new Dictionary<string, object>();
+        //        var a = Datas.TryGetValue(key.ToLower(), out obj);
+        //        if (!a)
+        //        {
+        //            throw new CRLException(string.Format("对象:{0}不存在索引值:{1}", GetType(), key));
+        //        }
+        //        return obj;
+        //    }
+        //    set
+        //    {
+        //        Datas = Datas ?? new Dictionary<string, object>();
+        //        Datas[key.ToLower()] = value;
+        //    }
+        //}
         /// <summary>
-        /// 获取关联查询的值
-        /// 不分区大小写
+        /// 获以索引的值
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        [Attribute.Field(MapingField = false)]
-        public dynamic this[string key]
+        public dynamic GetIndexData(string key)
         {
-            get
+            dynamic obj = null;
+            Datas = Datas ?? new Dictionary<string, object>();
+            var a = Datas.TryGetValue(key.ToLower(), out obj);
+            if (!a)
             {
-                dynamic obj = null;
-                Datas = Datas ?? new Dictionary<string, object>();
-                var a = Datas.TryGetValue(key.ToLower(), out obj);
-                if (!a)
-                {
-                    throw new CRLException(string.Format("对象:{0}不存在索引值:{1}", GetType(), key));
-                }
-                return obj;
+                throw new CRLException(string.Format("对象:{0}不存在索引值:{1}", GetType(), key));
             }
-            set
-            {
-                Datas = Datas ?? new Dictionary<string, object>();
-                Datas[key.ToLower()] = value;
-            }
+            return obj;
         }
         /// <summary>
         /// 设置索引值
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public void SetIndexData(string key, object value)
+        internal void SetIndexData(string key, object value)
         {
             Datas = Datas ?? new Dictionary<string, object>();
             Datas[key.ToLower()] = value;
@@ -415,14 +431,5 @@ namespace CRL
 
         #endregion
 
-        //bool __InnerChanges = false;
-        //internal bool GetInnerChanges()
-        //{
-        //    return __InnerChanges;
-        //}
-        //internal void SetInnerChanges(bool v = true)
-        //{
-        //    __InnerChanges = v;
-        //}
     }
 }
