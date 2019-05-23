@@ -65,6 +65,10 @@ namespace CRL.Core
                 get;
                 set;
             }
+            public string Method
+            {
+                get;set;
+            }
             public override string ToString()
             {
                 string s = Time.ToString("yy-MM-dd HH:mm:ss fffff");
@@ -81,10 +85,10 @@ namespace CRL.Core
                 {
                     s += "\r\nUrl:" + RequestUrl;
                 }
-                //if (!string.IsNullOrEmpty(Post))
-                //{
-                //    s += "\r\nPost:" + Post;
-                //}
+                if (!string.IsNullOrEmpty(Method))
+                {
+                    s += "\r\nMethod:" + Method;
+                }
                 if (!string.IsNullOrEmpty(UrlReferrer))
                 {
                     s += "\r\nUrlReferrer:" + UrlReferrer;
@@ -178,6 +182,7 @@ namespace CRL.Core
                             logItem.UserAgent = context.Request.UserAgent;
                             logItem.UrlReferrer = context.Request.UrlReferrer + "";
                             logItem.Post = context.Request.Form.ToString();
+                            logItem.Method = context.Request.HttpMethod;
                         }
                     }
                 }

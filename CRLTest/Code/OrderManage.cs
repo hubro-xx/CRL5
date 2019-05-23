@@ -113,7 +113,7 @@ namespace CRLTest.Code
                 product.Number = 10;
                 ProductDataManage.Instance.Add(product);
                 Add(item);
-                return true; //会回滚
+                return true; //不会回滚
             }, out error);
         }
 

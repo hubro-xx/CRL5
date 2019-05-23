@@ -95,6 +95,7 @@
     <Compile Include="StringHelper\PinYin.cs" />
     <Compile Include="StringHelper\StringCommon.cs" />
     <Compile Include="StringHelper\StringHelper.cs" />
+    <Compile Include="ThreadWork.cs" />
     <Compile Include="TimeHelper.cs" />
     <Compile Include="VerifyImage.cs" />
     <Compile Include="ICoreConfig.cs" />

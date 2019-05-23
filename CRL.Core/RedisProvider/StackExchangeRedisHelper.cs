@@ -349,6 +349,32 @@ namespace CRL.Core.RedisProvider
             EndPoint[] endpoints = Instance.GetEndPoints();
             return endpoints;
         }
-
+        public static long ListRightPush(string key, object value)
+        {
+            return GetDatabase().ListRightPush(key, Serialize(value));
+        }
+        public static long ListRemove(string key, object value)
+        {
+            return GetDatabase().ListRemove(key, Serialize(value));
+        }
+        public static List<T> ListRange<T>(string key, long start, long end)
+        {
+            var list = new List<T>();
+            var result = GetDatabase().ListRange(key, start, end);
+            foreach (var json in result)
+            {
+                var obj = Deserialize<T>(json.ToString());
+                list.Add(obj);
+            }
+            return list;
+        }
+        public static void ListTrim(string key, long start, long end)
+        {
+            GetDatabase().ListTrim(key, start, end);
+        }
+        public static long ListLength(string key)
+        {
+            return GetDatabase().ListLength(key);
+        }
     }
 }

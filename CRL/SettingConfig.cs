@@ -145,6 +145,10 @@ namespace CRL
         /// 默认nolock
         /// </summary>
         public static bool QueryWithNoLock = true;
+        /// <summary>
+        /// 分页是否编译存储过程
+        /// </summary>
+        public static bool CompileSp = true;
         #endregion
     }
 

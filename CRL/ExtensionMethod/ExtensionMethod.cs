@@ -170,11 +170,11 @@ namespace CRL
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="name"></param>
-        public static void CheckNull(this object obj, object name)
+        public static void CheckNull(this object obj, object name,string message="")
         {
             if (obj == null)
             {
-                throw new ArgumentNullException(name.ToString());
+                throw new ArgumentNullException(name.ToString(), message);
             }
         }
     }

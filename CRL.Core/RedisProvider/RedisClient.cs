@@ -214,6 +214,28 @@ namespace CRL.Core.RedisProvider
             return value.data;
         }
         #endregion
+        #region list
+        public long ListRightPush(string key, object value)
+        {
+            return StackExchangeRedisHelper.ListRightPush(key, value);
+        }
+        public long ListRemove(string key, object value)
+        {
+            return StackExchangeRedisHelper.ListRemove(key, value);
+        }
+        public List<T> ListRange<T>(string key, long start, long end)
+        {
+            return StackExchangeRedisHelper.ListRange<T>(key, start, end);
+        }
+        public  void ListTrim(string key, long start, long end)
+        {
+            StackExchangeRedisHelper.ListTrim(key, start, end);
+        }
+        public  long ListLength(string key)
+        {
+            return StackExchangeRedisHelper.ListLength(key);
+        }
+        #endregion
 
     }
 

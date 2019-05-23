@@ -252,12 +252,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
             Type type = obj.GetType();
             var helper = dbContext.DBHelper;
             var table = TypeCache.GetTable(type);
-            //Type type = obj.GetType();
-            //string table = TypeCache.GetTableName(type, dbContext);
-            //var typeArry = TypeCache.GetProperties(type, true).Values;
-            //string sql = string.Format("insert into {0}(", table);
-            //string sql1 = "";
-            //string sql2 = "";
+   
             var primaryKey = table.PrimaryKey;
             object id;
             if (primaryKey.KeepIdentity)
@@ -270,38 +265,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
                 var sqlGetIndex = string.Format("select {0}.nextval from dual", sequenceName);//oracle不能同时执行多条语句
                 id = SqlStopWatch.ExecScalar(helper, sqlGetIndex);
             }
-            //foreach (Attribute.FieldAttribute info in typeArry)
-            //{
-            //    //if (info.FieldType != Attribute.FieldType.数据库字段)
-            //    //{
-            //    //    continue;
-            //    //}
-            //    string name = info.MapingName;
-            //    if (info.IsPrimaryKey && !info.KeepIdentity)
-            //    {
-            //        //continue;//手动插入ID
-            //    }
-            //    //if (!string.IsNullOrEmpty(info.VirtualField))
-            //    //{
-            //    //    continue;
-            //    //}
-            //    object value = info.GetValue(obj);
-            //    if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
-            //    {
-            //        if (value == null)
-            //        {
-            //            continue;
-            //        }
-            //    }
-            //    value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-            //    sql1 += string.Format("{0},", info.MapingName);
-            //    sql2 += string.Format("@{0},", info.MapingName);
-            //    helper.AddParam(info.MapingName, value);
-            //}
-            //sql1 = sql1.Substring(0, sql1.Length - 1);
-            //sql2 = sql2.Substring(0, sql2.Length - 1);
-            //sql += sql1 + ") values( " + sql2 + ")";
-            //sql = SqlFormat(sql);
+            
             var sql = GetInsertSql(dbContext, table, obj);
             //helper.SetParam(primaryKey.MapingName, id);
             SqlStopWatch.Execute(helper, sql);

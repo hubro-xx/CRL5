@@ -31,6 +31,10 @@ namespace CRL.DBExtend.RelationDB
             if (string.IsNullOrEmpty(rowOver))
             {
                 var table = TypeCache.GetTable(query1.__MainType);
+                if (table.PrimaryKey == null)
+                {
+                    throw new CRLException("分页缺少默认排序字段");
+                }
                 rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
             }
             var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "t.");
@@ -86,6 +90,10 @@ namespace CRL.DBExtend.RelationDB
             if (string.IsNullOrEmpty(rowOver))
             {
                 var table = TypeCache.GetTable(query1.__MainType);
+                if (table.PrimaryKey == null)
+                {
+                    throw new CRLException("分页缺少默认排序字段");
+                }
                 rowOver = string.Format("t1.{0} desc", table.PrimaryKey.MapingName);
             }
             //var orderBy = System.Text.RegularExpressions.Regex.Replace(rowOver, @"t\d\.", "");
