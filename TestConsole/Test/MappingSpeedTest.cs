@@ -59,6 +59,7 @@ namespace TestConsole
             {
                 query.Where(b => b.Id < id2 && b.Id > id);
             }
+            query.OrderBy(b => b.Id, false);
             var result = query.Top(takeCount).ToList();
 
         }
