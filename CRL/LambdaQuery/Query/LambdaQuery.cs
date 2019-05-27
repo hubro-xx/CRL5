@@ -272,6 +272,29 @@ namespace CRL.LambdaQuery
             }
             return this;
         }
+        /// <summary>
+        /// 左或右参数不为空时才成立
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQuery<T> WhereNotNull(Expression<Func<T, bool>> expression)
+        {
+            bool isNullValue;
+            var be = expression.Body as BinaryExpression;
+            var leftPar = __Visitor.RouteExpressionHandler(be.Left);
+            var rightPar = __Visitor.RouteExpressionHandler(be.Right);
+            var outLeft = __Visitor.DealCRLExpression(be.Left, leftPar, "", out isNullValue, true);
+            if (isNullValue)
+            {
+                return this;
+            }
+            var outRight = __Visitor.DealCRLExpression(be.Right, rightPar, "", out isNullValue, true);
+            if (isNullValue)
+            {
+                return this;
+            }
+            return Where(expression);
+        }
         #endregion
 
         #region order
@@ -345,6 +368,7 @@ namespace CRL.LambdaQuery
             {
                 EventLog.Log(sql + "\r\n", "LambdaQuery", false);
             }
+            Console.WriteLine(sql);
             return sql;
         }
         #endregion

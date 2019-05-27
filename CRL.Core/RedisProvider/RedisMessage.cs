@@ -47,10 +47,10 @@ namespace CRL.Core.RedisProvider
                     {
                         client.ListTrim(hashId, all.Count, -1);
                     }
-                    if (reSub.Count > 0)
+                    if (rePublish.Count > 0)
                     {
-                        Pubblish(reSub);
-                        reSub.Clear();
+                        Publish(rePublish);
+                        rePublish.Clear();
                     }
                     return true;
                 }, SleepSecond);
@@ -61,13 +61,13 @@ namespace CRL.Core.RedisProvider
         {
             return string.Format("RedisMessage_{0}",typeof(T).Name);
         }
-        public virtual void Pubblish(T message)
+        public virtual void Publish(T message)
         {
             var hashId = GetHashId();
             client.ListRightPush(hashId, message);
             //client.Pubblish(message);
         }
-        public virtual void Pubblish(List<T> messages)
+        public virtual void Publish(List<T> messages)
         {
             var hashId = GetHashId();
             foreach (var m in messages)
@@ -78,14 +78,14 @@ namespace CRL.Core.RedisProvider
 
         }
         protected abstract bool OnSubscribe(List<T> message);
-        List<T> reSub = new List<T>();
+        List<T> rePublish = new List<T>();
         /// <summary>
         /// 重新加入队列
         /// </summary>
         /// <param name="message"></param>
-        protected void ReSubscribe(T message)
+        protected void RePublish(T message)
         {
-            reSub.Add(message);
+            rePublish.Add(message);
         }
     }
 }

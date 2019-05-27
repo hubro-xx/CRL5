@@ -272,6 +272,15 @@ namespace CRLTest.Code
                 get; set;
             }
         }
+        public static void WhereNotNull()
+        {
+            var instance = MemberManage.Instance;
+            var query = instance.GetLambdaQuery();
+            string name = null;
+            name = "111";
+            query.WhereNotNull(b => b.Name == name);
+            query.PrintQuery();
+        }
 
         public static void TestUpdate()
         {

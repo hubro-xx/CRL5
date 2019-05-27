@@ -54,7 +54,6 @@ namespace CRL.LambdaQuery
         {
             return Prefixs[type] + fieldName;
         }
-
         /// <summary>
         /// 处理后的查询参数
         /// </summary>
@@ -590,10 +589,25 @@ namespace CRL.LambdaQuery
                 //当是常量转换方法
 
                 var method = mcExp.Method;
-                object obj;
-                if (mcExp.Method.IsStatic)//like DateTime.Parse("2016-02-11")
+                object obj = null;
+                if (method.IsStatic)//like DateTime.Parse("2016-02-11")
                 {
-                    obj = method.Invoke(null, arguments.ToArray());
+                    if (method.IsGenericMethod)//扩展方法,like public static bool Contains<TSource>(this IEnumerable<TSource> source, TSource value)
+                    {
+                        var valueObj = (ExpressionValueObj)arguments[1];
+                        if (valueObj == null)
+                        {
+                            throw new CRLException("不支持此语法:" + mcExp);
+                        }
+                        memberName = valueObj.member.Name;
+                        arguments = new List<object>() { arguments[0] };
+                        methodField = valueObj.Value.ToString();
+                        goto lable1;
+                    }
+                    else
+                    {
+                        obj = method.Invoke(null, arguments.ToArray());
+                    }
                 }
                 else//like time.AddDays(1)
                 {
@@ -617,6 +631,7 @@ namespace CRL.LambdaQuery
                 return exp2;
             }
         
+            lable1:
             var methodInfo = new CRLExpression.MethodCallObj() { Args = arguments, ExpressionType = nodeType.Value, MemberName = memberName, MethodName = methodName, MemberQueryName = methodField };
             methodInfo.ReturnType = mcExp.Type;
 

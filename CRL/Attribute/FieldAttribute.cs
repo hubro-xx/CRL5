@@ -160,8 +160,9 @@ namespace CRL.Attribute
  
             if (withTablePrefix)
             {
+                //mappNameFull = memberName;
                 FieldMapping.ResultName = mappNameFull;
-                mappNameFull = GetTableFieldFormat(TableName, mappNameFull);
+                mappNameFull = GetTableFieldFormat(TableName, MemberName);//始终返回属性名
                 //FieldMapping.QueryField = mappNameFull;
             }
 

@@ -187,7 +187,6 @@ namespace CRL.LambdaQuery
             _CurrentSelectFieldCache = fields;
             //__QueryFields = fields;
         }
-
         /// <summary>
         /// 转换为SQL条件，并提取参数
         /// </summary>
@@ -198,7 +197,9 @@ namespace CRL.LambdaQuery
             //string condition;
             if (expressionBody == null)
                 return null;
+
             var result = __Visitor.RouteExpressionHandler(expressionBody, firstLevel: true);
+
             if (string.IsNullOrEmpty(result.SqlOut))//没有构成树
             {
                 bool isNullValue;

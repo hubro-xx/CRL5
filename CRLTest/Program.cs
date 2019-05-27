@@ -64,9 +64,8 @@ namespace CRLTest
             Code.ProductDataManage.Instance.QueryItem(1);
         label1:
             //testSharding();
-            Code.TestAll.TestAnonymousResult();
-
             //TestAll();
+            Code.TestAll.WhereNotNull();
             Console.ReadLine();
             goto label1;
             Console.ReadLine();
