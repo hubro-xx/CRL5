@@ -37,7 +37,7 @@ namespace CRL.Runtime
         }
     }
     [Serializable]
-    public class RunTime : ICoreConfig<RunTime>
+    public class RunTime
     {
         public string path;
         public List<long> record = new List<long>();

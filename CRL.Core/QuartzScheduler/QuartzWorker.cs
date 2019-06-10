@@ -23,17 +23,6 @@ namespace CRL.Core.QuartzScheduler
 		}
         public static Dictionary<JobKey, bool> workCache = new Dictionary<JobKey, bool>();
 
-        /// <summary>
-        /// 添加任务
-        /// </summary>
-        /// <param name="jobs"></param>
-        public void AddWork(params QuartzJob[] jobs)
-        {
-            foreach(var item in jobs)
-            {
-                AddWork(item);
-            }
-        }
 
         /// <summary>
         /// 添加一个任务

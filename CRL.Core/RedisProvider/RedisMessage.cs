@@ -34,6 +34,8 @@ namespace CRL.Core.RedisProvider
             var hashId = GetHashId();
             if (!created)
             {
+                created = true;
+                Console.WriteLine("RedisMessage" + typeof(T) + "启动订阅");
                 //client.Subscribe<T>(OnSubscribe);
                 new ThreadWork().Start(hashId, () =>
                 {
