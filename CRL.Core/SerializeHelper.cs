@@ -186,7 +186,7 @@ namespace CRL.Core
         /// <returns></returns>
         public static string SerializerToJson<T>(T obj)
         {
-            return fastJSON.JSON.ToJSON(obj, new fastJSON.JSONParameters() { EnableAnonymousTypes = true, SerializeNullValues = false });
+            return fastJSON.JSON.ToJSON(obj, new fastJSON.JSONParameters() { EnableAnonymousTypes = true, SerializeNullValues = false,  UseEscapedUnicode=false });
             //Type type = typeof(T);
             //DataContractJsonSerializer serilializer = new DataContractJsonSerializer(type);
             //using (Stream stream = new MemoryStream())

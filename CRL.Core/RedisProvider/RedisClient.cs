@@ -16,6 +16,10 @@ namespace CRL.Core.RedisProvider
     public class RedisClient
     {
         int _id = -1;
+        public RedisClient()
+        {
+            _id = -1;
+        }
         public RedisClient(int db = -1)
         {
             _id = db;

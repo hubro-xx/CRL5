@@ -41,7 +41,8 @@ namespace CRLTest
             //var s2= ConvertObject(typeof(CRL.DBAccess.DBType), "1");
             //var s3 = ConvertObject(typeof(decimal), "");
 
-
+            var test2 = new test2() { name="中广开言路上" };
+            var json = CRL.Core.SerializeHelper.SerializerToJson(test2);
             //自定义定位
             CRL.Sharding.LocationManage.Register<Code.Sharding.MemberSharding>((t, a) =>
             {
@@ -61,7 +62,7 @@ namespace CRLTest
                 {
                     return new CRL.DBAccessBuild(DBType.MSSQL, "Data Source=.;Initial Catalog=" + dbLocation.ShardingLocation.DataBaseName + ";User ID=sa;Password=123");
                 }
-                return new CRL.DBAccessBuild(DBType.MSSQL, "server=47.105.149.240,1433;database=testDb; uid=hwsc;pwd=HNHWYY_2018;");
+                return new CRL.DBAccessBuild(DBType.MSSQL, "server=.;database=testDb; uid=sa;pwd=123;");
             };
 
 
