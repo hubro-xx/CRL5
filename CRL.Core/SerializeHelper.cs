@@ -186,8 +186,7 @@ namespace CRL.Core
         /// <returns></returns>
         public static string SerializerToJson<T>(T obj)
         {
-            var jsonSerialize = new System.Web.Script.Serialization.JavaScriptSerializer();
-            return jsonSerialize.Serialize(obj);
+            return fastJSON.JSON.ToJSON(obj, new fastJSON.JSONParameters() { EnableAnonymousTypes = true, SerializeNullValues = false });
             //Type type = typeof(T);
             //DataContractJsonSerializer serilializer = new DataContractJsonSerializer(type);
             //using (Stream stream = new MemoryStream())
@@ -209,8 +208,7 @@ namespace CRL.Core
         /// <returns></returns>
         public static T DeserializeFromJson<T>(string json)
         {
-            var jsonSerialize = new System.Web.Script.Serialization.JavaScriptSerializer();
-            return jsonSerialize.Deserialize<T>(json);
+            return fastJSON.JSON.ToObject<T>(json);
             //byte[] buffer = Encoding.UTF8.GetBytes(json);
             //var type = typeof(T);
             //using (MemoryStream ms = new MemoryStream(buffer))

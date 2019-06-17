@@ -125,7 +125,7 @@ namespace CRL.Core
                 Thread thread = new Thread(new ThreadStart(work));
                 thread.Start();
             }
-            AutoResetEvent.WaitAll(waits);//等待Waits中的所有对象发出信号
+            WaitHandle.WaitAll(waits);//等待Waits中的所有对象发出信号
             workStatus = Status.结束;
             //失败任务重新开始,直到完成
             if (failed.Count > 0)

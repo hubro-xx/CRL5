@@ -491,14 +491,20 @@ namespace CRL.LambdaQuery
             else
             {
                 firstArgs = mcExp.Object;//like b.Id.ToString()
-                if (allArguments.Count > 0 && allArguments[0] is MemberExpression)//like ids.Contains(b.Id)
+                if (allArguments.Count > 0 && (allArguments[0] is MemberExpression))//like ids.Contains(b.Id)
                 {
-                    firstArgs = allArguments[0];
-                    argsIndex = 1;
-                    allArguments.Add(mcExp.Object);
-                    if (firstArgs.Type.Name.Contains("LambdaQueryJoin"))
+                    var mexp2 = allArguments[0] as MemberExpression;
+                    var firstArgsM = firstArgs as MemberExpression;
+                    //var par2 = (ParameterExpression)mexp2.Expression;
+                    if (mexp2.Expression is ParameterExpression && firstArgsM.Expression is ConstantExpression)
                     {
-                        isLambdaQueryJoinExt = true;
+                        firstArgs = allArguments[0];
+                        argsIndex = 1;
+                        allArguments.Add(mcExp.Object);
+                        if (firstArgs.Type.Name.Contains("LambdaQueryJoin"))
+                        {
+                            isLambdaQueryJoinExt = true;
+                        }
                     }
                 }
             }

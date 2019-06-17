@@ -17,7 +17,7 @@ namespace CRL
 {
 
 
-    internal static class ReflectionHelper
+    public static class ReflectionHelper
     {
         static Dictionary<Type, object> ReflectionInfoCache = new Dictionary<Type, object>(50);
         public static ReflectionInfo<TObject> GetInfo<TObject>(System.Reflection.ConstructorInfo constructor = null)

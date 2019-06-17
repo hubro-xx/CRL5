@@ -1,4 +1,5 @@
-﻿using CRL.DBAccess;
+﻿using CRL;
+using CRL.DBAccess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CRLTest
 {
-    public class testClass
+    class testClass
     {
         public string name
         {
@@ -36,6 +37,11 @@ namespace CRLTest
         }
         static void Main(string[] args)
         {
+
+            //var s2= ConvertObject(typeof(CRL.DBAccess.DBType), "1");
+            //var s3 = ConvertObject(typeof(decimal), "");
+
+
             //自定义定位
             CRL.Sharding.LocationManage.Register<Code.Sharding.MemberSharding>((t, a) =>
             {
@@ -55,17 +61,19 @@ namespace CRLTest
                 {
                     return new CRL.DBAccessBuild(DBType.MSSQL, "Data Source=.;Initial Catalog=" + dbLocation.ShardingLocation.DataBaseName + ";User ID=sa;Password=123");
                 }
-                return new CRL.DBAccessBuild(DBType.MSSQL, "Data Source=.;Initial Catalog=testdb;User ID=sa;Password=123");
+                return new CRL.DBAccessBuild(DBType.MSSQL, "server=47.105.149.240,1433;database=testDb; uid=hwsc;pwd=HNHWYY_2018;");
             };
 
 
-            Code.MemberManage.Instance.QueryItem(1);
-            Code.OrderManage.Instance.QueryItem(1);
-            Code.ProductDataManage.Instance.QueryItem(1);
+        //Code.MemberManage.Instance.QueryItem(1);
+        //Code.OrderManage.Instance.QueryItem(1);
+        //Code.ProductDataManage.Instance.QueryItem(1);
         label1:
             //testSharding();
             //TestAll();
-            Code.TestAll.WhereNotNull();
+            var str = "ffsf";
+            Code.TestAll.Test5(str);
+            //Code.TestAll.TestUnion();
             Console.ReadLine();
             goto label1;
             Console.ReadLine();
@@ -102,5 +110,8 @@ namespace CRLTest
  
             }
         }
+
+
+        
     }
 }

@@ -41,7 +41,7 @@ namespace CRLTest.Code
             var sql = query.ToString();
             Console.WriteLine(sql);
         }
-        public static void TestMethod()
+        public static void TestMethod(string str="123")
         {
             //扩展方法测试
             //var instance = Code.ProductDataManage.Instance;
@@ -66,7 +66,7 @@ namespace CRLTest.Code
             query.Where(b => b.IsTop);//没有运算符的bool一元运算
             query.Where(b => 0 < b.Id && b.IsTop);//不再区分左边右边了
             query.Where(b => b.Id < b.Number);//直接比较可以解析通过
-            query.Where(b => b.ProductName.Contains("122"));//包含字符串
+            query.Where(b => b.ProductName.Contains(str));//包含字符串
             query.Where(b => !b.ProductName.Contains("122"));//不包含字符串
             query.Where(b => b.CategoryName.Contains(b.BarCode));//支持属性调用了
             query.Where(b => b.ProductName.In("111", "222"));//string in
@@ -123,6 +123,7 @@ namespace CRLTest.Code
             var sql = query.PrintQuery();
             Console.WriteLine(sql);
         }
+
         public static void TestIn()
         { 
             //按IN查询
@@ -368,6 +369,27 @@ namespace CRLTest.Code
                 throw new Exception("事务未回滚");
             }
             #endregion
+        }
+
+        public class testC
+        {
+            public int? id
+            {
+                get;set;
+            }
+        }
+        public static void Test5(string abc)
+        {
+            var query = ProductDataManage.Instance.GetLambdaQuery();
+            query.Page(2,1);
+            //query.Where(b => b.Id > 1 && b.CategoryName.StartsWith(b.ProductName));
+            query.Join<Code.Order>((a, b) => a.Id == b.Id).Select((a, b) => new testC { id = b.Id }).OrderBy(b => b.id).ToList();
+            var list = new List<int>() { 1,2,3};
+            //query.Where(b=>list.Contains(b.Id));
+            //query.Where(b => b.Id > 1 && b.CategoryName.StartsWith(abc));
+            //query.Join<Member>((a, b) => a.Id == b.Id)
+            //    .Select((a, b) => b).ToList();
+            Console.WriteLine(query.ToString());
         }
     }
 }

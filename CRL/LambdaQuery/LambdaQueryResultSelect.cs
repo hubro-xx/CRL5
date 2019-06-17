@@ -104,6 +104,13 @@ namespace CRL.LambdaQuery
             {
                 throw new CRLException("请返回匿名类型" + resultSelectorBody);
             }
+            else if(resultSelectorBody is ParameterExpression)
+            {
+                //TODO 按指定类型创建结果
+                throw new NotSupportedException("不支持此条件选择" + resultSelectorBody);
+                //var par= resultSelectorBody as ParameterExpression;
+                //return db.QueryList<TResult>(BaseQuery);
+            }
        
             throw new CRLException("ToList不支持此表达式 " + resultSelectorBody);
         }

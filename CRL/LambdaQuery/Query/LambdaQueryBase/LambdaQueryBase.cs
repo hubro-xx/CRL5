@@ -126,7 +126,7 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        internal string GetPrefix(Type type = null)
+        internal string GetPrefix(Type type = null,bool checkExists = false)
         {
             if (type == null)
             {
@@ -134,6 +134,10 @@ namespace CRL.LambdaQuery
             }
             string prefix;
             var a = __Prefixs.TryGetValue(type, out prefix);
+            if (checkExists && !a)//当为匿名类型,暂无法判断前辍
+            {
+                return "";
+            }
             if (!a)
             {
                 prefixIndex += 1;

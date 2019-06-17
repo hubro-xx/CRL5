@@ -202,13 +202,14 @@ namespace CRL.LambdaQuery
             string parName = GetParamName("like", parIndex);
             parIndex += 1;
 
-            if (args is ExpressionValueObj)
+            if (args is ExpressionValueObj)//like 字段名 '%'+t1.[ProductName1]
             {
                 parName = args.ToString();
-                //if (!parName.ToString().Contains("%"))
-                //{
-                //    parName = string.Format(likeFormat, parName);
-                //}
+
+                likeFormat = likeFormat.Replace("%", "+'%'+");
+                parName = string.Format(likeFormat, parName);
+                parName = System.Text.RegularExpressions.Regex.Replace(parName,@"^\+","");
+                parName = System.Text.RegularExpressions.Regex.Replace(parName, @"\+$", "");
             }
             else
             {
@@ -490,33 +491,7 @@ namespace CRL.LambdaQuery
         }
         public string StartsWith(CRLExpression.MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
-            var field = methodInfo.MemberQueryName;
-            var nodeType = methodInfo.ExpressionType;
-            var args = methodInfo.Args;
-            var par = args[0].ToString();
-            string parName = GetParamName("startsWith", parIndex);
-            parIndex += 1;
-            var args1 = args[0];
-            if (args1 is ExpressionValueObj)
-            {
-                parName = args1.ToString();
-            }
-            else
-            {
-                addParame(parName, par);
-            }
-            var str = dBAdapter.SubstringFormat(field, 0, par.Length);
-
-            var operate = ExpressionVisitor.ExpressionTypeCast(nodeType);
-            return string.Format("{0}{2}{1}", str, parName, operate);
-            //if (nodeType == ExpressionType.Equal)
-            //{
-            //    return string.Format("{0}={1}", str, parName);
-            //}
-            //else
-            //{
-            //    return string.Format("{0}!={1}", str, parName);
-            //}
+            return StringLikeRight(methodInfo, ref parIndex, addParame);
         }
     }
 }

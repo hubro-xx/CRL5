@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 namespace CRL.Core.RedisProvider
 {
-    public static class StackExchangeRedisHelper
+    public class StackExchangeRedisHelper
     {
         private static readonly string Coonstr = RedisClient.GetRedisConn();
         private static object _locker = new Object();
@@ -62,20 +62,22 @@ namespace CRL.Core.RedisProvider
                 return _instance;
             }
         }
-        static StackExchangeRedisHelper()
+        int _id = -1;
+        public StackExchangeRedisHelper(int db=-1)
         {
+            _id = db;
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public static IDatabase GetDatabase()
+        public IDatabase GetDatabase()
         {
-            return Instance.GetDatabase();
+            return Instance.GetDatabase(_id);
         }
 
-        private static string MergeKey(string key)
+        private string MergeKey(string key)
         {
             return key;
         }
@@ -85,7 +87,7 @@ namespace CRL.Core.RedisProvider
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static T Get<T>(string key)
+        public T Get<T>(string key)
         {
             key = MergeKey(key);
             return Deserialize<T>(GetDatabase().StringGet(key));
@@ -95,7 +97,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static string Get(string key)
+        public string Get(string key)
         {
             key = MergeKey(key);
             return GetDatabase().StringGet(key);
@@ -106,7 +108,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public static bool Set(string key, object value, TimeSpan expireIn)
+        public bool Set(string key, object value, TimeSpan expireIn)
         {
             key = MergeKey(key);
             return GetDatabase().StringSet(key, Serialize(value), expireIn);
@@ -117,7 +119,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static bool Exists(string key)
+        public bool Exists(string key)
         {
             key = MergeKey(key);
             return GetDatabase().KeyExists(key);  //可直接调用
@@ -129,7 +131,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="key">需要移除的主键,一般为对象ID值</param>
         /// <returns></returns>
-        public static bool HRemove(string hashId, string key)
+        public bool HRemove(string hashId, string key)
         {
             return GetDatabase().HashDelete(hashId,key);
         }
@@ -139,7 +141,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="key">需要写入的主键,一般为对象ID值,必须是文本/数字等对象</param>
         /// <param name="value">对象</param>
-        public static bool HSet(string hashId, string key, object value)
+        public bool HSet(string hashId, string key, object value)
         {
             return GetDatabase().HashSet(hashId, key, Serialize(value));
         }
@@ -149,7 +151,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="key">需要获取的主键,一般为对象ID值</param>
         /// <returns></returns>
-        public static T HGet<T>(string hashId, string key)
+        public T HGet<T>(string hashId, string key)
         {
             if (string.IsNullOrEmpty(hashId))
             {
@@ -167,7 +169,7 @@ namespace CRL.Core.RedisProvider
             }
             return Deserialize<T>(result);
         }
-        public static bool HContainsKey(string hashId, string key)
+        public bool HContainsKey(string hashId, string key)
         {
             if (string.IsNullOrEmpty(hashId))
             {
@@ -179,7 +181,7 @@ namespace CRL.Core.RedisProvider
             }
             return GetDatabase().HashExists(hashId,key);
         }
-        public static List<T> HGetAll<T>(string hashId)
+        public List<T> HGetAll<T>(string hashId)
         {
             var result = GetDatabase().HashGetAll(hashId);
             var list = new List<T>();
@@ -190,7 +192,7 @@ namespace CRL.Core.RedisProvider
             }
             return list;
         }
-        public static long GetHashCount(string hashId)
+        public long GetHashCount(string hashId)
         {
             return GetDatabase().HashLength(hashId);
         }
@@ -202,7 +204,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static bool Remove(string key)
+        public bool Remove(string key)
         {
             key = MergeKey(key);
             return GetDatabase().KeyDelete(key);
@@ -213,7 +215,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        public static async Task SetAsync(string key, object value)
+        public async Task SetAsync(string key, object value)
         {
             key = MergeKey(key);
             await GetDatabase().StringSetAsync(key, Serialize(value));
@@ -224,7 +226,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static async Task<object> GetAsync(string key)
+        public async Task<object> GetAsync(string key)
         {
             key = MergeKey(key);
             object value = await GetDatabase().StringGetAsync(key);
@@ -236,7 +238,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static long Increment(string key)
+        public long Increment(string key)
         {
             key = MergeKey(key);
             //三种命令模式
@@ -253,7 +255,7 @@ namespace CRL.Core.RedisProvider
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static long Decrement(string key, string value)
+        public long Decrement(string key, string value)
         {
             key = MergeKey(key);
             return GetDatabase().HashDecrement(key, value, flags: CommandFlags.FireAndForget);
@@ -295,7 +297,7 @@ namespace CRL.Core.RedisProvider
         /// <param name="channel"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static long Publish(string channel, string message)
+        public long Publish(string channel, string message)
         {
             ISubscriber sub = Instance.GetSubscriber();
             //return sub.Publish("messages", "hello");
@@ -307,7 +309,7 @@ namespace CRL.Core.RedisProvider
         /// </summary>
         /// <param name="channelFrom"></param>
         /// <returns></returns>
-        public static void Subscribe<T>(string channelFrom, Action<T> callBack)
+        public void Subscribe<T>(string channelFrom, Action<T> callBack)
         {
             ISubscriber sub = Instance.GetSubscriber();
             sub.Subscribe(channelFrom, (channel, message) =>
@@ -334,7 +336,7 @@ namespace CRL.Core.RedisProvider
         /// 如果报错在连接字符串后加 ,allowAdmin=true;
         /// </summary>
         /// <returns></returns>
-        public static IServer GetServer(string host, int port)
+        public IServer GetServer(string host, int port)
         {
             IServer server = Instance.GetServer(host, port);
             return server;
@@ -344,20 +346,25 @@ namespace CRL.Core.RedisProvider
         /// 获取全部终结点
         /// </summary>
         /// <returns></returns>
-        public static EndPoint[] GetEndPoints()
+        public EndPoint[] GetEndPoints()
         {
             EndPoint[] endpoints = Instance.GetEndPoints();
             return endpoints;
         }
-        public static long ListRightPush(string key, object value)
+        public long ListRightPush<T>(string key, T value)
         {
-            return GetDatabase().ListRightPush(key, Serialize(value));
+            return ListRightPush(key, Serialize(value));
+            //return GetDatabase().ListRightPush(key, Serialize(value));
         }
-        public static long ListRemove(string key, object value)
+        public long ListRightPush(string key, string value)
+        {
+            return GetDatabase().ListRightPush(key, value);
+        }
+        public long ListRemove(string key, object value)
         {
             return GetDatabase().ListRemove(key, Serialize(value));
         }
-        public static List<T> ListRange<T>(string key, long start, long end)
+        public List<T> ListRange<T>(string key, long start, long end)
         {
             var list = new List<T>();
             var result = GetDatabase().ListRange(key, start, end);
@@ -368,11 +375,11 @@ namespace CRL.Core.RedisProvider
             }
             return list;
         }
-        public static void ListTrim(string key, long start, long end)
+        public void ListTrim(string key, long start, long end)
         {
             GetDatabase().ListTrim(key, start, end);
         }
-        public static long ListLength(string key)
+        public long ListLength(string key)
         {
             return GetDatabase().ListLength(key);
         }

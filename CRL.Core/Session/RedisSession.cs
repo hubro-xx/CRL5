@@ -12,6 +12,7 @@ namespace CRL.Core.Session
     /// </summary>
     public class RedisSession : AbsSession
     {
+        RedisClient client;
         static int timeOut = 30;
         /// <summary>
         /// 初始化
@@ -30,6 +31,7 @@ namespace CRL.Core.Session
             {
                 SessionId = cookie.Value;
             }
+            client = new RedisClient(1);
         }
 
         /// <summary>
@@ -43,7 +45,7 @@ namespace CRL.Core.Session
 
         SessionObj getSession()
         {
-            var obj = new RedisClient().KGet<SessionObj>(SessionId);
+            var obj = client.KGet<SessionObj>(SessionId);
             if (obj == null)
             {
                 return null;
@@ -83,7 +85,7 @@ namespace CRL.Core.Session
                 sessionObj.Data = new Dictionary<string, string>();
             }
             sessionObj.Data[name] = SerializeHelper.SerializerToJson(value);
-            new RedisClient().KSet(SessionId, sessionObj, new TimeSpan(0, timeOut, 0));
+            client.KSet(SessionId, sessionObj, new TimeSpan(0, timeOut, 0));
         }
 
         public override void Remove(string name)
@@ -98,17 +100,17 @@ namespace CRL.Core.Session
                 return;
             }
             sessionObj.Data.Remove(name);
-            new RedisClient().KSet(SessionId, sessionObj, new TimeSpan(0, timeOut, 0));
+            client.KSet(SessionId, sessionObj, new TimeSpan(0, timeOut, 0));
         }
 
         public override void Clean()
         {
-            new RedisClient().Remove(SessionId);
+            client.Remove(SessionId);
         }
         public override void Refresh()
         {
             //每个请求会刷新
-            new RedisClient().KSetEntryIn(SessionId, new TimeSpan(0, timeOut, 0));
+            client.KSetEntryIn(SessionId, new TimeSpan(0, timeOut, 0));
         }
 
         /// <summary>
@@ -125,7 +127,7 @@ namespace CRL.Core.Session
         ///// <returns></returns>
         //public override T Get<T>()
         //{
-        //    return new RedisClient().KGet<T>(SessionId);
+        //    return client.KGet<T>(SessionId);
         //}
 
         ///// <summary>
@@ -134,7 +136,7 @@ namespace CRL.Core.Session
         ///// <returns></returns>
         //public override bool IsLogin()
         //{
-        //    return new RedisClient().KIsExist(SessionId);
+        //    return client.KIsExist(SessionId);
         //}
 
         ///// <summary>
@@ -144,7 +146,7 @@ namespace CRL.Core.Session
         ///// <param name="obj"></param>
         //public override void Login<T>(T obj)
         //{
-        //    new RedisClient().KSet(SessionId, obj, new TimeSpan(0, Managers.TimeOut, 0));
+        //    client.KSet(SessionId, obj, new TimeSpan(0, Managers.TimeOut, 0));
         //}
 
         ///// <summary>
@@ -152,7 +154,7 @@ namespace CRL.Core.Session
         ///// </summary>
         //public override void Quit()
         //{
-        //    new RedisClient().KRemove(SessionId);
+        //    client.KRemove(SessionId);
         //}
 
         ///// <summary>
@@ -160,7 +162,7 @@ namespace CRL.Core.Session
         ///// </summary>
         //public override void Postpone()
         //{
-        //    new RedisClient().KSetEntryIn(SessionId, new TimeSpan(0, Managers.TimeOut, 0));
+        //    client.KSetEntryIn(SessionId, new TimeSpan(0, Managers.TimeOut, 0));
         //}
     }
 }

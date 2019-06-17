@@ -174,7 +174,7 @@ namespace CRL.LambdaQuery
                 {
                     //按匿名对象属性,视图关联时用
                     var _f = new Attribute.FieldAttribute() { MemberName = mExp.Member.Name, PropertyType = mExp.Type };
-                    var f3 = _f.GetFieldMapping(__DBAdapter, GetPrefix(mExp.Expression.Type), withTablePrefix, mExp.Member.Name);
+                    var f3 = _f.GetFieldMapping(__DBAdapter, GetPrefix(mExp.Expression.Type,true), withTablePrefix, mExp.Member.Name);
                     return new SelectFieldInfo(f3);
                 }
                 CRL.Attribute.FieldAttribute f;
@@ -206,6 +206,7 @@ namespace CRL.LambdaQuery
                 i += 1;
                 var item = args.Expression;
                 var memberName = args.Member.Name;
+                label1:
                 if (item is MethodCallExpression)//group用
                 {
                     var methodCallExpression = item as MethodCallExpression;
@@ -288,6 +289,12 @@ namespace CRL.LambdaQuery
                     }
                     //f.FieldQuery = new Attribute.FieldQuery() { MemberName = memberName, FieldName = f.MapingName, MethodName = "" };
                     resultFields.Add(_f2);
+                }
+                else if (item is UnaryExpression)
+                {
+                    var unaryExpression = item as UnaryExpression;
+                    item = unaryExpression.Operand;
+                    goto label1;
                 }
                 else
                 {

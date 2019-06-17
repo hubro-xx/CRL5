@@ -15,10 +15,15 @@ namespace CRL.Core.RedisProvider
     /// </summary>
     public class RedisClient
     {
+        int _id = -1;
+        public RedisClient(int db = -1)
+        {
+            _id = db;
+        }
         public static Func<string> GetRedisConn;
         public bool Remove(string key)
         {
-            return StackExchangeRedisHelper.Remove(key);
+            return new StackExchangeRedisHelper(_id).Remove(key);
         }
 
         public T KGet<T>(string key)
@@ -49,7 +54,7 @@ namespace CRL.Core.RedisProvider
         public string KGet(string key, out bool find)
         {
             find = false;
-            var str = StackExchangeRedisHelper.Get(key);
+            var str = new StackExchangeRedisHelper(_id).Get(key);
             find = str != null;
             return str;
         }
@@ -58,36 +63,36 @@ namespace CRL.Core.RedisProvider
         #region hash
         public void HSet(string hashId, string key, object obj)
         {
-            StackExchangeRedisHelper.HSet(hashId, key, obj);
+            new StackExchangeRedisHelper(_id).HSet(hashId, key, obj);
         }
 
         public bool HRemove(string hashId, string key)
         {
-            return StackExchangeRedisHelper.HRemove(hashId,key);
+            return new StackExchangeRedisHelper(_id).HRemove(hashId,key);
         }
 
         public T HGet<T>(string hashId, string key)
         {
-            return StackExchangeRedisHelper.HGet<T>(hashId, key);
+            return new StackExchangeRedisHelper(_id).HGet<T>(hashId, key);
         }
 
         public List<T> HGetAll<T>(string hashId)
         {
-            return StackExchangeRedisHelper.HGetAll<T>(hashId);
+            return new StackExchangeRedisHelper(_id).HGetAll<T>(hashId);
         }
 
         public bool HContainsKey(string hashId, string key)
         {
-            return StackExchangeRedisHelper.HContainsKey(hashId,key);
+            return new StackExchangeRedisHelper(_id).HContainsKey(hashId,key);
         }
 
         public long GetHashCount(string hashId)
         {
-            return StackExchangeRedisHelper.GetHashCount(hashId);
+            return new StackExchangeRedisHelper(_id).GetHashCount(hashId);
         }
         public List<string> HGetAllKeys(string hashId)
         {
-            var allKeys = StackExchangeRedisHelper.GetDatabase().HashKeys(hashId);
+            var allKeys = new StackExchangeRedisHelper(_id).GetDatabase().HashKeys(hashId);
             if (allKeys.Length == 0)
             {
                 return new List<string>();
@@ -102,17 +107,17 @@ namespace CRL.Core.RedisProvider
         /// <param name="expiresTime"></param>
         public void KSetEntryIn(string key, TimeSpan expiresTime)
         {
-            StackExchangeRedisHelper.GetDatabase().KeyExpire(key, expiresTime);
+            new StackExchangeRedisHelper(_id).GetDatabase().KeyExpire(key, expiresTime);
         }
 
         public void KSet(string key, object obj, TimeSpan timeSpan)
         {
-            StackExchangeRedisHelper.Set(key, obj, timeSpan);
+            new StackExchangeRedisHelper(_id).Set(key, obj, timeSpan);
         }
 
         public bool ContainsKey(string key)
         {
-            return StackExchangeRedisHelper.GetDatabase().KeyExists(key);
+            return new StackExchangeRedisHelper(_id).GetDatabase().KeyExists(key);
         }
         /// <summary>
         /// 递增
@@ -126,7 +131,7 @@ namespace CRL.Core.RedisProvider
             key = string.Format("Increment_{0}", key);
             var exis = ContainsKey(key);
 
-            var result = StackExchangeRedisHelper.GetDatabase().HashIncrement(key, type, num);
+            var result = new StackExchangeRedisHelper(_id).GetDatabase().HashIncrement(key, type, num);
             if (!exis)
             {
                 //自动失效,清理垃圾数据
@@ -141,14 +146,14 @@ namespace CRL.Core.RedisProvider
             var process = System.Diagnostics.Process.GetCurrentProcess().Id;
             var channelName = string.Format("{0}_{1}", process, typeof(T).Name);
             string ser = SerializeHelper.SerializerToJson(obj);
-            return StackExchangeRedisHelper.Publish(channelName, ser);
+            return new StackExchangeRedisHelper(_id).Publish(channelName, ser);
         }
         public void Subscribe<T>(Action<T> callBack)
         {
             //只限当前进程
             var process = System.Diagnostics.Process.GetCurrentProcess().Id;
             var channelName = string.Format("{0}_{1}", process, typeof(T).Name);
-            StackExchangeRedisHelper.Subscribe(channelName, callBack);
+            new StackExchangeRedisHelper(_id).Subscribe(channelName, callBack);
             EventLog.Info($"RedisMessage 启动 {channelName}");
         }
         #endregion
@@ -215,25 +220,29 @@ namespace CRL.Core.RedisProvider
         }
         #endregion
         #region list
-        public long ListRightPush(string key, object value)
+        public long ListRightPush<T>(string key, T value)
         {
-            return StackExchangeRedisHelper.ListRightPush(key, value);
+            return new StackExchangeRedisHelper(_id).ListRightPush(key, value);
+        }
+        public long ListRightPush(string key, string value)
+        {
+            return new StackExchangeRedisHelper(_id).ListRightPush(key, value);
         }
         public long ListRemove(string key, object value)
         {
-            return StackExchangeRedisHelper.ListRemove(key, value);
+            return new StackExchangeRedisHelper(_id).ListRemove(key, value);
         }
         public List<T> ListRange<T>(string key, long start, long end)
         {
-            return StackExchangeRedisHelper.ListRange<T>(key, start, end);
+            return new StackExchangeRedisHelper(_id).ListRange<T>(key, start, end);
         }
         public  void ListTrim(string key, long start, long end)
         {
-            StackExchangeRedisHelper.ListTrim(key, start, end);
+            new StackExchangeRedisHelper(_id).ListTrim(key, start, end);
         }
         public  long ListLength(string key)
         {
-            return StackExchangeRedisHelper.ListLength(key);
+            return new StackExchangeRedisHelper(_id).ListLength(key);
         }
         #endregion
 

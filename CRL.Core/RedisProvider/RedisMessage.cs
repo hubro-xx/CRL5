@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CRL.Core.RedisProvider
@@ -29,7 +30,20 @@ namespace CRL.Core.RedisProvider
         }
         public static bool created = false;
         protected RedisClient client = new RedisClient();
-        public RedisMessage()
+        public Type GetMessageType()
+        {
+            return typeof(T);
+        }
+        public RedisMessage(bool start = true)
+        {
+            if (start)
+            {
+                Start();
+            }
+        }
+        bool wait = false;
+        object lockObj = new object();
+        public void Start()
         {
             var hashId = GetHashId();
             if (!created)
@@ -39,19 +53,28 @@ namespace CRL.Core.RedisProvider
                 //client.Subscribe<T>(OnSubscribe);
                 new ThreadWork().Start(hashId, () =>
                 {
+                    //var len = GetLength();
+                    wait = false;
                     var all = client.ListRange<T>(hashId, 0, Take - 1);
                     if (all.Count == 0)
                     {
                         return true;
                     }
                     var a = OnSubscribe(all);
-                    if (a)
+                    lock (lockObj)
                     {
-                        client.ListTrim(hashId, all.Count, -1);
+                        wait = true;
+                        if (a)
+                        {
+                            client.ListTrim(hashId, all.Count, -1);
+                            //var len2 = GetLength();
+                            ///CRL.Core.EventLog.Log($"删除前{len} 获取:{all.Count} 删除后:{len2} 差异{len - all.Count != len2}", GetType().Name);
+                        }
+                        wait = false;
                     }
                     if (rePublish.Count > 0)
                     {
-                        Publish(rePublish);
+                        PublishList(rePublish);
                         rePublish.Clear();
                     }
                     return true;
@@ -65,16 +88,50 @@ namespace CRL.Core.RedisProvider
         }
         public virtual void Publish(T message)
         {
+            if (message == null)
+            {
+                return;
+            }
             var hashId = GetHashId();
             client.ListRightPush(hashId, message);
-            //client.Pubblish(message);
         }
-        public virtual void Publish(List<T> messages)
+        public void DeleteAll()
         {
+            var hashId = GetHashId();
+            client.Remove(hashId);
+        }
+        public long GetLength()
+        {
+            var hashId = GetHashId();
+            return client.ListLength(hashId);
+        }
+        public void PublishList(string jsonData)
+        {
+            if (string.IsNullOrEmpty(jsonData))
+            {
+                return;
+            }
+            var list = SerializeHelper.DeserializeFromJson<List<T>>(jsonData);
+            PublishList(list);
+        }
+        public virtual void PublishList(List<T> messages)
+        {
+           
+            if (messages == null)
+            {
+                return;
+            }
+            if (messages.Count == 0)
+            {
+                return;
+            }
             var hashId = GetHashId();
             foreach (var m in messages)
             {
-                //client.Pubblish(m);
+                while (wait)
+                {
+                    Thread.Sleep(10);
+                }
                 client.ListRightPush(hashId, m);
             }
 
