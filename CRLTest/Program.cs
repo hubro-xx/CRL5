@@ -1,5 +1,6 @@
 ﻿using CRL;
 using CRL.DBAccess;
+using CRLTest.Code;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,7 +74,7 @@ namespace CRLTest
             //testSharding();
             //TestAll();
             var str = "ffsf";
-            Code.TestAll.Test5(str);
+            Test5(str);
             //Code.TestAll.TestUnion();
             Console.ReadLine();
             goto label1;
@@ -112,7 +113,19 @@ namespace CRLTest
             }
         }
 
+        public static void Test5(string abc = "123")
+        {
+            var query = ProductDataManage.Instance.GetLambdaQuery();
+            query.Page(2, 1);
+            //query.Where(b => b.Id > 1 && b.CategoryName.StartsWith(b.ProductName));
+            //query.Join<Code.Order>((a, b) => a.Id == b.Id).Select((a, b) => new testC { id = b.Id }).OrderBy(b => b.id).ToList();
+            var list = new List<int>() { 1, 2, 3 };
+            //query.Where(b=>list.Contains(b.Id));
+            query.Where(b => b.Id > 1 && b.CategoryName.StartsWith(abc));
+            query.Join<Member>((a, b) => a.Id == b.Id)
+                .Select((a, b) => b).ToList();
+            Console.WriteLine(query.ToString());
+        }
 
-        
     }
 }

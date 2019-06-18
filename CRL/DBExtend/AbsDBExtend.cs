@@ -761,7 +761,7 @@ namespace CRL
         /// <param name="query"></param>
         /// <param name="cacheKey"></param>
         /// <returns></returns>
-        public abstract List<TModel> QueryOrFromCache<TModel>(CRL.LambdaQuery.LambdaQuery<TModel> query, out string cacheKey) where TModel : CRL.IModel, new();
+        public abstract List<TModel> QueryOrFromCache<TModel>(LambdaQuery.LambdaQueryBase query, out string cacheKey) where TModel : CRL.IModel, new();
         #endregion
 
         #region 存储过程

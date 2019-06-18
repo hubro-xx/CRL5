@@ -200,7 +200,7 @@ namespace CRL.DBExtend.MongoDBEx
         }
         #endregion
 
-        public override List<TModel> QueryOrFromCache<TModel>(LambdaQuery.LambdaQuery<TModel> query1, out string cacheKey)
+        public override List<TModel> QueryOrFromCache<TModel>(LambdaQueryBase query1, out string cacheKey)
         {
             cacheKey = "none";
             var query = query1 as MongoDBLambdaQuery<TModel>;

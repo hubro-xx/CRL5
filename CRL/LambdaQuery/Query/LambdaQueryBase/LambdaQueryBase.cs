@@ -57,6 +57,11 @@ namespace CRL.LambdaQuery
         /// </summary>
         public int SkipPage = 0;
 
+
+        /// <summary>
+        /// 是否自动跟踪对象状态
+        /// </summary>
+        internal bool __TrackingModel = true;
         /// <summary>
         /// group字段 QueryField
         /// </summary>

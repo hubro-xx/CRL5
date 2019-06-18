@@ -28,7 +28,7 @@ namespace CRL.DBExtend.RelationDB
         /// <param name="query"></param>
         /// <param name="cacheKey">cacheKey</param>
         /// <returns></returns>
-        public override List<TModel> QueryOrFromCache<TModel>(LambdaQuery<TModel> query, out string cacheKey)
+        public override List<TModel> QueryOrFromCache<TModel>(LambdaQueryBase query, out string cacheKey)
         {
             cacheKey = "";
             CheckTableCreated<TModel>();

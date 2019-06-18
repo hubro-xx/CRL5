@@ -68,13 +68,6 @@ namespace CRL.LambdaQuery
         /// </summary>
         internal string __FieldFunctionFormat = "";
 
-
-
-
-        /// <summary>
-        /// 是否自动跟踪对象状态
-        /// </summary>
-        internal bool __TrackingModel = true;
         #endregion
 
 

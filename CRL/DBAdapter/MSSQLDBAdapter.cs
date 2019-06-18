@@ -68,7 +68,6 @@ end", spName, script);
             dic.Add(typeof(System.Object), "nvarchar(30)");
             dic.Add(typeof(System.Byte[]), "varbinary({0})");
             dic.Add(typeof(System.Guid), "uniqueidentifier");
-            dic.Add(typeof(System.Int64), "timestamp");
             return dic;
         }
         /// <summary>
