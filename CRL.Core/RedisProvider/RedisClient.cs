@@ -62,7 +62,10 @@ namespace CRL.Core.RedisProvider
             find = str != null;
             return str;
         }
-
+        public List<string> SearchKey(string key)
+        {
+            return new StackExchangeRedisHelper(_id).SearchKey(key);
+        }
 
         #region hash
         public void HSet(string hashId, string key, object obj)

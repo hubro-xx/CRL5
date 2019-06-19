@@ -16,6 +16,7 @@ namespace CRL.Core.RedisProvider
         private static readonly string Coonstr = RedisClient.GetRedisConn();
         private static object _locker = new Object();
         private static ConnectionMultiplexer _instance = null;
+        static string host;
         /// <summary>
         /// 使用一个静态属性来返回已连接的实例，如下列中所示。这样，一旦 ConnectionMultiplexer 断开连接，便可以初始化新的连接实例。
         /// </summary>
@@ -46,6 +47,7 @@ namespace CRL.Core.RedisProvider
                             {
                                 ip = arry1[0];
                             }
+                            host = ip;
                             var options = ConfigurationOptions.Parse(ip);
                             options.Password = pass;
                             _instance = ConnectionMultiplexer.Connect(options);
@@ -62,10 +64,10 @@ namespace CRL.Core.RedisProvider
                 return _instance;
             }
         }
-        int _id = -1;
+        int _db = -1;
         public StackExchangeRedisHelper(int db=-1)
         {
-            _id = db;
+            _db = db;
         }
 
         /// <summary>
@@ -74,7 +76,12 @@ namespace CRL.Core.RedisProvider
         /// <returns></returns>
         public IDatabase GetDatabase()
         {
-            return Instance.GetDatabase(_id);
+            return Instance.GetDatabase(_db);
+        }
+        public List<string> SearchKey(string key)
+        {
+            var db = _db < 0 ? 0 : _db;
+            return Instance.GetServer(host).Keys(db, key + "*").Select(b => b.ToString()).ToList();
         }
 
         private string MergeKey(string key)

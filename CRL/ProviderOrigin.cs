@@ -88,12 +88,19 @@ namespace CRL
             {
                 if (_RedisClient == null)
                 {
-                    _RedisClient = new Core.RedisProvider.RedisClient();
+                    _RedisClient = new Core.RedisProvider.RedisClient(RedisDbIndex);
                 }
                 return _RedisClient;
             }
         }
         #region redis 仅HASH 如果重载了，则在操作实体时写入REDIS
+        protected virtual int RedisDbIndex
+        {
+            get
+            {
+                return -1;
+            }
+        }
         /// <summary>
         /// 重写获到HashId
         /// </summary>
