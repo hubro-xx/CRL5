@@ -36,7 +36,8 @@ namespace CRLTest.Code
                 name2 = b.ProductName.Substring(0, 2),
                 time = time,
                 aa = DateTime.Parse("2016-02-11 12:56"),
-                aa2 = Convert.ToDateTime(times)
+                aa2 = Convert.ToDateTime(times),
+                field = "field"
             }).ToList();
             var sql = query.ToString();
             Console.WriteLine(sql);

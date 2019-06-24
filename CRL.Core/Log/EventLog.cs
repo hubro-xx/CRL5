@@ -264,7 +264,7 @@ namespace CRL.Core
                 if (timer == null)
                 {
                     timer = new System.Timers.Timer();
-                    timer.Interval = 2000;
+                    timer.Interval = 1000;
                     timer.Elapsed += new System.Timers.ElapsedEventHandler(timer_Elapsed);
                     timer.Start();
                 }

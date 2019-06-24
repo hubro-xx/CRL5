@@ -207,9 +207,14 @@ namespace CRL
         /// 更新所有数据到REDIS 
         /// 仅测试
         /// </summary>
-        public int UpdateAllToRedis()
+        public int UpdateAllDataToRedis(Expression<Func<T, bool>> expression= null)
         {
-            var list = QueryList(b => true);
+            var query = GetLambdaQuery();
+            if (expression == null)
+            {
+                query.Where(expression);
+            }
+            var list = query.ToList();
             var type = typeof(T).Name;
             Console.WriteLine($"{type} 总数:{list.Count}条");
             var allHash = list.Select(b => GetHashId(b)).GroupBy(b => b).Select(b => b.Key).ToList();

@@ -74,7 +74,8 @@ namespace CRLTest
             //testSharding();
             //TestAll();
             var str = "ffsf";
-            Test5(str);
+            //Test5(str);
+            Code.TestAll.TestSelect();
             //Code.TestAll.TestUnion();
             Console.ReadLine();
             goto label1;
