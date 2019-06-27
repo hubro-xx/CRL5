@@ -30,6 +30,10 @@ namespace CRL.Core
             lock (lockObj)
             {
                 cacheObj = handler();
+                if (cacheObj == null)
+                {
+                    return default(T);
+                }
                 cache.Insert(key, cacheObj, null, DateTime.Now.AddMinutes(minute), System.Web.Caching.Cache.NoSlidingExpiration);
             }
             return (T)cacheObj;
