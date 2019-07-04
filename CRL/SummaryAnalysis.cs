@@ -18,6 +18,7 @@ namespace CRL
     /// </summary>
     public class SummaryAnalysis
     {
+        public static bool OnlyCRLModel = true;
         #region obj
         class ObjItem
         {
@@ -59,18 +60,19 @@ namespace CRL
                 Type[] types = assembyle.GetTypes();
                 foreach (var type in types)
                 {
-                    if(!typeof(CRL.IModel).IsAssignableFrom(type))
+                    if (OnlyCRLModel && !typeof(CRL.IModel).IsAssignableFrom(type))
                     {
                         continue;
                     }
+                    bool remove = false;
                     foreach (var k in removeKeys)
                     {
                         if (type.FullName.Contains(k))
                         {
-                            continue;
+                            remove = true;
                         }
                     }
-                    if (type.IsClass)
+                    if (!remove && type.IsClass)
                     {
                         findTypes.Add(type);
                     }
