@@ -49,5 +49,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CRL.RPC\CRL.RPC.csproj">
+      <Project>{a5f7c0ae-af7a-45f6-8f50-c3ae5616abbe}</Project>
+      <Name>CRL.RPC</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
