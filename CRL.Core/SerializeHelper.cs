@@ -217,5 +217,9 @@ namespace CRL.Core
             //    return (T)serializer.ReadObject(ms);
             //}
         }
+        public static object DeserializeFromJson(string json, Type type)
+        {
+            return fastJSON.JSON.ToObject(json, type);
+        }
     }
 }
