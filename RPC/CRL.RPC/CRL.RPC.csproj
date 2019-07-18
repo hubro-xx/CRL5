@@ -95,7 +95,7 @@
     <Compile Include="Message.cs" />
     <Compile Include="ResponseWaits.cs" />
     <Compile Include="RPCClient.cs" />
-    <Compile Include="RPCClientFactory.cs" />
+    <Compile Include="RPCClientConnect.cs" />
     <Compile Include="RPCServer.cs" />
   </ItemGroup>
   <ItemGroup>

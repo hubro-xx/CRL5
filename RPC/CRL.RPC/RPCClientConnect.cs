@@ -1,14 +1,21 @@
 ﻿
 using ImpromptuInterface;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace CRL.RPC
 {
 
-    public class RPCClientFactory
+    public class RPCClientConnect
     {
-        static ConcurrentDictionary<string, object> _services { get; } = new ConcurrentDictionary<string, object>();
-        public static T GetClient<T>(string host, int port) where T : class
+        string host;
+        int port;
+        public RPCClientConnect(string _host, int _port)
+        {
+            host = _host;
+            port = _port;
+        }
+        Dictionary<string, object> _services  = new Dictionary<string, object>();
+        public T GetClient<T>() where T : class
         {
             var serviceName = typeof(T).Name;
             var key = string.Format("{0}_{1}_{2}", host, port, serviceName);

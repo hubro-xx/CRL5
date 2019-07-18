@@ -17,9 +17,10 @@ namespace CRL.RPC
         {
             var buffer = message as IByteBuffer;
             var request = RequestMessage.FromBuffer(buffer);
-            ResponseMessage response = server.GetResponse(request);
+            ResponseMessage response = server.InvokeResult(request);
+            response.MsgId = request.MsgId;
             context.WriteAndFlushAsync(response.ToBuffer());
-            context.CloseAsync();
+            //context.CloseAsync();
         }
         public override void ChannelReadComplete(IChannelHandlerContext context) => context.Flush();
         public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)

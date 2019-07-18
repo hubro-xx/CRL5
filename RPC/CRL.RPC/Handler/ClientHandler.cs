@@ -14,8 +14,10 @@ namespace CRL.RPC
         }
         public override void ChannelRead(IChannelHandlerContext context, object message)
         {
+            //Console.WriteLine(context.Channel.Id);
             var buffer = message as IByteBuffer;
-            waits.Set(context.Channel.Id.AsShortText(), buffer);
+            var response = ResponseMessage.FromBuffer(buffer);
+            waits.Set(response.MsgId, response);
         }
         public override void ChannelReadComplete(IChannelHandlerContext context) => context.Flush();
 

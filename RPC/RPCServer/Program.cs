@@ -11,8 +11,8 @@ namespace RPCServerTest
     {
         static void Main(string[] args)
         {
-            var rPCServer = new RPCServer(8026);
-            rPCServer.RegisterService<ITest, Test>();
+            var rPCServer = new RPCServer(805);
+            rPCServer.Register<ITest, Test>();
             rPCServer.Start();
 
             Console.ReadLine();

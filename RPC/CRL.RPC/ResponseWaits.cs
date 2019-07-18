@@ -8,7 +8,7 @@ namespace CRL.RPC
     class ResponseWait
     {
         AutoResetEvent autoReset = new AutoResetEvent(false);
-        public IByteBuffer Response;
+        public ResponseMessage Response;
         public void Set()
         {
             autoReset.Set();
@@ -25,7 +25,7 @@ namespace CRL.RPC
         {
             waits[id] = new ResponseWait();
         }
-        public void Set(string key, IByteBuffer response)
+        public void Set(string key, ResponseMessage response)
         {
             var wait = waits[key];
             wait.Response = response;

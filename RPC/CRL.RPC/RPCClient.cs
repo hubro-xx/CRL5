@@ -17,13 +17,13 @@ namespace CRL.RPC
         public int Port;
         public string ServiceName;
         public Type ServiceType;
-        static Bootstrap _bootstrap;
+        static Bootstrap bootstrap;
         IChannel channel = null;
 
         static ResponseWaits allWaits = new ResponseWaits();
         static RPCClient()
         {
-            _bootstrap = new Bootstrap()
+            bootstrap = new Bootstrap()
                 .Group(new MultithreadEventLoopGroup())
                 .Channel<TcpSocketChannel>()
                 .Option(ChannelOption.TcpNodelay, true)
@@ -42,33 +42,35 @@ namespace CRL.RPC
         {
             try
             {
-                channel = AsyncInvoke.RunSync(() => _bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(Host), Port)));
+                if (channel == null || !channel.Open)
+                {
+                    channel = AsyncInvoke.RunSync(() => bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(Host), Port)));
+                }
             }
             catch(Exception ero)
             {
                 throw new Exception("连接服务端失败:" + ero);
             }
-            var id = channel.Id.AsShortText();
+            var id = Guid.NewGuid().ToString();
             allWaits.Add(id);
             var request = new RequestMessage
             {
-                ServiceName = ServiceName,
-                MethodName = binder.Name,
-                Paramters = args.ToList()
+                MsgId = id,
+                Service = ServiceName,
+                Method = binder.Name,
+                Args = args.ToList(),
             };
 
             channel.WriteAndFlushAsync(request.ToBuffer());
             //等待返回
-            var responseData = allWaits.Wait(id).Response;
-            var response = ResponseMessage.FromBuffer(responseData);
-
+            var response = allWaits.Wait(id).Response;
             if (response == null)
             {
                 throw new Exception("请求超时未响应");
             }
             if (!response.Success)
             {
-                throw new Exception($"服务端处理错误：{response.Message}");
+                throw new Exception($"服务端处理错误：{response.Msg}");
             }
             var returnType = ServiceType.GetMethod(binder.Name).ReturnType;
             if (returnType == typeof(void))

@@ -7,6 +7,10 @@ namespace CRL.RPC
 {
     abstract class MessageBase
     {
+        public string MsgId
+        {
+            get;set;
+        }
         public IByteBuffer ToBuffer()
         {
             var data = this.ToByte();
@@ -15,9 +19,9 @@ namespace CRL.RPC
     }
     class RequestMessage : MessageBase
     {
-        public string ServiceName { get; set; }
-        public string MethodName { get; set; }
-        public List<object> Paramters { get; set; }
+        public string Service { get; set; }
+        public string Method { get; set; }
+        public List<object> Args { get; set; }
         public static RequestMessage FromBuffer(IByteBuffer buffer)
         {
             var data = buffer.ToString(Encoding.UTF8);
@@ -37,7 +41,7 @@ namespace CRL.RPC
         {
             Data = data.ToJson();
         }
-        public string Message { get; set; }
+        public string Msg { get; set; }
         public static ResponseMessage FromBuffer(IByteBuffer buffer)
         {
             var data = buffer.ToString(Encoding.UTF8);

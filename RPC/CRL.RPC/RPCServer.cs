@@ -15,14 +15,16 @@ namespace CRL.RPC
     /// </summary>
     public class RPCServer
     {
-        #region 构造函数
-
-
-        public RPCServer(int port)
+        int port;
+        Dictionary<string, object> serviceHandle = new Dictionary<string, object>();
+        ConcurrentDictionary<string, MethodInfo> methods = new ConcurrentDictionary<string, MethodInfo>();
+        ServerBootstrap serverBootstrap;
+        IChannel serverChannel { get; set; }
+        public RPCServer(int _port)
         {
-            _port = port;
+            port = _port;
 
-            _serverBootstrap = new ServerBootstrap()
+            serverBootstrap = new ServerBootstrap()
                 .Group(new MultithreadEventLoopGroup(), new MultithreadEventLoopGroup())
                 .Channel<TcpServerSocketChannel>()
                 .Option(ChannelOption.SoBacklog, 100)
@@ -36,36 +38,30 @@ namespace CRL.RPC
                 }));
         }
 
-        #endregion
 
-        #region 私有成员
 
-        private int _port { get; set; }
-        private Dictionary<string, object> _serviceHandle { get; set; } = new Dictionary<string, object>();
-        ConcurrentDictionary<string, MethodInfo> methods = new ConcurrentDictionary<string, MethodInfo>();
-        ServerBootstrap _serverBootstrap { get; }
-        IChannel _serverChannel { get; set; }
-        internal ResponseMessage GetResponse(RequestMessage request)
+
+        internal ResponseMessage InvokeResult(RequestMessage request)
         {
             ResponseMessage response = new ResponseMessage();
 
             try
             {
-                var a = _serviceHandle.TryGetValue(request.ServiceName, out object service);
+                var a = serviceHandle.TryGetValue(request.Service, out object service);
                 if (!a)
                 {
                     throw new Exception("未找到该服务");
                 }
-                a = methods.TryGetValue(request.MethodName, out MethodInfo method);
+                a = methods.TryGetValue(request.Method, out MethodInfo method);
                 if (!a)
                 {
                     var serviceType = service.GetType();
-                    method = serviceType.GetMethod(request.MethodName);
+                    method = serviceType.GetMethod(request.Method);
                     if (method == null)
                         throw new Exception("未找到该方法");
-                    methods.TryAdd(request.MethodName, method);
+                    methods.TryAdd(request.Method, method);
                 }
-                var paramters = request.Paramters.ToArray();
+                var paramters = request.Args.ToArray();
 
                 var result = method.Invoke(service, paramters);
                 response.SetData(result);
@@ -74,31 +70,29 @@ namespace CRL.RPC
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = ex.Message;
+                response.Msg = ex.Message;
             }
 
             return response;
         }
 
-        #endregion
 
-        #region 外部接口
 
-        public void RegisterService<IService, Service>() where Service : class, IService, new() where IService : class
+        public void Register<IService, Service>() where Service : class, IService, new() where IService : class
         {
-            _serviceHandle.Add(typeof(IService).Name, new Service());
+            serviceHandle.Add(typeof(IService).Name, new Service());
         }
 
         public void Start()
         {
-            _serverChannel = _serverBootstrap.BindAsync(_port).Result;
+            serverChannel = serverBootstrap.BindAsync(port).Result;
+            Console.WriteLine("RPCServer start at "+ port);
         }
 
         public void Stop()
         {
-            _serverChannel.CloseAsync();
+            serverChannel.CloseAsync();
         }
 
-        #endregion
     }
 }
