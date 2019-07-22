@@ -24,6 +24,10 @@ namespace CRL.Core.RedisProvider
         {
             get
             {
+                if(RedisClient.GetRedisConn==null)
+                {
+                    throw new Exception("请实现RedisClient.GetRedisConn");
+                }
                 if (_instance == null)
                 {
                     lock (_locker)
@@ -34,23 +38,31 @@ namespace CRL.Core.RedisProvider
                             {
                                 throw new Exception("请实现RedisClient.GetRedisConn");
                             }
-                            var arry = Coonstr.Split(',');
-                            var arry1 = arry[0].Split('@');
-                            var pass = "";
-                            var ip = "";
-                            if(arry1.Length>1)
+                            if (Coonstr.Contains("@"))
                             {
-                                pass = arry1[0];
-                                ip = arry1[1];
+                                var arry = Coonstr.Split(',');
+                                var arry1 = arry[0].Split('@');
+                                var pass = "";
+                                var ip = "";
+                                if (arry1.Length > 1)
+                                {
+                                    pass = arry1[0];
+                                    ip = arry1[1];
+                                }
+                                else
+                                {
+                                    ip = arry1[0];
+                                }
+                                host = ip;
+                                var options = ConfigurationOptions.Parse(ip);
+                                options.Password = pass;
+                                _instance = ConnectionMultiplexer.Connect(options);
                             }
                             else
                             {
-                                ip = arry1[0];
+                                _instance = ConnectionMultiplexer.Connect(Coonstr);
                             }
-                            host = ip;
-                            var options = ConfigurationOptions.Parse(ip);
-                            options.Password = pass;
-                            _instance = ConnectionMultiplexer.Connect(options);
+                            
                         }
                     }
                 }
