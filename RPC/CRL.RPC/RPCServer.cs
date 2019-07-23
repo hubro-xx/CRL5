@@ -62,7 +62,16 @@ namespace CRL.RPC
                     methods.TryAdd(request.Method, method);
                 }
                 var paramters = request.Args.ToArray();
-
+                var methodParamters = method.GetParameters();
+                //格式化参数
+                for (int i = 0; i < methodParamters.Length; i++)
+                {
+                    var type = methodParamters[i].ParameterType;
+                    if (paramters[i].GetType() != type)
+                    {
+                        paramters[i] = paramters[i].ToJson().ToObject(type);
+                    }
+                }
                 var result = method.Invoke(service, paramters);
                 response.SetData(result);
                 response.Success = true;
@@ -71,6 +80,7 @@ namespace CRL.RPC
             {
                 response.Success = false;
                 response.Msg = ex.Message;
+                Console.WriteLine(ex.ToString());
             }
 
             return response;
