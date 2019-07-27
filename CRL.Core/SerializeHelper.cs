@@ -9,10 +9,23 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
 
 using System.Runtime.Serialization.Json;
+using Newtonsoft.Json;
+
 namespace CRL.Core
 {
     public static class SerializeHelper
     {
+        static SerializeHelper()
+        {
+            JsonSerializerSettings setting = new JsonSerializerSettings();
+            JsonConvert.DefaultSettings = new Func<JsonSerializerSettings>(() =>
+            {
+                //日期类型默认格式化处理
+                setting.DateFormatHandling = DateFormatHandling.MicrosoftDateFormat;
+                setting.DateFormatString = "yyyy-MM-dd HH:mm:ss";
+                return setting;
+            });
+        }
         #region 二进制格式序列化和反序列化
 
         /// <summary>
@@ -186,7 +199,7 @@ namespace CRL.Core
         /// <returns></returns>
         public static string SerializerToJson<T>(T obj)
         {
-            return fastJSON.JSON.ToJSON(obj, new fastJSON.JSONParameters() { EnableAnonymousTypes = true, SerializeNullValues = false,  UseEscapedUnicode=false });
+            return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
             //Type type = typeof(T);
             //DataContractJsonSerializer serilializer = new DataContractJsonSerializer(type);
             //using (Stream stream = new MemoryStream())
@@ -208,7 +221,7 @@ namespace CRL.Core
         /// <returns></returns>
         public static T DeserializeFromJson<T>(string json)
         {
-            return fastJSON.JSON.ToObject<T>(json);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
             //byte[] buffer = Encoding.UTF8.GetBytes(json);
             //var type = typeof(T);
             //using (MemoryStream ms = new MemoryStream(buffer))
@@ -219,7 +232,7 @@ namespace CRL.Core
         }
         public static object DeserializeFromJson(string json, Type type)
         {
-            return fastJSON.JSON.ToObject(json, type);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject(json, type);
         }
     }
 }

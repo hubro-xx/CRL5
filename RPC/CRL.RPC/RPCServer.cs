@@ -43,7 +43,7 @@ namespace CRL.RPC
 
         internal ResponseMessage InvokeResult(RequestMessage request)
         {
-            ResponseMessage response = new ResponseMessage();
+            var response = new ResponseMessage();
 
             try
             {
@@ -52,14 +52,15 @@ namespace CRL.RPC
                 {
                     throw new Exception("未找到该服务");
                 }
-                a = methods.TryGetValue(request.Method, out MethodInfo method);
+                var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
+                a = methods.TryGetValue(methodKey, out MethodInfo method);
                 if (!a)
                 {
                     var serviceType = service.GetType();
                     method = serviceType.GetMethod(request.Method);
                     if (method == null)
                         throw new Exception("未找到该方法");
-                    methods.TryAdd(request.Method, method);
+                    methods.TryAdd(methodKey, method);
                 }
                 var paramters = request.Args.ToArray();
                 var methodParamters = method.GetParameters();
