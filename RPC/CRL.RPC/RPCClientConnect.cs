@@ -1,11 +1,12 @@
 ﻿
 using ImpromptuInterface;
+using System;
 using System.Collections.Generic;
 
 namespace CRL.RPC
 {
 
-    public class RPCClientConnect
+    public class RPCClientConnect: IDisposable
     {
         string host;
         int port;
@@ -13,6 +14,12 @@ namespace CRL.RPC
         {
             host = _host;
             port = _port;
+        }
+        string user, token;
+        public void SetToken(string _user , string _token )
+        {
+            user = _user;
+            token = _token;
         }
         Dictionary<string, object> _services  = new Dictionary<string, object>();
         public T GetClient<T>() where T : class
@@ -29,12 +36,24 @@ namespace CRL.RPC
                 Host = host,
                 Port = port,
                 ServiceType = typeof(T),
-                ServiceName = serviceName
+                ServiceName = serviceName,
+                Token = string.Format("{0}@{1}", user, token)
             };
             //创建代理
             instance = client.ActLike<T>();
             _services[key] = instance;
             return instance as T;
         }
+
+        public void Dispose()
+        {
+            foreach(var kv in _services)
+            {
+                var client = kv.Value.UndoActLike() as RPCClient;
+                client.Dispose();
+            }
+            _services.Clear();
+        }
+
     }
 }

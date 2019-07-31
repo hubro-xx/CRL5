@@ -227,7 +227,7 @@ end", spName, script);
             string sql = "Select name,name from syscolumns Where ID=OBJECT_ID('" + tableName + "')";
             return sql;
         }
-        static System.Collections.Concurrent.ConcurrentDictionary <Type, DataTable> cacheTables = new System.Collections.Concurrent.ConcurrentDictionary<Type, DataTable>();
+        //static System.Collections.Concurrent.ConcurrentDictionary <string, DataTable> cacheTables = new System.Collections.Concurrent.ConcurrentDictionary<string, DataTable>();
         /// <summary>
         /// 批量插入
         /// </summary>
@@ -241,23 +241,32 @@ end", spName, script);
             var table = TypeCache.GetTable(type);
             var tableName = KeyWordFormat(table.TableName);
             var helper = dbContext.DBHelper;
-            DataTable tempTable;
-            if (!cacheTables.ContainsKey(type))
+            //DataTable tempTable;
+            //var key = string.Format("{0}_{1}", dbContext.DBHelper.DatabaseName, type.Name);
+            //if (!cacheTables.ContainsKey(key))
+            //{
+            //    var sb = new StringBuilder();
+            //    GetSelectTop(sb,"*", b=>
+            //    {
+            //        b.Append(" from " + tableName + " where 1=0");
+            //    }, "", 1);
+            //    var sql = sb.ToString();
+            //    var tempTable2 = helper.ExecDataTable(sql);
+            //    //cacheTables.TryAdd(key, tempTable2);//暂每次动态查询
+            //    tempTable = tempTable2.Clone();//创建一个副本
+            //}
+            //else
+            //{
+            //    tempTable = cacheTables[key].Clone();
+            //}
+            var sb = new StringBuilder();
+            GetSelectTop(sb, "*", b =>
             {
-                var sb = new StringBuilder();
-                GetSelectTop(sb,"*", b=>
-                {
-                    b.Append(" from " + tableName + " where 1=0");
-                }, "", 1);
-                var sql = sb.ToString();
-                var tempTable2 = helper.ExecDataTable(sql);
-                cacheTables.TryAdd(type, tempTable2);
-                tempTable = tempTable2.Clone();//创建一个副本
-            }
-            else
-            {
-                tempTable = cacheTables[type].Clone();
-            }
+                b.Append(" from " + tableName + " where 1=0");
+            }, "", 1);
+            var sql = sb.ToString();
+            var tempTable = helper.ExecDataTable(sql);
+
             ////字段顺序得和表一至,不然插入出错
             //DataTable tempTable = new DataTable() { TableName = tableName };
             //foreach (var f in table.Fields)

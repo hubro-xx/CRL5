@@ -11,17 +11,23 @@ namespace RPCClient
     {
         static void Main(string[] args)
         {
-            var clientConnect = new RPCClientConnect("47.105.88.113", 805);
-            //var clientConnect = new RPCClientConnect("127.0.0.1", 805);
+            var user = "user";
+            string token = "123";
+            //var clientConnect = new RPCClientConnect("47.105.88.113", 805);
+
+            var clientConnect = new RPCClientConnect("127.0.0.1", 805);
+            clientConnect.SetToken(user, token);
         label1:
             Test2(clientConnect);
 
 
             Console.ReadLine();
+            //clientConnect.Dispose();
             goto label1;
         }
         static void Test2(RPCClientConnect clientConnect)
         {
+         
             var client = clientConnect.GetClient<ITest>();
             long total = 0;
             var sw = new System.Diagnostics.Stopwatch();

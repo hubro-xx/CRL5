@@ -52,6 +52,18 @@ namespace CRL.RPC
                 {
                     throw new Exception("未找到该服务");
                 }
+                if (tokenCheck != null)
+                {
+                    var tokenArry = request.Token.Split('@');
+                    if (tokenArry.Length < 2)
+                    {
+                        throw new Exception("token不合法");
+                    }
+                    if (!tokenCheck(tokenArry[0], tokenArry[1]))
+                    {
+                        throw new Exception("token验证失败");
+                    }
+                }
                 var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
                 a = methods.TryGetValue(methodKey, out MethodInfo method);
                 if (!a)
@@ -92,6 +104,11 @@ namespace CRL.RPC
         public void Register<IService, Service>() where Service : class, IService, new() where IService : class
         {
             serviceHandle.Add(typeof(IService).Name, new Service());
+        }
+        Func<string, string, bool> tokenCheck;
+        public void SetTokenCheck(Func<string, string, bool> _tokenCheck)
+        {
+            tokenCheck = _tokenCheck;
         }
 
         public void Start()

@@ -16,6 +16,10 @@ namespace CRL.RPC
             var data = this.ToByte();
             return Unpooled.WrappedBuffer(data);
         }
+        public string Token
+        {
+            get;set;
+        }
     }
     class RequestMessage : MessageBase
     {

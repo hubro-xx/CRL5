@@ -11,13 +11,14 @@ using System.Net;
 using System.Text;
 namespace CRL.RPC
 {
-    class RPCClient : DynamicObject
+    class RPCClient : DynamicObject,IDisposable
     {
         public string Host;
         public int Port;
         public string ServiceName;
         public Type ServiceType;
         static Bootstrap bootstrap;
+        public string Token;
         IChannel channel = null;
 
         static ResponseWaits allWaits = new ResponseWaits();
@@ -59,6 +60,7 @@ namespace CRL.RPC
                 Service = ServiceName,
                 Method = binder.Name,
                 Args = args.ToList(),
+                Token = Token
             };
 
             channel.WriteAndFlushAsync(request.ToBuffer());
@@ -80,6 +82,14 @@ namespace CRL.RPC
             }
             result = response.GetData(returnType);
             return true;
+        }
+
+        public void Dispose()
+        {
+            if (channel != null)
+            {
+                channel.CloseAsync();
+            }
         }
     }
 }

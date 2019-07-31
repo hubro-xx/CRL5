@@ -12,6 +12,10 @@ namespace RPCServerTest
         static void Main(string[] args)
         {
             var rPCServer = new RPCServer(805);
+            rPCServer.SetTokenCheck((u, t) =>
+            {
+                return u == "user" && t == "123";
+            });
             rPCServer.Register<ITest, Test>();
             rPCServer.Start();
 
