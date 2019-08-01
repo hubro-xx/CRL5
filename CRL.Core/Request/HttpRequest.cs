@@ -18,8 +18,12 @@ namespace CRL.Core.Request
         /// <param name="contentType"></param>
         /// <param name="proxyHost">代理</param>
         /// <returns></returns>
-        public static string HttpPost(string url, string data, Encoding enc, string contentType = "application/x-www-form-urlencoded", string proxyHost = "")
+        public static string HttpPost(string url, string data, Encoding enc = null, string contentType = "application/x-www-form-urlencoded", string proxyHost = "")
         {
+            if (enc == null)
+            {
+                enc = Encoding.UTF8;
+            }
             var request = new ImitateWebRequest(new Uri(url).Host, enc);
             request.ContentEncoding = enc;
             request.ContentType = contentType;
@@ -32,8 +36,12 @@ namespace CRL.Core.Request
         /// <param name="url"></param>
         /// <param name="enc"></param>
         /// <returns></returns>
-        public static string HttpGet(string url, Encoding enc)
+        public static string HttpGet(string url, Encoding enc = null)
         {
+            if (enc == null)
+            {
+                enc = Encoding.UTF8;
+            }
             return HttpGet(url, null, enc);
         }
         /// <summary>
