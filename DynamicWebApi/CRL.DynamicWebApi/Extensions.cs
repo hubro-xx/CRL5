@@ -4,22 +4,22 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using CRL;
 namespace CRL.DynamicWebApi
 {
     static class Extensions
     {
         public static string ToJson(this object obj)
         {
-            return JsonConvert.SerializeObject(obj);
+            return Core.SerializeHelper.SerializerToJson(obj);
         }
         public static T ToObject<T>(this string json)
         {
-            if(string.IsNullOrEmpty(json))
+            if (string.IsNullOrEmpty(json))
             {
                 return default(T);
             }
-            return JsonConvert.DeserializeObject<T>(json);
+            return Core.SerializeHelper.DeserializeFromJson<T>(json);
         }
         public static object ToObject(this string json, Type type)
         {
@@ -27,7 +27,7 @@ namespace CRL.DynamicWebApi
             {
                 return null;
             }
-            return JsonConvert.DeserializeObject(json, type);
+            return Core.SerializeHelper.DeserializeFromJson(json, type);
         }
         public static byte[] ToByte(this object obj)
         {
