@@ -11,6 +11,7 @@ namespace DynamicWebApiTest
         string Test(string str, int a);
         string Test2(argsTest a, int b);
         string Test3();
+        void Test4(out string error);
     }
     public class argsTest
     {
@@ -31,6 +32,11 @@ namespace DynamicWebApiTest
         public string Test3()
         {
             return "Test3";
+        }
+
+        public void Test4(out string error)
+        {
+            error = "error";
         }
     }
 }

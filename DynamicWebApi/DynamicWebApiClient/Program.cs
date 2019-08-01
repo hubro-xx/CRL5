@@ -14,9 +14,10 @@ namespace DynamicWebApiClient
             clientConnect.SetToken("user", "123");
             var service = clientConnect.GetClient<ITestService>();
         label1:
-            service.Test3();
-            service.Test("test", 100);
-            service.Test2(new argsTest() { str = "test", time = DateTime.Now }, 111);
+            //service.Test3();
+            //service.Test("test", 100);
+            //service.Test2(new argsTest() { str = "test", time = DateTime.Now }, 111);
+            service.Test4(out string error);
             Console.ReadLine();
             goto label1;
         }

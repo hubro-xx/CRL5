@@ -51,6 +51,13 @@ namespace CRL.DynamicWebApi
                 throw new Exception($"服务端处理错误：{response.Msg}");
             }
             var returnType = method.ReturnType;
+            if (response.Outs != null && response.Outs.Count > 0)
+            {
+                foreach (var kv in response.Outs)
+                {
+
+                }
+            }
             if (returnType == typeof(void))
             {
                 result = null;

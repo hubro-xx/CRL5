@@ -60,6 +60,8 @@ namespace CRL.DynamicWebApi
                 }
                 var paramters = request.Args;
                 var methodParamters = method.GetParameters();
+                var outs = new Dictionary<string,object>();
+                int i = 0;
                 foreach (var p in methodParamters)
                 {
                     var find = paramters.TryGetValue(p.Name, out object value);
@@ -71,10 +73,26 @@ namespace CRL.DynamicWebApi
                             paramters[p.Name] = value2;
                         }
                     }
+                    else
+                    {
+                        paramters[p.Name] = null;
+                    }
+                    if (p.Attributes == ParameterAttributes.Out)
+                    {
+                        outs.Add(p.Name, i);
+                    }
+                    i += 1;
                 }
-                var result = method.Invoke(service, paramters?.Select(b => b.Value)?.ToArray());
+                var args3 = paramters?.Select(b => b.Value)?.ToArray();
+                var result = method.Invoke(service, args3);
+                foreach (var kv in new Dictionary<string, object>(outs))
+                {
+                    var value = args3[(int)kv.Value];
+                    outs[kv.Key] = value;
+                }
                 response.SetData(result);
                 response.Success = true;
+                response.Outs = outs;
             }
             catch (Exception ex)
             {

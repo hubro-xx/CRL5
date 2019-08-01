@@ -35,6 +35,10 @@ namespace CRL.DynamicWebApi
         {
             return Data.ToObject(type);
         }
+        public Dictionary<string, object> Outs
+        {
+            get; set;
+        }
         public void SetData(object data)
         {
             Data = data.ToJson();

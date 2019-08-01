@@ -11,6 +11,7 @@ namespace DynamicWebApiClient
         string Test(string str, int a);
         string Test2(argsTest a, int b);
         string Test3();
+        void Test4(out string error);
     }
     public class argsTest
     {
