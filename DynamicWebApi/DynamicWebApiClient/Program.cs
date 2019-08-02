@@ -18,6 +18,7 @@ namespace DynamicWebApiClient
             //service.Test("test", 100);
             //service.Test2(new argsTest() { str = "test", time = DateTime.Now }, 111);
             service.Test4(out string error);
+            Console.WriteLine(error);
             Console.ReadLine();
             goto label1;
         }

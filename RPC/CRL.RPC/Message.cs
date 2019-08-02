@@ -25,7 +25,7 @@ namespace CRL.RPC
     {
         public string Service { get; set; }
         public string Method { get; set; }
-        public List<object> Args { get; set; }
+        public Dictionary<string, object> Args { get; set; }
         public static RequestMessage FromBuffer(IByteBuffer buffer)
         {
             var data = buffer.ToString(Encoding.UTF8);
@@ -37,6 +37,10 @@ namespace CRL.RPC
     {
         public bool Success { get; set; }
         public string Data { get; set; }
+        public Dictionary<string, object> Outs
+        {
+            get; set;
+        }
         public object GetData(Type type)
         {
             return Data.ToObject(type);

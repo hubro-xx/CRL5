@@ -5,9 +5,11 @@ using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
 using DotNetty.Transport.Channels.Sockets;
 using System;
+using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 namespace CRL.RPC
 {
@@ -53,16 +55,28 @@ namespace CRL.RPC
                 throw new Exception("连接服务端失败:" + ero);
             }
             var id = Guid.NewGuid().ToString();
+            var method = ServiceType.GetMethod(binder.Name);
             allWaits.Add(id);
             var request = new RequestMessage
             {
                 MsgId = id,
                 Service = ServiceName,
                 Method = binder.Name,
-                Args = args.ToList(),
                 Token = Token
             };
-
+            var dic = new Dictionary<string, object>();
+            var allArgs = method.GetParameters();
+            var outs = new Dictionary<string, object>();
+            for (int i = 0; i < allArgs.Length; i++)
+            {
+                var p = allArgs[i];
+                dic.Add(p.Name, args[i]);
+                if (p.Attributes == ParameterAttributes.Out)
+                {
+                    outs.Add(p.Name, i);
+                }
+            }
+            request.Args = dic;
             channel.WriteAndFlushAsync(request.ToBuffer());
             //等待返回
             var response = allWaits.Wait(id).Response;
@@ -74,7 +88,15 @@ namespace CRL.RPC
             {
                 throw new Exception($"服务端处理错误：{response.Msg}");
             }
-            var returnType = ServiceType.GetMethod(binder.Name).ReturnType;
+            var returnType = method.ReturnType;
+            if (response.Outs != null && response.Outs.Count > 0)
+            {
+                foreach (var kv in response.Outs)
+                {
+                    var find = outs[kv.Key];
+                    args[(int)find] = kv.Value;
+                }
+            }
             if (returnType == typeof(void))
             {
                 result = null;

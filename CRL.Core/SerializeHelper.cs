@@ -186,6 +186,7 @@ namespace CRL.Core
         /// <returns></returns>
         public static string SerializerToJson<T>(T obj)
         {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
             return fastJSON.JSON.ToJSON(obj, new fastJSON.JSONParameters() { EnableAnonymousTypes = true, SerializeNullValues = false,  UseEscapedUnicode=false });
         }
         /// <summary>
@@ -196,11 +197,13 @@ namespace CRL.Core
         /// <returns></returns>
         public static T DeserializeFromJson<T>(string json)
         {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
             return fastJSON.JSON.ToObject<T>(json);
         }
         public static object DeserializeFromJson(string json, Type type)
         {
-            return fastJSON.JSON.ToObject(json, type);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject(json, type);
+            return fastJSON.JSON.ToObject(json, type, new fastJSON.JSONParameters() { EnableAnonymousTypes = true, SerializeNullValues = false, UseEscapedUnicode = false });
         }
     }
 }

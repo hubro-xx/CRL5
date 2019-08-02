@@ -18,19 +18,27 @@ namespace RPCServerTest
             });
             rPCServer.Register<ITest, Test>();
             rPCServer.Start();
-
+            
             Console.ReadLine();
         }
         public interface ITest
         {
-            string Test1(string msg);
+            string Test1(string msg, out string error);
         }
         public class Test : ITest
         {
-            public string Test1(string msg)
+            public string Test1(string msg, out string error)
             {
-                return DateTime.Now.ToString();
+                error = "error";
+                return msg;
             }
+        }
+    }
+    public class test1 : IDisposable
+    {
+        public void Dispose()
+        {
+            Console.WriteLine("Dispose");
         }
     }
 }

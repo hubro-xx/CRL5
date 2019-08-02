@@ -18,8 +18,15 @@ namespace RPCClient
             var clientConnect = new RPCClientConnect("127.0.0.1", 805);
             clientConnect.SetToken(user, token);
         label1:
-            Test2(clientConnect);
+            try
+            {
+                Test2(clientConnect);
 
+            }
+            catch(Exception ero)
+            {
+                Console.WriteLine(ero.Message);
+            }
 
             Console.ReadLine();
             //clientConnect.Dispose();
@@ -32,9 +39,10 @@ namespace RPCClient
             long total = 0;
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
-                var str = client.Test1("aaa");
+                string error = "";
+                var str = client.Test1("aaa",out error);
                 //System.Threading.Thread.Sleep(10);
             }
             sw.Stop();
@@ -45,13 +53,6 @@ namespace RPCClient
 
     public interface ITest
     {
-        string Test1(string msg);
-    }
-    public class Test : ITest
-    {
-        public string Test1(string msg)
-        {
-            return msg;
-        }
+        string Test1(string msg,out string error);
     }
 }

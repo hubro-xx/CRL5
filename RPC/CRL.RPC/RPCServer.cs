@@ -6,6 +6,7 @@ using DotNetty.Transport.Channels.Sockets;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace CRL.RPC
@@ -13,7 +14,7 @@ namespace CRL.RPC
     /// <summary>
     /// RPC服务端
     /// </summary>
-    public class RPCServer
+    public class RPCServer: IDisposable
     {
         int port;
         Dictionary<string, object> serviceHandle = new Dictionary<string, object>();
@@ -74,20 +75,41 @@ namespace CRL.RPC
                         throw new Exception("未找到该方法");
                     methods.TryAdd(methodKey, method);
                 }
-                var paramters = request.Args.ToArray();
+                var paramters = request.Args;
                 var methodParamters = method.GetParameters();
-                //格式化参数
-                for (int i = 0; i < methodParamters.Length; i++)
+                var outs = new Dictionary<string, object>();
+                int i = 0;
+                foreach (var p in methodParamters)
                 {
-                    var type = methodParamters[i].ParameterType;
-                    if (paramters[i].GetType() != type)
+                    var find = paramters.TryGetValue(p.Name, out object value);
+                    if (find && value != null)
                     {
-                        paramters[i] = paramters[i].ToJson().ToObject(type);
+                        if (value.GetType() != p.ParameterType)
+                        {
+                            var value2 = value.ToJson().ToObject(p.ParameterType);
+                            paramters[p.Name] = value2;
+                        }
                     }
+                    else
+                    {
+                        paramters[p.Name] = null;
+                    }
+                    if (p.Attributes == ParameterAttributes.Out)
+                    {
+                        outs.Add(p.Name, i);
+                    }
+                    i += 1;
                 }
-                var result = method.Invoke(service, paramters);
+                var args3 = paramters?.Select(b => b.Value)?.ToArray();
+                var result = method.Invoke(service, args3);
+                foreach (var kv in new Dictionary<string, object>(outs))
+                {
+                    var value = args3[(int)kv.Value];
+                    outs[kv.Key] = value;
+                }
                 response.SetData(result);
                 response.Success = true;
+                response.Outs = outs;
             }
             catch (Exception ex)
             {
@@ -119,8 +141,12 @@ namespace CRL.RPC
 
         public void Stop()
         {
-            serverChannel.CloseAsync();
+            Dispose();
         }
 
+        public void Dispose()
+        {
+            serverChannel.CloseAsync();
+        }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,9 +37,15 @@ namespace CRL.DynamicWebApi
             };
             var dic = new Dictionary<string, object>();
             var allArgs = method.GetParameters();
+            var outs = new Dictionary<string, object>();
             for (int i = 0; i < allArgs.Length; i++)
             {
-                dic.Add(allArgs[i].Name, args[i]);
+                var p = allArgs[i];
+                dic.Add(p.Name, args[i]);
+                if (p.Attributes == ParameterAttributes.Out)
+                {
+                    outs.Add(p.Name, i);
+                }
             }
             request.Args = dic;
             var response = SendRequest(request);
@@ -55,7 +62,8 @@ namespace CRL.DynamicWebApi
             {
                 foreach (var kv in response.Outs)
                 {
-
+                    var find = outs[kv.Key];
+                    args[(int)find] = kv.Value;
                 }
             }
             if (returnType == typeof(void))
