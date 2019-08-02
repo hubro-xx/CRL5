@@ -14,12 +14,12 @@ namespace CRL.DynamicWebApi
         {
             host = _host;
         }
-        string user, token;
-        public void SetToken(string _user, string _token)
-        {
-            user = _user;
-            token = _token;
-        }
+        //string user, token;
+        //public void SetToken(string _user, string _token)
+        //{
+        //    user = _user;
+        //    token = _token;
+        //}
         Dictionary<string, object> _services = new Dictionary<string, object>();
         public T GetClient<T>() where T : class
         {
@@ -35,7 +35,7 @@ namespace CRL.DynamicWebApi
                 Host = host,
                 ServiceType = typeof(T),
                 ServiceName = serviceName,
-                Token = string.Format("{0}@{1}", user, token)
+                //Token = string.Format("{0}@{1}", user, token)
             };
             //创建代理
             instance = client.ActLike<T>();

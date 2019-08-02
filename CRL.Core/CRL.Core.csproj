@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncInvoke.cs" />
+    <Compile Include="CallContext.cs" />
     <Compile Include="CoreConfig.cs" />
     <Compile Include="CustomSetting.cs" />
     <Compile Include="Encrypt\CBC.cs" />

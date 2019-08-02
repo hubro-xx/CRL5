@@ -14,7 +14,7 @@ namespace CRL.DynamicWebApi
         public string Host;
         public string ServiceName;
         public Type ServiceType;
-        public string Token;
+        string Token="";
 
         ResponseMessage SendRequest(RequestMessage msg)
         {
@@ -66,12 +66,17 @@ namespace CRL.DynamicWebApi
                     args[(int)find] = kv.Value;
                 }
             }
+            if (!string.IsNullOrEmpty(response.Token))
+            {
+                Token = response.Token;
+            }
             if (returnType == typeof(void))
             {
                 result = null;
                 return true;
             }
             result = response.GetData(returnType);
+
             return true;
         }
     }

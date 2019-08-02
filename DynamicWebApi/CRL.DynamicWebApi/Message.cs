@@ -11,7 +11,7 @@ namespace CRL.DynamicWebApi
         {
             return this.ToJson();
         }
-        internal string Token
+        public string Token
         {
             get;set;
         }

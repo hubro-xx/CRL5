@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CRL.DynamicWebApi;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,14 +9,9 @@ namespace DynamicWebApiClient
 {
     public interface ITestService
     {
-        string Test(string str, int a);
-        string Test2(argsTest a, int b);
-        string Test3();
-        void Test4(out string error);
-    }
-    public class argsTest
-    {
-        public DateTime time;
-        public string str;
+        [LoginPoint]
+        string Login(string name, string pass);
+        void SendData(string msg);
+
     }
 }

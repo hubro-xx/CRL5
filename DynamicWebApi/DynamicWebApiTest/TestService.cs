@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CRL.DynamicWebApi;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,9 @@ namespace DynamicWebApiTest
 {
     public interface ITestService
     {
-        string Test(string str, int a);
-        string Test2(argsTest a, int b);
-        string Test3();
-        void Test4(out string error);
+        string Login(string name, string  pass);
+        void SendData(string msg);
+
     }
     public class argsTest
     {
@@ -20,23 +20,16 @@ namespace DynamicWebApiTest
     }
     public class TestService : ITestService
     {
-        public string Test(string str, int a)
+        [LoginPoint]
+        public string Login(string name, string pass)
         {
-            return $"str:{str} a:{a}";
+            SessionManage.SaveSession("hubro","7777777777");
+            return name;
         }
 
-        public string Test2(argsTest a, int b)
+        public void SendData(string msg)
         {
-            return "Test2";
-        }
-        public string Test3()
-        {
-            return "Test3";
-        }
-
-        public void Test4(out string error)
-        {
-            error = "error";
+            var user = SessionManage.GetSession();
         }
     }
 }

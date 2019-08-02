@@ -16,11 +16,11 @@ namespace CRL.DynamicWebApi
         {
             serviceHandle.Add(typeof(IService).Name, new Service());
         }
-        static Func<string, string, bool> tokenCheck;
-        public void SetTokenCheck(Func<string, string, bool> _tokenCheck)
-        {
-            tokenCheck = _tokenCheck;
-        }
+        //static Func<string, string, bool> tokenCheck;
+        //public void SetTokenCheck(Func<string, string, bool> _tokenCheck)
+        //{
+        //    tokenCheck = _tokenCheck;
+        //}
         internal static ResponseMessage InvokeResult(RequestMessage request)
         {
             var response = new ResponseMessage();
@@ -32,7 +32,19 @@ namespace CRL.DynamicWebApi
                 {
                     throw new Exception("未找到该服务");
                 }
-                if (tokenCheck != null)
+   
+                var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
+                a = methods.TryGetValue(methodKey, out MethodInfo method);
+                if (!a)
+                {
+                    var serviceType = service.GetType();
+                    method = serviceType.GetMethod(request.Method);
+                    if (method == null)
+                        throw new Exception("未找到该方法");
+                    methods.TryAdd(methodKey, method);
+                }
+                var loginAttr = method.GetCustomAttribute<LoginPointAttribute>();
+                if (loginAttr == null)//登录切入点不验证
                 {
                     if (string.IsNullOrEmpty(request.Token))
                     {
@@ -43,20 +55,8 @@ namespace CRL.DynamicWebApi
                     {
                         throw new Exception("token不合法 user@token");
                     }
-                    if (!tokenCheck(tokenArry[0], tokenArry[1]))
-                    {
-                        throw new Exception("token验证失败");
-                    }
-                }
-                var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
-                a = methods.TryGetValue(methodKey, out MethodInfo method);
-                if (!a)
-                {
-                    var serviceType = service.GetType();
-                    method = serviceType.GetMethod(request.Method);
-                    if (method == null)
-                        throw new Exception("未找到该方法");
-                    methods.TryAdd(methodKey, method);
+                    SessionManage.CheckSession(tokenArry[0], tokenArry[1]);
+                    Core.CallContext.SetData("currentUser", tokenArry[0]);
                 }
                 var paramters = request.Args;
                 var methodParamters = method.GetParameters();
@@ -93,6 +93,10 @@ namespace CRL.DynamicWebApi
                 response.SetData(result);
                 response.Success = true;
                 response.Outs = outs;
+                if (loginAttr != null)//登录方法后返回新TOKEN
+                {
+                    response.Token = Core.CallContext.GetData<string>("newToken");
+                }
             }
             catch (Exception ex)
             {
@@ -100,8 +104,9 @@ namespace CRL.DynamicWebApi
                 response.Msg = ex.Message;
                 Console.WriteLine(ex.ToString());
             }
-
+ 
             return response;
         }
+
     }
 }
