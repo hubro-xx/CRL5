@@ -11,7 +11,7 @@ namespace CRL.Core.BinaryFormat
         public static byte[] Pack(object param)
         {
             var list = (System.Collections.IEnumerable)param;
-            List<byte> body = new List<byte>();
+            var body = new List<byte>();
             foreach (var obj in list)
             {
                 var data = FieldFormat.Pack(obj);

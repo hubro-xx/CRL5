@@ -25,10 +25,10 @@ namespace CRLTest
         //{
         //    get;set;
         //}
-        //public decimal price
-        //{
-        //    get; set;
-        //}
+        public decimal price
+        {
+            get; set;
+        }
         public Dictionary<string,int> dic
         {
             get;set;
@@ -56,15 +56,17 @@ namespace CRLTest
 
             //var s2= ConvertObject(typeof(CRL.DBAccess.DBType), "1");
             //var s3 = ConvertObject(typeof(decimal), "");
-            var num2 = 99999;
+            var num2 = 20000;
             var d2 = BitConverter.GetBytes(num2);
-            var obj = new testClass() { dic = new Dictionary<string, int>() { { "test", 1 }, { "test2", 1 }, { "tes3t", 1 } } };
-            obj.name = "test2";
+            var obj = new testClass() {  };
+            //obj.dic = new Dictionary<string, int>() { { "tes111111111112t", 1 }, { "t2222222222122est2", 1 }, { "te22222221s3t", 1 } };
+            obj.name = "test2ConvertObject";
             obj.time = DateTime.Now;
+            obj.price = 1002;
             var data = CRL.Core.BinaryFormat.ClassFormat.Pack(obj.GetType(), obj);
             var json = SerializeHelper.SerializerToJson(obj);
             var data2 = System.Text.Encoding.UTF8.GetBytes(json);
-            var obj2 = CRL.Core.BinaryFormat.ClassFormat.UnPack(obj.GetType(), data);
+            //var obj2 = CRL.Core.BinaryFormat.ClassFormat.UnPack(obj.GetType(), data);
             Console.WriteLine($"{data.Length} {data2.Length}");
             Console.ReadLine();
             //自定义定位

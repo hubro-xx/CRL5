@@ -11,7 +11,7 @@ namespace CRL.Core.BinaryFormat
         public static byte[] Pack(Type type, object obj)
         {
             var pro = type.GetProperties().Where(b => b.GetSetMethod() != null).OrderBy(b => b.Name);
-            List<byte> body = new List<byte>();
+            var body = new List<byte>();
             foreach (var p in pro)
             {
                 var d = FieldFormat.Pack(p.GetValue(obj));

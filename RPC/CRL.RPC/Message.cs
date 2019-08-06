@@ -20,6 +20,11 @@ namespace CRL.RPC
         {
             get;set;
         }
+        internal static T FromBuffer<T>(IByteBuffer buffer)
+        {
+            var data = buffer.ToString(Encoding.UTF8);
+            return data.ToObject<T>();
+        }
     }
     class RequestMessage : MessageBase
     {
@@ -28,8 +33,7 @@ namespace CRL.RPC
         public Dictionary<string, object> Args { get; set; }
         public static RequestMessage FromBuffer(IByteBuffer buffer)
         {
-            var data = buffer.ToString(Encoding.UTF8);
-            return data.ToObject<RequestMessage>();
+            return FromBuffer<RequestMessage>(buffer);
         }
 
     }
@@ -52,8 +56,7 @@ namespace CRL.RPC
         public string Msg { get; set; }
         public static ResponseMessage FromBuffer(IByteBuffer buffer)
         {
-            var data = buffer.ToString(Encoding.UTF8);
-            return data.ToObject<ResponseMessage>();
+            return FromBuffer<ResponseMessage>(buffer);
         }
     }
 }

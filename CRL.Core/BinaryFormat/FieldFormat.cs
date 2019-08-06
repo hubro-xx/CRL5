@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CRL.Core.BinaryFormat
 {
-    public class FieldFormat
+    class FieldFormat
     {
         /// <summary>
         /// 4字节长度+body
@@ -112,26 +112,29 @@ namespace CRL.Core.BinaryFormat
                 if (data != null)
                     len = data.Length;
             }
-            datas.AddRange(BitConverter.GetBytes(len));
+            //Console.WriteLine("add:"+ len);
+            var lenData = BitConverter.GetBytes(len).Take(lenSaveLength);
+            datas.AddRange(lenData);
             if (len > 0)
             {
                 datas.AddRange(data);
             }
             return datas.Count == 0 ? null : datas.ToArray();
         }
+        static int lenSaveLength = 2;
         public static object UnPack(Type type, byte[] datas, ref int offset)
         {
             dynamic obj = null;
-
             var len = 0;
+            var lenData = new byte[4];
 
-            byte[] data = null;
+            Buffer.BlockCopy(datas, offset, lenData, 0, lenSaveLength);
 
-            len = BitConverter.ToInt32(datas, offset);
-            offset += 4;
+            len = BitConverter.ToInt32(lenData, 0);
+            offset += lenSaveLength;
             if (len > 0)
             {
-                data = new byte[len];
+                byte[] data = new byte[len];
                 Buffer.BlockCopy(datas, offset, data, 0, len);
                 offset += len;
 

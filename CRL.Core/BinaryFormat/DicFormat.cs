@@ -11,7 +11,7 @@ namespace CRL.Core.BinaryFormat
         public static byte[] Pack(object param)
         {
             var list = (System.Collections.IDictionary)param;
-            List<byte> body = new List<byte>();
+            var body = new List<byte>();
             foreach (var key in list.Keys)
             {
                 var obj = list[key];
@@ -25,7 +25,6 @@ namespace CRL.Core.BinaryFormat
         public static object UnPack(Type type, byte[] datas)
         {
             var dic = (System.Collections.IDictionary)System.Activator.CreateInstance(type);
-            var method = type.GetMethod("Add");
             var innerType = type.GenericTypeArguments[0];
             var innerType2 = type.GenericTypeArguments[1];
             int dataIndex = 0;
@@ -33,6 +32,10 @@ namespace CRL.Core.BinaryFormat
             {
                 var key = FieldFormat.UnPack(innerType, datas, ref dataIndex);
                 var value = FieldFormat.UnPack(innerType2, datas, ref dataIndex);
+                if (key == null)
+                {
+                    continue;
+                }
                 dic.Add(key,value);
             }
             return dic;
