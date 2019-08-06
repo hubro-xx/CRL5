@@ -1,4 +1,5 @@
 ﻿using CRL;
+using CRL.Core;
 using CRL.DBAccess;
 using CRLTest.Code;
 using System;
@@ -16,14 +17,28 @@ namespace CRLTest
         {
             get; set;
         }
-        public string aa;
         public DateTime time
         {
             get; set;
         }
-        public decimal price
+        //public List<b> nums
+        //{
+        //    get;set;
+        //}
+        //public decimal price
+        //{
+        //    get; set;
+        //}
+        public Dictionary<string,int> dic
         {
-            get; set;
+            get;set;
+        }
+    }
+    public class b
+    {
+        public string name
+        {
+            get;set;
         }
     }
     class Program
@@ -41,9 +56,17 @@ namespace CRLTest
 
             //var s2= ConvertObject(typeof(CRL.DBAccess.DBType), "1");
             //var s3 = ConvertObject(typeof(decimal), "");
-
-            var test2 = new test2() { name="中广开言路上" };
-            var json = CRL.Core.SerializeHelper.SerializerToJson(test2);
+            var num2 = 99999;
+            var d2 = BitConverter.GetBytes(num2);
+            var obj = new testClass() { dic = new Dictionary<string, int>() { { "test", 1 }, { "test2", 1 }, { "tes3t", 1 } } };
+            obj.name = "test2";
+            obj.time = DateTime.Now;
+            var data = CRL.Core.BinaryFormat.ClassFormat.Pack(obj.GetType(), obj);
+            var json = SerializeHelper.SerializerToJson(obj);
+            var data2 = System.Text.Encoding.UTF8.GetBytes(json);
+            var obj2 = CRL.Core.BinaryFormat.ClassFormat.UnPack(obj.GetType(), data);
+            Console.WriteLine($"{data.Length} {data2.Length}");
+            Console.ReadLine();
             //自定义定位
             CRL.Sharding.LocationManage.Register<Code.Sharding.MemberSharding>((t, a) =>
             {

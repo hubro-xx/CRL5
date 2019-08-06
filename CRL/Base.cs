@@ -17,6 +17,7 @@ using System.Linq.Expressions;
 using System.Diagnostics;
 using CRL.LambdaQuery.Mapping;
 using System.Collections.Concurrent;
+using CRL.Core;
 
 namespace CRL
 {

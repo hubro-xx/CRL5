@@ -62,6 +62,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncInvoke.cs" />
+    <Compile Include="BinaryFormat\DicFormat.cs" />
+    <Compile Include="BinaryFormat\FieldFormat.cs" />
+    <Compile Include="BinaryFormat\ClassFormat.cs" />
+    <Compile Include="BinaryFormat\ListFormat.cs" />
     <Compile Include="CallContext.cs" />
     <Compile Include="CoreConfig.cs" />
     <Compile Include="CustomSetting.cs" />
@@ -78,6 +82,7 @@
     <Compile Include="CookieHelper.cs" />
     <Compile Include="DelegateCache.cs" />
     <Compile Include="ExceptionHelper.cs" />
+    <Compile Include="ReflectionHelper.cs" />
     <Compile Include="RequestLimiter.cs" />
     <Compile Include="Session\AbsSession.cs" />
     <Compile Include="RedisProvider\RedisClient.cs" />

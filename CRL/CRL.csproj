@@ -113,7 +113,6 @@
     <Compile Include="CacheServer\TcpPoolClient.cs" />
     <Compile Include="CacheServer\TcpServer.cs" />
     <Compile Include="CacheServer\ResultData.cs" />
-    <Compile Include="CallContext.cs" />
     <Compile Include="CRLDbConnectionScope.cs" />
     <Compile Include="DBExtend\CallBackDataReader.cs" />
     <Compile Include="CRLException.cs" />

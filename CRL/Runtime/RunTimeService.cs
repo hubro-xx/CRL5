@@ -5,6 +5,7 @@
 * 主页 http://www.cnblogs.com/hubro
 * 在线文档 http://crl.changqidongli.com/
 */
+using CRL.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
