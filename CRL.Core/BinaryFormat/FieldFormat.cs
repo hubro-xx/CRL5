@@ -117,6 +117,15 @@ namespace CRL.Core.BinaryFormat
             }));
             #endregion
         }
+        static int lenSaveLength = 2;
+        static Type ReturnType(Type type)
+        {
+            if (!type.Name.Contains("&"))
+            {
+                return type;
+            }
+            return Type.GetType(type.FullName.Replace("&", ""));
+        }
         public static byte[] Pack(Type type, object param)
         {
             type = ReturnType(type);
@@ -345,15 +354,7 @@ namespace CRL.Core.BinaryFormat
             }
             return datas.Count == 0 ? null : datas.ToArray();
         }
-        static int lenSaveLength = 2;
-        static Type ReturnType(Type type)
-        {
-            if (!type.Name.Contains("&"))
-            {
-                return type;
-            }
-            return Type.GetType(type.FullName.Replace("&", ""));
-        }
+
         public static object _UnPack(Type type, byte[] datas, ref int offset)
         {
             type = ReturnType(type);

@@ -50,12 +50,7 @@ namespace CRLTest
             //var s3 = ConvertObject(typeof(decimal), "");
             var num2 = 20000;
             var d2 = BitConverter.GetBytes(num2);
-            var obj = new testClass() {  };
-            obj.b = new b() { name="b22424"};
-            //obj.dic = new Dictionary<string, object>() { { "tes111111111112t", 1 }, { "t2222222222122est2", 1 }, { "te22222221s3t", 1 } };
-            obj.name = "test2ConvertObject";
-            obj.time = DateTime.Now;
-            obj.price = 1002;
+            
             
 
             //自定义定位
@@ -86,6 +81,20 @@ namespace CRLTest
         //Code.ProductDataManage.Instance.QueryItem(1);
         label1:
 
+            testFormat();
+            Console.ReadLine();
+            goto label1;
+            Console.ReadLine();
+        }
+        static void testFormat()
+        {
+            var obj = new testClass() { };
+            obj.b = new b() { name = "b22424" };
+            //obj.dic = new Dictionary<string, object>() { { "tes111111111112t", 1 }, { "t2222222222122est2", 1 }, { "te22222221s3t", 1 } };
+            obj.name = "test2ConvertObject";
+            obj.time = DateTime.Now;
+            obj.price = 1002;
+
             var count = 1000;
             long total1 = 0;
             long total2 = 0;
@@ -93,7 +102,7 @@ namespace CRLTest
             sw.Start();
             for (int i = 0; i < count; i++)
             {
-                total1+=testJson(obj);
+                total1 += testJson(obj);
             }
             sw.Stop();
             var el = sw.ElapsedMilliseconds;
@@ -107,9 +116,6 @@ namespace CRLTest
             sw.Stop();
             var el2 = sw.ElapsedMilliseconds;
             Console.WriteLine($"el:{el2} t:{total2}");
-            Console.ReadLine();
-            goto label1;
-            Console.ReadLine();
         }
         static int testJson(testClass obj)
         {
