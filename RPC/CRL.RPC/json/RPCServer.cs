@@ -76,32 +76,38 @@ namespace CRL.RPC
                     methods.TryAdd(methodKey, method);
                 }
                 var paramters = request.Args;
-
                 var methodParamters = method.GetParameters();
-                var args = new object[methodParamters.Length];
-                var outIndex = new Dictionary<string, int>();
+                var outs = new Dictionary<string, object>();
                 int i = 0;
                 foreach (var p in methodParamters)
                 {
-                    var find = paramters.TryGetValue(p.Name, out byte[] value);
-                    int offSet = 0;
-                    args[i] = Core.BinaryFormat.FieldFormat.UnPack(p.ParameterType, value, ref offSet);
+                    var find = paramters.TryGetValue(p.Name, out object value);
+                    if (find && value != null)
+                    {
+                        if (value.GetType() != p.ParameterType)
+                        {
+                            var value2 = value.ToJson().ToObject(p.ParameterType);
+                            paramters[p.Name] = value2;
+                        }
+                    }
+                    else
+                    {
+                        paramters[p.Name] = null;
+                    }
                     if (p.Attributes == ParameterAttributes.Out)
                     {
-                        outIndex.Add(p.Name, i);
+                        outs.Add(p.Name, i);
                     }
                     i += 1;
                 }
-                //var args3 = paramters?.Select(b => b.Value)?.ToArray();
-                var result = method.Invoke(service, args);
-                var outs = new Dictionary<string, byte[]>();
-                foreach (var kv in outIndex)
+                var args3 = paramters?.Select(b => b.Value)?.ToArray();
+                var result = method.Invoke(service, args3);
+                foreach (var kv in new Dictionary<string, object>(outs))
                 {
-                    var value = args[kv.Value];
-                    var type = methodParamters[kv.Value];
-                    outs[kv.Key] = Core.BinaryFormat.FieldFormat.Pack(type.ParameterType, value);
+                    var value = args3[(int)kv.Value];
+                    outs[kv.Key] = value;
                 }
-                response.SetData(method.ReturnType, result);
+                response.SetData(result);
                 response.Success = true;
                 response.Outs = outs;
             }

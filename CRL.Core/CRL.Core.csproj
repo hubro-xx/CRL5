@@ -82,7 +82,6 @@
     <Compile Include="CookieHelper.cs" />
     <Compile Include="DelegateCache.cs" />
     <Compile Include="ExceptionHelper.cs" />
-    <Compile Include="ReflectionHelper.cs" />
     <Compile Include="RequestLimiter.cs" />
     <Compile Include="Session\AbsSession.cs" />
     <Compile Include="RedisProvider\RedisClient.cs" />

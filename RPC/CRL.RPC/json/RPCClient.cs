@@ -64,14 +64,13 @@ namespace CRL.RPC
                 Method = binder.Name,
                 Token = Token
             };
-            var dic = new Dictionary<string, byte[]>();
+            var dic = new Dictionary<string, object>();
             var allArgs = method.GetParameters();
             var outs = new Dictionary<string, object>();
             for (int i = 0; i < allArgs.Length; i++)
             {
                 var p = allArgs[i];
-                //dic.Add(p.Name, args[i]);
-                dic.Add(p.Name, Core.BinaryFormat.FieldFormat.Pack(p.ParameterType, args[i]));
+                dic.Add(p.Name, args[i]);
                 if (p.Attributes == ParameterAttributes.Out)
                 {
                     outs.Add(p.Name, i);
@@ -94,11 +93,8 @@ namespace CRL.RPC
             {
                 foreach (var kv in response.Outs)
                 {
-                    var find = (int)outs[kv.Key];
-                    var type = allArgs[find];
-                    //args[(int)find] = kv.Value;
-                    int offSet = 0;
-                    args[find] = Core.BinaryFormat.FieldFormat.UnPack(type.ParameterType, kv.Value, ref offSet);
+                    var find = outs[kv.Key];
+                    args[(int)find] = kv.Value;
                 }
             }
             if (returnType == typeof(void))

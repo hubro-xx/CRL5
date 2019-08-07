@@ -12,9 +12,11 @@ namespace CRL.Core.BinaryFormat
         {
             var list = (System.Collections.IEnumerable)param;
             var body = new List<byte>();
+            var type = param.GetType();
+            var innerType = type.GenericTypeArguments[0];
             foreach (var obj in list)
             {
-                var data = FieldFormat.Pack(obj);
+                var data = FieldFormat.Pack(innerType,obj);
                 body.AddRange(data);
             }
             return body.ToArray();

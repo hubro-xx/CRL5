@@ -13,7 +13,7 @@ namespace CRLTest
 {
     class testClass
     {
-        public string name
+        public object name
         {
             get; set;
         }
@@ -21,17 +21,17 @@ namespace CRLTest
         {
             get; set;
         }
-        //public List<b> nums
-        //{
-        //    get;set;
-        //}
+        public b b
+        {
+            get; set;
+        }
         public decimal price
         {
             get; set;
         }
-        public Dictionary<string,int> dic
+        public Dictionary<string, object> dic
         {
-            get;set;
+            get; set;
         }
     }
     public class b
@@ -43,14 +43,6 @@ namespace CRLTest
     }
     class Program
     {
-        class test2
-        {
-            public string name
-            {
-                get;set;
-            }
-            public string name2;
-        }
         static void Main(string[] args)
         {
 
@@ -59,16 +51,13 @@ namespace CRLTest
             var num2 = 20000;
             var d2 = BitConverter.GetBytes(num2);
             var obj = new testClass() {  };
-            //obj.dic = new Dictionary<string, int>() { { "tes111111111112t", 1 }, { "t2222222222122est2", 1 }, { "te22222221s3t", 1 } };
+            obj.b = new b() { name="b22424"};
+            //obj.dic = new Dictionary<string, object>() { { "tes111111111112t", 1 }, { "t2222222222122est2", 1 }, { "te22222221s3t", 1 } };
             obj.name = "test2ConvertObject";
             obj.time = DateTime.Now;
             obj.price = 1002;
-            var data = CRL.Core.BinaryFormat.ClassFormat.Pack(obj.GetType(), obj);
-            var json = SerializeHelper.SerializerToJson(obj);
-            var data2 = System.Text.Encoding.UTF8.GetBytes(json);
-            //var obj2 = CRL.Core.BinaryFormat.ClassFormat.UnPack(obj.GetType(), data);
-            Console.WriteLine($"{data.Length} {data2.Length}");
-            Console.ReadLine();
+            
+
             //自定义定位
             CRL.Sharding.LocationManage.Register<Code.Sharding.MemberSharding>((t, a) =>
             {
@@ -96,15 +85,44 @@ namespace CRLTest
         //Code.OrderManage.Instance.QueryItem(1);
         //Code.ProductDataManage.Instance.QueryItem(1);
         label1:
-            //testSharding();
-            //TestAll();
-            var str = "ffsf";
-            //Test5(str);
-            Code.TestAll.TestSelect();
-            //Code.TestAll.TestUnion();
+
+            var count = 1000;
+            long total1 = 0;
+            long total2 = 0;
+            var sw = new System.Diagnostics.Stopwatch(); ;
+            sw.Start();
+            for (int i = 0; i < count; i++)
+            {
+                total1+=testJson(obj);
+            }
+            sw.Stop();
+            var el = sw.ElapsedMilliseconds;
+            Console.WriteLine($"el:{el} t:{total1}");
+            sw = new System.Diagnostics.Stopwatch(); ;
+            sw.Start();
+            for (int i = 0; i < count; i++)
+            {
+                total2 += testBinary(obj);
+            }
+            sw.Stop();
+            var el2 = sw.ElapsedMilliseconds;
+            Console.WriteLine($"el:{el2} t:{total2}");
             Console.ReadLine();
             goto label1;
             Console.ReadLine();
+        }
+        static int testJson(testClass obj)
+        {
+            var json = SerializeHelper.SerializerToJson(obj);
+            var obj2 = SerializeHelper.DeserializeFromJson<testClass>(json);
+            var buffer = System.Text.Encoding.UTF8.GetBytes(json);
+            return buffer.Length;
+        }
+        static int testBinary(testClass obj)
+        {
+            var data = CRL.Core.BinaryFormat.ClassFormat.Pack(obj.GetType(), obj);
+            var obj2 = CRL.Core.BinaryFormat.ClassFormat.UnPack(obj.GetType(), data);
+            return data.Length;
         }
         static void testSharding()
         {

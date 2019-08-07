@@ -13,8 +13,7 @@ namespace CRL.RPC
         }
         public IByteBuffer ToBuffer()
         {
-            //var data = this.ToByte();
-            var data = Core.BinaryFormat.ClassFormat.Pack(GetType(), this);
+            var data = this.ToByte();
             return Unpooled.WrappedBuffer(data);
         }
         public string Token
@@ -23,18 +22,15 @@ namespace CRL.RPC
         }
         internal static T FromBuffer<T>(IByteBuffer buffer)
         {
-            //var data = buffer.ToString(Encoding.UTF8);
-            //return data.ToObject<T>();
-            var data = new byte[buffer.MaxCapacity];
-            buffer.ReadBytes(data);
-            return (T)Core.BinaryFormat.ClassFormat.UnPack(typeof(T), data);
+            var data = buffer.ToString(Encoding.UTF8);
+            return data.ToObject<T>();
         }
     }
     class RequestMessage : MessageBase
     {
         public string Service { get; set; }
         public string Method { get; set; }
-        public Dictionary<string, byte[]> Args { get; set; }
+        public Dictionary<string, object> Args { get; set; }
         public static RequestMessage FromBuffer(IByteBuffer buffer)
         {
             return FromBuffer<RequestMessage>(buffer);
@@ -44,21 +40,18 @@ namespace CRL.RPC
     class ResponseMessage : MessageBase
     {
         public bool Success { get; set; }
-        public byte[] Data { get; set; }
-        public Dictionary<string, byte[]> Outs
+        public string Data { get; set; }
+        public Dictionary<string, object> Outs
         {
             get; set;
         }
         public object GetData(Type type)
         {
-            int offSet = 0;
-            return Core.BinaryFormat.FieldFormat.UnPack(type, Data,ref offSet);
-            //return Data.ToObject(type);
+            return Data.ToObject(type);
         }
-        public void SetData(Type type, object data)
+        public void SetData(object data)
         {
-            Data = Core.BinaryFormat.FieldFormat.Pack(type, data);
-            //Data = data.ToJson();
+            Data = data.ToJson();
         }
         public string Msg { get; set; }
         public static ResponseMessage FromBuffer(IByteBuffer buffer)

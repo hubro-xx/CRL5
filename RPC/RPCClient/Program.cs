@@ -25,7 +25,7 @@ namespace RPCClient
             }
             catch(Exception ero)
             {
-                Console.WriteLine(ero.Message);
+                Console.WriteLine(ero.ToString());
             }
 
             Console.ReadLine();
@@ -43,11 +43,11 @@ namespace RPCClient
             {
                 string error = "";
                 var str = client.Test1("aaa",out error);
-                //System.Threading.Thread.Sleep(10);
+                Console.WriteLine($"return:{str} out:{error}");
             }
             sw.Stop();
             var el = sw.ElapsedMilliseconds;
-            Console.WriteLine("total:"+ el.ToString());
+          
         }
     }
 

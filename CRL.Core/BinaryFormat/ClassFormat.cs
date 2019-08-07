@@ -14,7 +14,7 @@ namespace CRL.Core.BinaryFormat
             var body = new List<byte>();
             foreach (var p in pro)
             {
-                var d = FieldFormat.Pack(p.GetValue(obj));
+                var d = FieldFormat.Pack(p.PropertyType, p.GetValue(obj));
                 body.AddRange(d);
             }
             return body.ToArray();
