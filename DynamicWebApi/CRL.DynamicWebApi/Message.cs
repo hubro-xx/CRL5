@@ -31,6 +31,10 @@ namespace CRL.DynamicWebApi
     {
         public bool Success { get; set; }
         public string Data { get; set; }
+        public static ResponseMessage CreateError(string msg, string code)
+        {
+            return new ResponseMessage() { Success = false, Msg = msg, Data = code };
+        }
         public object GetData(Type type)
         {
             return Data.ToObject(type);

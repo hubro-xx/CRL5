@@ -11,6 +11,7 @@ namespace CRL.DynamicWebApi
 {
     class ApiClient: DynamicObject
     {
+        internal ApiClientConnect ApiClientConnect;
         public string Host;
         public string ServiceName;
         public Type ServiceType;
@@ -51,11 +52,11 @@ namespace CRL.DynamicWebApi
             var response = SendRequest(request);
             if (response == null)
             {
-                throw new Exception("请求超时未响应");
+                ShowError("请求超时未响应","500");
             }
             if (!response.Success)
             {
-                throw new Exception($"服务端处理错误：{response.Msg}");
+                ShowError($"服务端处理错误：{response.Msg}", response.Data);
             }
             var returnType = method.ReturnType;
             if (response.Outs != null && response.Outs.Count > 0)
@@ -78,6 +79,17 @@ namespace CRL.DynamicWebApi
             result = response.GetData(returnType);
 
             return true;
+        }
+        void ShowError(string msg,string code)
+        {
+            if (ApiClientConnect.OnError != null)
+            {
+                ApiClientConnect.OnError(msg,code);
+            }
+            else
+            {
+                throw new Exception(msg);
+            }
         }
     }
 }

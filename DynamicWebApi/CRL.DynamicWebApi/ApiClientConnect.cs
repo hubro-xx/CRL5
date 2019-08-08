@@ -10,6 +10,7 @@ namespace CRL.DynamicWebApi
     public class ApiClientConnect
     {
         string host;
+        public Action<string,string> OnError;
         public ApiClientConnect(string _host)
         {
             host = _host;
@@ -35,6 +36,7 @@ namespace CRL.DynamicWebApi
                 Host = host,
                 ServiceType = typeof(T),
                 ServiceName = serviceName,
+                ApiClientConnect = this
                 //Token = string.Format("{0}@{1}", user, token)
             };
             //创建代理

@@ -16,11 +16,6 @@ namespace CRL.DynamicWebApi
         {
             serviceHandle.Add(typeof(IService).Name, new Service());
         }
-        //static Func<string, string, bool> tokenCheck;
-        //public void SetTokenCheck(Func<string, string, bool> _tokenCheck)
-        //{
-        //    tokenCheck = _tokenCheck;
-        //}
         internal static ResponseMessage InvokeResult(RequestMessage request)
         {
             var response = new ResponseMessage();
@@ -30,7 +25,7 @@ namespace CRL.DynamicWebApi
                 var a = serviceHandle.TryGetValue(request.Service, out object service);
                 if (!a)
                 {
-                    throw new Exception("未找到该服务");
+                    return ResponseMessage.CreateError("未找到该服务", "404");
                 }
    
                 var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
@@ -40,7 +35,9 @@ namespace CRL.DynamicWebApi
                     var serviceType = service.GetType();
                     method = serviceType.GetMethod(request.Method);
                     if (method == null)
-                        throw new Exception("未找到该方法");
+                    {
+                        return ResponseMessage.CreateError("未找到该方法", "404");
+                    }
                     methods.TryAdd(methodKey, method);
                 }
                 var loginAttr = method.GetCustomAttribute<LoginPointAttribute>();
@@ -48,14 +45,20 @@ namespace CRL.DynamicWebApi
                 {
                     if (string.IsNullOrEmpty(request.Token))
                     {
-                        throw new Exception("token为空");
+                        return ResponseMessage.CreateError("token为空", "401");
+                        //throw new Exception("token为空");
                     }
                     var tokenArry = request.Token.Split('@');
                     if (tokenArry.Length < 2)
                     {
-                        throw new Exception("token不合法 user@token");
+                        return ResponseMessage.CreateError("token不合法 user@token", "401");
+                        //throw new Exception("token不合法 user@token");
                     }
-                    SessionManage.CheckSession(tokenArry[0], tokenArry[1]);
+                    var a2 = SessionManage.CheckSession(tokenArry[0], tokenArry[1], out string error);
+                    if (!a)
+                    {
+                        return ResponseMessage.CreateError(error, "401");
+                    }
                     Core.CallContext.SetData("currentUser", tokenArry[0]);
                 }
                 var paramters = request.Args;
@@ -103,6 +106,7 @@ namespace CRL.DynamicWebApi
                 response.Success = false;
                 response.Msg = ex.Message;
                 Console.WriteLine(ex.ToString());
+                return ResponseMessage.CreateError("服务端处理错误:" + ex.Message, "500");
             }
  
             return response;

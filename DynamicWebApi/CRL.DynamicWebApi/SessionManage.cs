@@ -35,17 +35,21 @@ namespace CRL.DynamicWebApi
         {
             return Core.CallContext.GetData<string>("currentUser");
         }
-        internal static void CheckSession(string user,string token)
+        internal static bool CheckSession(string user,string token,out string error)
         {
+            error = "";
             var exists = sessions.TryGetValue(user, out string v);
             if (!exists)
             {
-                throw new Exception("API未登录");
+                error = "API未登录";
+                return false;
             }
             if (token != v)
             {
-                throw new Exception("token验证失败");
+                error = "token验证失败";
+                return false;
             }
+            return true;
         }
     }
 }
