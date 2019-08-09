@@ -15,14 +15,17 @@ namespace CRL.DynamicWebApi
         public string Host;
         public string ServiceName;
         public Type ServiceType;
-        string Token="";
 
+        public ApiClient()
+        {
+
+        }
         ResponseMessage SendRequest(RequestMessage msg)
         {
             var url = Host + $"/DynamicApi/{msg.Service}/{msg.Method}";
             var request = new ImitateWebRequest("orgsync", Encoding.UTF8);
             request.ContentType = "application/json";
-            request.SetHead("token", Token);
+            request.SetHead("token", ApiClientConnect.Token);
             var result = request.Post(url, msg.Args.ToJson());
             return result.ToObject<ResponseMessage>();
         }
@@ -34,7 +37,7 @@ namespace CRL.DynamicWebApi
             {
                 Service = ServiceName,
                 Method = binder.Name,
-                Token = Token
+                Token = ApiClientConnect.Token
             };
             var dic = new Dictionary<string, object>();
             var allArgs = method.GetParameters();
@@ -69,7 +72,7 @@ namespace CRL.DynamicWebApi
             }
             if (!string.IsNullOrEmpty(response.Token))
             {
-                Token = response.Token;
+                ApiClientConnect.Token = response.Token;
             }
             if (returnType == typeof(void))
             {

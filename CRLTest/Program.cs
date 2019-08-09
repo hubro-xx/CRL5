@@ -17,7 +17,7 @@ namespace CRLTest
         {
             get; set;
         }
-        public DateTime time
+        public DateTime? time
         {
             get; set;
         }
@@ -90,12 +90,12 @@ namespace CRLTest
         {
             var obj = new testClass() { };
             obj.b = new b() { name = "b22424" };
-            //obj.dic = new Dictionary<string, object>() { { "tes111111111112t", 1 }, { "t2222222222122est2", 1 }, { "te22222221s3t", 1 } };
+            obj.dic = new Dictionary<string, object>() { { "tes111111111112t", 1 }, { "t2222222222122est2", 1 }, { "te22222221s3t", 1 } };
             obj.name = "test2ConvertObject";
             obj.time = DateTime.Now;
             obj.price = 1002;
 
-            var count = 1000;
+            var count = 2;
             long total1 = 0;
             long total2 = 0;
             var sw = new System.Diagnostics.Stopwatch(); ;

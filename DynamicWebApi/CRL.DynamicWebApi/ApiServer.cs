@@ -55,7 +55,7 @@ namespace CRL.DynamicWebApi
                         //throw new Exception("token不合法 user@token");
                     }
                     var a2 = SessionManage.CheckSession(tokenArry[0], tokenArry[1], out string error);
-                    if (!a)
+                    if (!a2)
                     {
                         return ResponseMessage.CreateError(error, "401");
                     }

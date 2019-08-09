@@ -120,10 +120,16 @@ namespace CRL.Core.BinaryFormat
         static int lenSaveLength = 2;
         static Type ReturnType(Type type)
         {
+            if (type.FullName.StartsWith("System.Nullable"))
+            {
+                //Nullable<T> 可空属性
+                return type.GenericTypeArguments[0];
+            }
             if (!type.Name.Contains("&"))
             {
                 return type;
             }
+
             return Type.GetType(type.FullName.Replace("&", ""));
         }
         public static byte[] Pack(Type type, object param)

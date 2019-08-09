@@ -11,16 +11,11 @@ namespace CRL.DynamicWebApi
     {
         string host;
         public Action<string,string> OnError;
+        internal static string Token = "";
         public ApiClientConnect(string _host)
         {
             host = _host;
         }
-        //string user, token;
-        //public void SetToken(string _user, string _token)
-        //{
-        //    user = _user;
-        //    token = _token;
-        //}
         Dictionary<string, object> _services = new Dictionary<string, object>();
         public T GetClient<T>() where T : class
         {
