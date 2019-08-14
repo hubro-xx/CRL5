@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Linq.Expressions;
+using MongoDB.Driver.Linq;
+
 namespace CRL.DBExtend.MongoDBEx
 {
     /// <summary>
@@ -22,6 +24,17 @@ namespace CRL.DBExtend.MongoDBEx
     /// </summary>
     public sealed partial class MongoDBExt
     {
+        /// <summary>
+        /// 返回MongoQueryable
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public IMongoQueryable<T> GetQueryable<T>()
+        {
+            var collection = _MongoDB.GetCollection<T>(typeof(T).Name);
+            return collection.AsQueryable();
+
+        }
         List<dynamic> GetDynamicResult<TModel>(LambdaQuery.LambdaQuery<TModel> query1) where TModel : IModel, new()
         {
             var query = query1 as MongoDBLambdaQuery<TModel>;

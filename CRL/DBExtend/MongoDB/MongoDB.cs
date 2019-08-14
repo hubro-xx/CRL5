@@ -49,6 +49,9 @@ namespace CRL.DBExtend.MongoDBEx
             query.Where(expression);
             var collection = _MongoDB.GetCollection<TModel>(query.QueryTableName);
             object result = null;
+            //https://blog.csdn.net/shiyaru1314/article/details/52370478
+            //https://www.jb51.net/article/113820.htm
+            //https://blog.csdn.net/u013476435/article/details/81560089
             switch (functionType)
             {
                 case FunctionType.COUNT:

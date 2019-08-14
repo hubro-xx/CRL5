@@ -19,14 +19,17 @@ namespace CRL
     {
         #region 对象转换
         static Dictionary<Type, Dictionary<string, PropertyInfo>> objProperty = new Dictionary<Type, Dictionary<string, PropertyInfo>>();
-        static Dictionary<string, PropertyInfo> GetObjProperty(Type type)
+        static Dictionary<string, PropertyInfo> GetObjProperty(Type type, bool getPro=false)
         {
             if (objProperty.ContainsKey(type))
             {
                 return objProperty[type];
             }
             var destTypes = type.GetProperties().ToList();
-            destTypes.RemoveAll(b => b.SetMethod == null || (b.SetMethod != null && b.SetMethod.Name == "set_Item"));
+            if (!getPro)
+            {
+                destTypes.RemoveAll(b => b.SetMethod == null || (b.SetMethod != null && b.SetMethod.Name == "set_Item"));
+            }
             var dic = destTypes.ToDictionary(b => b.Name.ToUpper());
             objProperty[type] = dic;
             return dic;
@@ -41,7 +44,7 @@ namespace CRL
             where TDest : class, new()
         {
             var destTypes = GetObjProperty(typeof(TDest));
-            var sourceTypes = GetObjProperty(source.GetType());
+            var sourceTypes = GetObjProperty(source.GetType(),true);
             var obj = ToType(sourceTypes, destTypes, source, typeof(TDest));
             return obj as TDest;
         }

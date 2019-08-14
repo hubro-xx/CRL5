@@ -45,7 +45,8 @@ namespace CRLTest
     {
         static void Main(string[] args)
         {
-
+            var obj = new { name="test"};
+            var obj2 = obj.ToType<b>();
             //var s2= ConvertObject(typeof(CRL.DBAccess.DBType), "1");
             //var s3 = ConvertObject(typeof(decimal), "");
             var num2 = 20000;
