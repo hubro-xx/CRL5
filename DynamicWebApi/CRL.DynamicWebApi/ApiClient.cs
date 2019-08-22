@@ -52,36 +52,45 @@ namespace CRL.DynamicWebApi
                 }
             }
             request.Args = dic;
-            var response = SendRequest(request);
-            if (response == null)
+            try
             {
-                ShowError("请求超时未响应","500");
-            }
-            if (!response.Success)
-            {
-                ShowError($"服务端处理错误：{response.Msg}", response.Data);
-            }
-            var returnType = method.ReturnType;
-            if (response.Outs != null && response.Outs.Count > 0)
-            {
-                foreach (var kv in response.Outs)
+                var response = SendRequest(request);
+                if (response == null)
                 {
-                    var find = outs[kv.Key];
-                    args[(int)find] = kv.Value;
+                    ShowError("请求超时未响应", "500");
                 }
+                if (!response.Success)
+                {
+                    ShowError($"服务端处理错误：{response.Msg}", response.Data);
+                }
+                var returnType = method.ReturnType;
+                if (response.Outs != null && response.Outs.Count > 0)
+                {
+                    foreach (var kv in response.Outs)
+                    {
+                        var find = outs[kv.Key];
+                        args[(int)find] = kv.Value;
+                    }
+                }
+                if (!string.IsNullOrEmpty(response.Token))
+                {
+                    ApiClientConnect.Token = response.Token;
+                }
+                if (returnType == typeof(void))
+                {
+                    result = null;
+                    return true;
+                }
+                result = response.GetData(returnType);
+
+                return true;
             }
-            if (!string.IsNullOrEmpty(response.Token))
+            catch( Exception ero)
             {
-                ApiClientConnect.Token = response.Token;
-            }
-            if (returnType == typeof(void))
-            {
+                ShowError(ero.Message, "401");
                 result = null;
                 return true;
             }
-            result = response.GetData(returnType);
-
-            return true;
         }
         void ShowError(string msg,string code)
         {
