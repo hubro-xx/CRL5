@@ -12,6 +12,7 @@ using System.Linq.Expressions;
 using System.Text;
 using CRL.Core;
 using CRL.DBAccess;
+using MongoDB.Driver.Linq;
 
 namespace CRL
 {
@@ -947,5 +948,11 @@ namespace CRL
             return c;
 
         }
+        /// <summary>
+        /// 获取Mongo查询
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <returns></returns>
+        public abstract IMongoQueryable<TModel> GetMongoQueryable<TModel>();
     }
 }

@@ -20,7 +20,8 @@ namespace CRL.RPC
         public string ServiceName;
         public Type ServiceType;
         static Bootstrap bootstrap;
-        public string Token;
+
+        internal RPCClientConnect RPCClientConnect;
         IChannel channel = null;
 
         static ResponseWaits allWaits = new ResponseWaits();
@@ -62,7 +63,7 @@ namespace CRL.RPC
                 MsgId = id,
                 Service = ServiceName,
                 Method = binder.Name,
-                Token = Token
+                Token = RPCClientConnect.Token
             };
             var dic = new Dictionary<string, byte[]>();
             var allArgs = method.GetParameters();
@@ -83,11 +84,11 @@ namespace CRL.RPC
             var response = allWaits.Wait(id).Response;
             if (response == null)
             {
-                throw new Exception("请求超时未响应");
+                ShowError("请求超时未响应", "500");
             }
             if (!response.Success)
             {
-                throw new Exception($"服务端处理错误：{response.Msg}");
+                ShowError($"服务端处理错误：{response.Msg}", response.GetData(typeof(string)) + "");
             }
             var returnType = method.ReturnType;
             if (response.Outs != null && response.Outs.Count > 0)
@@ -101,6 +102,10 @@ namespace CRL.RPC
                     args[find] = Core.BinaryFormat.FieldFormat.UnPack(type.ParameterType, kv.Value, ref offSet);
                 }
             }
+            if (!string.IsNullOrEmpty(response.Token))
+            {
+                RPCClientConnect.Token = response.Token;
+            }
             if (returnType == typeof(void))
             {
                 result = null;
@@ -109,7 +114,17 @@ namespace CRL.RPC
             result = response.GetData(returnType);
             return true;
         }
-
+        void ShowError(string msg, string code)
+        {
+            if (RPCClientConnect.OnError != null)
+            {
+                RPCClientConnect.OnError(msg, code);
+            }
+            else
+            {
+                throw new Exception(msg);
+            }
+        }
         public void Dispose()
         {
             if (channel != null)

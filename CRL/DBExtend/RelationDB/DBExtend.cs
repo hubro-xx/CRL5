@@ -18,6 +18,7 @@ using System.Data.Common;
 using CRL.LambdaQuery;
 using System.Collections.Concurrent;
 using CRL.DBAccess;
+using MongoDB.Driver.Linq;
 
 namespace CRL.DBExtend.RelationDB
 {
@@ -34,7 +35,11 @@ namespace CRL.DBExtend.RelationDB
         {
             return new RelationLambdaQuery<TModel>(dbContext); 
         }
-        
+
+        public override IMongoQueryable<TModel> GetMongoQueryable<TModel>()
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// 通过关键类型,格式化SQL语句

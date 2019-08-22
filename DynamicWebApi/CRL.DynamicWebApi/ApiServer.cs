@@ -27,12 +27,11 @@ namespace CRL.DynamicWebApi
                 {
                     return ResponseMessage.CreateError("未找到该服务", "404");
                 }
-   
+                var serviceType = service.GetType();
                 var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
                 a = methods.TryGetValue(methodKey, out MethodInfo method);
                 if (!a)
                 {
-                    var serviceType = service.GetType();
                     method = serviceType.GetMethod(request.Method);
                     if (method == null)
                     {
@@ -40,12 +39,23 @@ namespace CRL.DynamicWebApi
                     }
                     methods.TryAdd(methodKey, method);
                 }
+                var checkToken = true;
+                var allowAnonymous = serviceType.GetCustomAttribute<AllowAnonymousAttribute>();
+                var allowAnonymous2 = method.GetCustomAttribute<AllowAnonymousAttribute>();
+                if (allowAnonymous != null || allowAnonymous2 != null)
+                {
+                    checkToken = false;
+                }
                 var loginAttr = method.GetCustomAttribute<LoginPointAttribute>();
-                if (loginAttr == null)//登录切入点不验证
+                if (loginAttr != null)
+                {
+                    checkToken = false;
+                }
+                if (checkToken)//登录切入点不验证
                 {
                     if (string.IsNullOrEmpty(request.Token))
                     {
-                        return ResponseMessage.CreateError("token为空", "401");
+                        return ResponseMessage.CreateError("请求token为空,请先登录", "401");
                         //throw new Exception("token为空");
                     }
                     var tokenArry = request.Token.Split('@');

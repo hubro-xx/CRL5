@@ -14,6 +14,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 using CRL.LambdaQuery;
+using MongoDB.Driver.Linq;
+
 namespace CRL.DBExtend.MongoDBEx
 {
     public sealed partial class MongoDBExt : AbsDBExtend
@@ -26,6 +28,7 @@ namespace CRL.DBExtend.MongoDBEx
         {
             return new MongoDBLambdaQuery<TModel>(dbContext);
         }
+
         IMongoDatabase _mongoDatabase=null;
         
         IMongoDatabase _MongoDB
@@ -41,7 +44,46 @@ namespace CRL.DBExtend.MongoDBEx
                 return _mongoDatabase; }
             set { _mongoDatabase = value; }
         }
-        
+        /// <summary>
+        /// 返回MongoQueryable
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <returns></returns>
+        public override IMongoQueryable<TModel> GetMongoQueryable<TModel>()
+        {
+            var collection = GetCollection<TModel>();
+            return collection.AsQueryable();
+
+        }
+        /// <summary>
+        /// 获取集合名,统一按定位判断
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <returns></returns>
+        protected IMongoCollection<TModel> GetCollection<TModel>()
+        {
+            string tableName;
+            if (dbContext.DBLocation.ShardingLocation != null)
+            {
+                tableName = dbContext.DBLocation.ShardingLocation.TablePartName;
+            }
+            else
+            {
+                tableName = TypeCache.GetTableName(typeof(TModel), dbContext);
+            }
+            return _MongoDB.GetCollection<TModel>(tableName);
+        }
+        /// <summary>
+        /// 创建索引
+        /// </summary>
+        /// <typeparam name="TModel"></typeparam>
+        /// <param name="name"></param>
+        public void CreateIndex<TModel>(string name)
+        {
+            var collection = GetCollection<TModel>();
+            var indexKeys = Builders<TModel>.IndexKeys.Ascending(name);
+            collection.Indexes.CreateOne(indexKeys);
+        }
         internal override TType GetFunction<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> selectField, FunctionType functionType, bool compileSp = false)
         {
             var query = new MongoDBLambdaQuery<TModel>(dbContext);

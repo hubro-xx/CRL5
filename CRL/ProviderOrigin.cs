@@ -14,6 +14,7 @@ using System.Transactions;
 using CRL.LambdaQuery;
 using System.Messaging;
 using CRL.Core;
+using MongoDB.Driver.Linq;
 
 namespace CRL
 {
@@ -289,6 +290,14 @@ namespace CRL
             //var dbContext2 = GetDbContext(true);//避开事务控制,使用新的连接
             var query = LambdaQueryFactory.CreateLambdaQuery<T>(DBExtend.dbContext);
             return query;
+        }
+        /// <summary>
+        /// 获取Mongo查询
+        /// </summary>
+        /// <returns></returns>
+        public IMongoQueryable<T> GetMongoQueryable()
+        {
+            return DBExtend.GetMongoQueryable<T>();
         }
         /// <summary>
         /// 指定查询条件创建表达式实例

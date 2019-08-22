@@ -51,30 +51,53 @@ namespace CRL.RPC
                 var a = serviceHandle.TryGetValue(request.Service, out object service);
                 if (!a)
                 {
-                    throw new Exception("未找到该服务");
-                }
-                if (tokenCheck != null)
-                {
-                    var tokenArry = request.Token.Split('@');
-                    if (tokenArry.Length < 2)
-                    {
-                        throw new Exception("token不合法");
-                    }
-                    if (!tokenCheck(tokenArry[0], tokenArry[1]))
-                    {
-                        throw new Exception("token验证失败");
-                    }
+                    return ResponseMessage.CreateError("未找到该服务", "404");
                 }
                 var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
                 a = methods.TryGetValue(methodKey, out MethodInfo method);
+                var serviceType = service.GetType();
                 if (!a)
                 {
-                    var serviceType = service.GetType();
                     method = serviceType.GetMethod(request.Method);
                     if (method == null)
-                        throw new Exception("未找到该方法");
+                    {
+                        return ResponseMessage.CreateError("未找到该方法", "404");
+                    }
                     methods.TryAdd(methodKey, method);
                 }
+                var checkToken = true;
+                var allowAnonymous = serviceType.GetCustomAttribute<AllowAnonymousAttribute>();
+                var allowAnonymous2 = method.GetCustomAttribute<AllowAnonymousAttribute>();
+                if(allowAnonymous!=null || allowAnonymous2!=null)
+                {
+                    checkToken = false;
+                }
+                var loginAttr = method.GetCustomAttribute<LoginPointAttribute>();
+                if (loginAttr != null)
+                {
+                    checkToken = false;
+                }
+                if (checkToken)//登录切入点不验证
+                {
+                    if (string.IsNullOrEmpty(request.Token))
+                    {
+                        return ResponseMessage.CreateError("请求token为空,请先登录", "401");
+                        //throw new Exception("token为空");
+                    }
+                    var tokenArry = request.Token.Split('@');
+                    if (tokenArry.Length < 2)
+                    {
+                        return ResponseMessage.CreateError("token不合法 user@token", "401");
+                        //throw new Exception("token不合法 user@token");
+                    }
+                    var a2 = SessionManage.CheckSession(tokenArry[0], tokenArry[1], out string error);
+                    if (!a2)
+                    {
+                        return ResponseMessage.CreateError(error, "401");
+                    }
+                    Core.CallContext.SetData("currentUser", tokenArry[0]);
+                }
+
                 var paramters = request.Args;
 
                 var methodParamters = method.GetParameters();
@@ -104,27 +127,25 @@ namespace CRL.RPC
                 response.SetData(method.ReturnType, result);
                 response.Success = true;
                 response.Outs = outs;
+                if (loginAttr != null)//登录方法后返回新TOKEN
+                {
+                    response.Token = Core.CallContext.GetData<string>("newToken");
+                }
             }
             catch (Exception ex)
             {
                 response.Success = false;
                 response.Msg = ex.Message;
                 Console.WriteLine(ex.ToString());
+                return ResponseMessage.CreateError("服务端处理错误:" + ex.Message, "500");
             }
 
             return response;
         }
 
-
-
         public void Register<IService, Service>() where Service : class, IService, new() where IService : class
         {
             serviceHandle.Add(typeof(IService).Name, new Service());
-        }
-        Func<string, string, bool> tokenCheck;
-        public void SetTokenCheck(Func<string, string, bool> _tokenCheck)
-        {
-            tokenCheck = _tokenCheck;
         }
 
         public void Start()

@@ -16,7 +16,10 @@ namespace RPCClient
             //var clientConnect = new RPCClientConnect("47.105.88.113", 805);
 
             var clientConnect = new RPCClientConnect("127.0.0.1", 805);
-            clientConnect.SetToken(user, token);
+            clientConnect.OnError = (ero, code) =>
+              {
+                  Console.WriteLine(ero + " " + code);
+              };
         label1:
             try
             {
@@ -36,6 +39,7 @@ namespace RPCClient
         {
          
             var client = clientConnect.GetClient<ITest>();
+            //client.login();
             long total = 0;
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -53,6 +57,7 @@ namespace RPCClient
 
     public interface ITest
     {
+        bool login();
         string Test1(string msg,out string error);
     }
 }

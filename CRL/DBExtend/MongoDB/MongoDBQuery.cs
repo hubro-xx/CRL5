@@ -24,23 +24,12 @@ namespace CRL.DBExtend.MongoDBEx
     /// </summary>
     public sealed partial class MongoDBExt
     {
-        /// <summary>
-        /// 返回MongoQueryable
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public IMongoQueryable<T> GetQueryable<T>()
-        {
-            var collection = _MongoDB.GetCollection<T>(typeof(T).Name);
-            return collection.AsQueryable();
-
-        }
         List<dynamic> GetDynamicResult<TModel>(LambdaQuery.LambdaQuery<TModel> query1) where TModel : IModel, new()
         {
             var query = query1 as MongoDBLambdaQuery<TModel>;
             //var selectField = query.__QueryFields;
             var selectField = query._CurrentSelectFieldCache.mapping;
-            var collection = _MongoDB.GetCollection<TModel>(query.QueryTableName);
+            var collection = GetCollection<TModel>();
             var pageIndex = query1.SkipPage-1;
             var pageSize = query1.TakeNum;
             var skip = 0;
@@ -217,7 +206,7 @@ namespace CRL.DBExtend.MongoDBEx
         {
             cacheKey = "none";
             var query = query1 as MongoDBLambdaQuery<TModel>;
-            var collection = _MongoDB.GetCollection<TModel>(query.QueryTableName);
+            var collection = GetCollection<TModel>();
             long rowNum = 0;
             var query2 = collection.Find(query.__MongoDBFilter).Sort(query._MongoDBSort);
             if (query.TakeNum > 0)

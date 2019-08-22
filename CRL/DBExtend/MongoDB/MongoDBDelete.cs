@@ -21,7 +21,7 @@ namespace CRL.DBExtend.MongoDBEx
         public override int Delete<T>(LambdaQuery.LambdaQuery<T> query1)
         {
             var query = query1 as MongoDBLambdaQuery<T>;
-            var collection = _MongoDB.GetCollection<T>(query.QueryTableName);
+            var collection = GetCollection<T>();
             var result = collection.DeleteMany(query.__MongoDBFilter);
             return (int)result.DeletedCount;
         }

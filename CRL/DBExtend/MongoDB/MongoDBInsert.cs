@@ -20,8 +20,8 @@ namespace CRL.DBExtend.MongoDBEx
             if (details.Count == 0)
                 return;
             var table = TypeCache.GetTable(typeof(TModel));
-            var collection = _MongoDB.GetCollection<TModel>(table.TableName);
-            foreach(var item in details)
+            var collection = GetCollection<TModel>();
+            foreach (var item in details)
             {
                 var index = getId(table.TableName);
                 table.PrimaryKey.SetValue(item, index);
@@ -41,7 +41,7 @@ $inc:{ 'currentIdValue':1}
             var table = TypeCache.GetTable(typeof(TModel));
             var index = getId(table.TableName);
             table.PrimaryKey.SetValue(obj, index);
-            var collection = _MongoDB.GetCollection<TModel>(table.TableName);
+            var collection = GetCollection<TModel>();
             collection.InsertOne(obj);
         }
     }

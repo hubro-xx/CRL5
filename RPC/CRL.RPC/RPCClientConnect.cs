@@ -10,16 +10,12 @@ namespace CRL.RPC
     {
         string host;
         int port;
+        public Action<string, string> OnError;
+        internal string Token;
         public RPCClientConnect(string _host, int _port)
         {
             host = _host;
             port = _port;
-        }
-        string user, token;
-        public void SetToken(string _user , string _token )
-        {
-            user = _user;
-            token = _token;
         }
         Dictionary<string, object> _services  = new Dictionary<string, object>();
         public T GetClient<T>() where T : class
@@ -37,7 +33,7 @@ namespace CRL.RPC
                 Port = port,
                 ServiceType = typeof(T),
                 ServiceName = serviceName,
-                Token = string.Format("{0}@{1}", user, token)
+                RPCClientConnect = this
             };
             //创建代理
             instance = client.ActLike<T>();

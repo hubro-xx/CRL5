@@ -76,6 +76,8 @@
     <Compile Include="Encrypt\RSA.cs" />
     <Compile Include="Encrypt\TripleDES.cs" />
     <Compile Include="Encrypt\TripleDES2.cs" />
+    <Compile Include="Extension\Json.cs" />
+    <Compile Include="Extension\String.cs" />
     <Compile Include="FormAuthentication\AuthenticationSecurity.cs" />
     <Compile Include="FormAuthentication\IUser.cs" />
     <Compile Include="ConcurrentControl.cs" />

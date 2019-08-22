@@ -45,6 +45,12 @@ namespace CRL.RPC
     {
         public bool Success { get; set; }
         public byte[] Data { get; set; }
+        public static ResponseMessage CreateError(string msg, string code)
+        {
+            var response = new ResponseMessage() { Success = false, Msg = msg };
+            response.SetData(typeof(string), code);
+            return response;
+        }
         public Dictionary<string, byte[]> Outs
         {
             get; set;

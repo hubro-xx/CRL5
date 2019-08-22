@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CRL.DynamicWebApi
+namespace CRL.RPC
 {
     /// <summary>
     /// 登录切入点

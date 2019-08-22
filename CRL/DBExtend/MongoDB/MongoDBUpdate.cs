@@ -23,8 +23,7 @@ namespace CRL.DBExtend.MongoDBEx
         //}
         int Update<TModel>(FilterDefinition<TModel> filter, ParameCollection setValue)
         {
-            var table = TypeCache.GetTable(typeof(TModel));
-            var collection = _MongoDB.GetCollection<TModel>(table.TableName);
+            var collection = GetCollection<TModel>();
             var update = Builders<TModel>.Update;
             var first = setValue.First();
             var updateSet = update.Set(first.Key, first.Value);
