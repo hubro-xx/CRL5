@@ -16,8 +16,10 @@ namespace CRL.DynamicWebApi
         {
             context.BeginRequest += (s, e) =>
             {
-                var app = s as HttpApplication;
-                var path = app.Request.FilePath;
+                var application = s as HttpApplication;
+                var request = application.Request;
+                var response = application.Response;
+                var path = request.FilePath;
                 if(!path.StartsWith("/DynamicApi/"))
                 {
                     return;
@@ -25,27 +27,27 @@ namespace CRL.DynamicWebApi
                 var arry = path.Split('/');
                 var service = arry[2];
                 var method = arry[3];
-                var serviceHandle = ApiServer.serviceHandle;
-                var token = app.Request.Headers["token"];
+                //var serviceHandle = ApiServer.serviceHandle;
+                var token = request.Headers["token"];
 
-                var request = new RequestMessage()
+                var requestMsg = new RequestMessage()
                 {
                     Service = service,
                     Method = method,
                     Token = token,
                 };
-                if (app.Request.ContentLength > 0)
+                if (request.ContentLength > 0)
                 {
-                    var ms = app.Request.InputStream;
-                    var data = new byte[app.Request.ContentLength];
+                    var ms = request.InputStream;
+                    var data = new byte[request.ContentLength];
                     ms.Read(data, 0, data.Length);
                     var args = System.Text.Encoding.UTF8.GetString(data);
-                    request.Args = args.ToObject<Dictionary<string, object>>();
+                    requestMsg.Args = args.ToObject<Dictionary<string, object>>();
                 }
-                var result = ApiServer.InvokeResult(request);
-                app.Response.ContentType = "application/json";
-                app.Response.Write(result.ToJson());
-                app.Response.End();
+                var result = ApiServer.InvokeResult(requestMsg);
+                response.ContentType = "application/json";
+                response.Write(result.ToJson());
+                response.End();
             };
         }
     }
