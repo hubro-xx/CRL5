@@ -48,7 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LoginPointAttribute.cs" />
+    <Compile Include="Attribute.cs" />
     <Compile Include="ApiClient.cs" />
     <Compile Include="ApiClientConnect.cs" />
     <Compile Include="DynamicModule.cs" />

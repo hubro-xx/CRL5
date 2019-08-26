@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace CRL.DynamicWebApi
 {
@@ -35,7 +36,7 @@ namespace CRL.DynamicWebApi
         {
             return Core.CallContext.GetData<string>("currentUser");
         }
-        internal static bool CheckSession(string user,string token,out string error)
+        internal static bool CheckSession(string user, string token, out string error)
         {
             error = "";
             var exists = sessions.TryGetValue(user, out string v);
@@ -50,6 +51,14 @@ namespace CRL.DynamicWebApi
                 return false;
             }
             return true;
+        }
+        /// <summary>
+        /// 获取发送的文件
+        /// </summary>
+        /// <returns></returns>
+        public static HttpPostedFile GetPostFile()
+        {
+            return Core.CallContext.GetData<HttpPostedFile>("postFile");
         }
     }
 }

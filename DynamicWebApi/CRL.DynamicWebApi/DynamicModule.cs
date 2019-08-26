@@ -29,7 +29,11 @@ namespace CRL.DynamicWebApi
                 var method = arry[3];
                 //var serviceHandle = ApiServer.serviceHandle;
                 var token = request.Headers["token"];
-
+                if (request.Files != null && request.Files.Count > 0)
+                {
+                    var file = request.Files[0];
+                    Core.CallContext.SetData("postFile", file);
+                }
                 var requestMsg = new RequestMessage()
                 {
                     Service = service,
@@ -45,6 +49,7 @@ namespace CRL.DynamicWebApi
                     requestMsg.Args = args.ToObject<Dictionary<string, object>>();
                 }
                 var result = ApiServer.InvokeResult(requestMsg);
+                response.Headers.Add("Access-Control-Allow-Origin", "*");
                 response.ContentType = "application/json";
                 response.Write(result.ToJson());
                 response.End();

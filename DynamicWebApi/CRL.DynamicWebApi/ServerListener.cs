@@ -42,6 +42,7 @@ namespace CRL.DynamicWebApi
         {
             var request = context.Request;
             var response = context.Response;
+            response.Headers.Add("Access-Control-Allow-Origin", "*");
             var path = request.Url.AbsolutePath;
             if (!path.StartsWith("/DynamicApi/"))
             {
