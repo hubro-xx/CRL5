@@ -18,18 +18,19 @@ namespace DynamicWebApiServerTest
         public DateTime time;
         public string str;
     }
-    public class TestService : ITestService
+    public class TestService : AbsService, ITestService
     {
         [LoginPoint]
         public string Login(string name, string pass)
         {
-            SessionManage.SaveSession("hubro","7777777777");
+            SaveSession("hubro","7777777777");
             return name;
         }
 
         public void SendData(string msg)
         {
-            var user = SessionManage.GetSession();
+            var user = GetUser();
+            var file = GetPostFile();
         }
     }
 }

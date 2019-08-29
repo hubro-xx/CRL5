@@ -16,7 +16,7 @@ namespace CRL.DynamicWebApi
         /// </summary>
         /// <param name="user"></param>
         /// <param name="token"></param>
-        public static void SaveSession(string user, string token)
+        internal static void SaveSession(string user, string token)
         {
             if (!sessions.TryGetValue(user, out string token2))
             {
@@ -26,16 +26,8 @@ namespace CRL.DynamicWebApi
             {
                 sessions[user] = token;
             }
-            Core.CallContext.SetData("newToken", string.Format("{0}@{1}", user, token));
         }
-        /// <summary>
-        /// 返回登录名
-        /// </summary>
-        /// <returns></returns>
-        public static string GetSession()
-        {
-            return Core.CallContext.GetData<string>("currentUser");
-        }
+
         internal static bool CheckSession(string user, string token, out string error)
         {
             error = "";
@@ -52,13 +44,6 @@ namespace CRL.DynamicWebApi
             }
             return true;
         }
-        /// <summary>
-        /// 获取发送的文件
-        /// </summary>
-        /// <returns></returns>
-        public static HttpPostedFile GetPostFile()
-        {
-            return Core.CallContext.GetData<HttpPostedFile>("postFile");
-        }
+
     }
 }

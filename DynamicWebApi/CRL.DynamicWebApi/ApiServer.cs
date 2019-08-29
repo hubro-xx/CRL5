@@ -10,9 +10,9 @@ namespace CRL.DynamicWebApi
 {
     public class ApiServer
     {
-        internal static Dictionary<string, object> serviceHandle = new Dictionary<string, object>();
+        internal static Dictionary<string, AbsService> serviceHandle = new Dictionary<string, AbsService>();
         static ConcurrentDictionary<string, MethodInfo> methods = new ConcurrentDictionary<string, MethodInfo>();
-        public void Register<IService, Service>() where Service : class, IService, new() where IService : class
+        public void Register<IService, Service>() where Service : AbsService, IService, new() where IService : class
         {
             serviceHandle.Add(typeof(IService).Name, new Service());
         }
@@ -22,7 +22,7 @@ namespace CRL.DynamicWebApi
 
             try
             {
-                var a = serviceHandle.TryGetValue(request.Service, out object service);
+                var a = serviceHandle.TryGetValue(request.Service, out AbsService service);
                 if (!a)
                 {
                     return ResponseMessage.CreateError("未找到该服务", "404");
@@ -69,7 +69,8 @@ namespace CRL.DynamicWebApi
                     {
                         return ResponseMessage.CreateError(error, "401");
                     }
-                    Core.CallContext.SetData("currentUser", tokenArry[0]);
+                    //Core.CallContext.SetData("currentUser", tokenArry[0]);
+                    service.SetUser(tokenArry[0]);
                 }
                 var paramters = request.Args;
                 var methodParamters = method.GetParameters();
@@ -108,7 +109,7 @@ namespace CRL.DynamicWebApi
                 response.Outs = outs;
                 if (loginAttr != null)//登录方法后返回新TOKEN
                 {
-                    response.Token = Core.CallContext.GetData<string>("newToken");
+                    response.Token = service.GetToken();
                 }
             }
             catch (Exception ex)
