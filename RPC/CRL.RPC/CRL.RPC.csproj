@@ -84,7 +84,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AsyncInvoke.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Handler\ClientHandler.cs" />
     <Compile Include="Handler\ServerHandler.cs" />

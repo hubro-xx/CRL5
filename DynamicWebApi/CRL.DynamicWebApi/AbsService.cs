@@ -33,7 +33,7 @@ namespace CRL.DynamicWebApi
         /// <param name="token"></param>
         protected void SaveSession(string user, string token)
         {
-            SessionManage.SaveSession(user, token);
+            ApiServer.sessionManage.SaveSession(user, token);
             __token = string.Format("{0}@{1}", user, token);
         }
 

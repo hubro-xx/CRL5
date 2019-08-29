@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,24 @@ namespace CRL.DynamicWebApi
 {
     public class ApiServer
     {
+        static ApiServer()
+        {
+            sessionManage = new SessionManage();
+        }
         internal static Dictionary<string, AbsService> serviceHandle = new Dictionary<string, AbsService>();
         static ConcurrentDictionary<string, MethodInfo> methods = new ConcurrentDictionary<string, MethodInfo>();
         public void Register<IService, Service>() where Service : AbsService, IService, new() where IService : class
         {
             serviceHandle.Add(typeof(IService).Name, new Service());
+        }
+        internal static ISessionManage sessionManage;
+        /// <summary>
+        /// 自定义session管理
+        /// </summary>
+        /// <param name="_sessionManage"></param>
+        public static void SetSessionManage(ISessionManage _sessionManage)
+        {
+            sessionManage = _sessionManage;
         }
         internal static ResponseMessage InvokeResult(RequestMessage request)
         {
@@ -64,7 +78,7 @@ namespace CRL.DynamicWebApi
                         return ResponseMessage.CreateError("token不合法 user@token", "401");
                         //throw new Exception("token不合法 user@token");
                     }
-                    var a2 = SessionManage.CheckSession(tokenArry[0], tokenArry[1], out string error);
+                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], out string error);
                     if (!a2)
                     {
                         return ResponseMessage.CreateError(error, "401");

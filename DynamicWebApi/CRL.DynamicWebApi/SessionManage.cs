@@ -8,7 +8,12 @@ using System.Web;
 
 namespace CRL.DynamicWebApi
 {
-    public class SessionManage
+    public interface ISessionManage
+    {
+        void SaveSession(string user, string token);
+        bool CheckSession(string user, string token, out string error);
+    }
+    public class SessionManage: ISessionManage
     {
         static ConcurrentDictionary<string, string> sessions = new ConcurrentDictionary<string, string>();
         /// <summary>
@@ -16,7 +21,7 @@ namespace CRL.DynamicWebApi
         /// </summary>
         /// <param name="user"></param>
         /// <param name="token"></param>
-        internal static void SaveSession(string user, string token)
+        public void SaveSession(string user, string token)
         {
             if (!sessions.TryGetValue(user, out string token2))
             {
@@ -28,7 +33,7 @@ namespace CRL.DynamicWebApi
             }
         }
 
-        internal static bool CheckSession(string user, string token, out string error)
+        public bool CheckSession(string user, string token, out string error)
         {
             error = "";
             var exists = sessions.TryGetValue(user, out string v);

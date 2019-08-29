@@ -49,9 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbsService.cs" />
-    <Compile Include="Attribute.cs" />
     <Compile Include="ApiClient.cs" />
     <Compile Include="ApiClientConnect.cs" />
+    <Compile Include="Attribute.cs" />
     <Compile Include="DynamicModule.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Message.cs" />
