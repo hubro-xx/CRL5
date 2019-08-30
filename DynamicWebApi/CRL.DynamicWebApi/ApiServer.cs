@@ -1,4 +1,6 @@
 ﻿
+using CRL.Core.Extension;
+using CRL.Remoting;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,7 +15,6 @@ namespace CRL.DynamicWebApi
     {
         static ApiServer()
         {
-            sessionManage = new SessionManage();
         }
         internal static Dictionary<string, AbsService> serviceHandle = new Dictionary<string, AbsService>();
         static ConcurrentDictionary<string, MethodInfo> methods = new ConcurrentDictionary<string, MethodInfo>();
@@ -21,14 +22,20 @@ namespace CRL.DynamicWebApi
         {
             serviceHandle.Add(typeof(IService).Name, new Service());
         }
-        internal static ISessionManage sessionManage;
+        internal static ISessionManage sessionManage
+        {
+            get
+            {
+                return Setting.SessionManage;
+            }
+        }
         /// <summary>
         /// 自定义session管理
         /// </summary>
         /// <param name="_sessionManage"></param>
-        public static void SetSessionManage(ISessionManage _sessionManage)
+        public void SetSessionManage(ISessionManage _sessionManage)
         {
-            sessionManage = _sessionManage;
+            Setting.SessionManage = _sessionManage;
         }
         internal static ResponseMessage InvokeResult(RequestMessage request)
         {

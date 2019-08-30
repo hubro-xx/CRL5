@@ -88,6 +88,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Remoting\CRL.Remoting\CRL.Remoting.csproj">
+      <Project>{5018b73c-bfbf-42bf-b5e6-c8859a36d0af}</Project>
+      <Name>CRL.Remoting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CRL.DynamicWebApi\CRL.DynamicWebApi.csproj">
       <Project>{d38d1696-a995-4764-9a04-52d55db2b947}</Project>
       <Name>CRL.DynamicWebApi</Name>

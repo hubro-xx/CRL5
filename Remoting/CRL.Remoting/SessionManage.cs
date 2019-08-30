@@ -4,10 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
-namespace CRL.RPC
+namespace CRL.Remoting
 {
-    public class SessionManage
+    public interface ISessionManage
+    {
+        void SaveSession(string user, string token);
+        bool CheckSession(string user, string token, out string error);
+    }
+    public class SessionManage: ISessionManage
     {
         static ConcurrentDictionary<string, string> sessions = new ConcurrentDictionary<string, string>();
         /// <summary>
@@ -15,7 +21,7 @@ namespace CRL.RPC
         /// </summary>
         /// <param name="user"></param>
         /// <param name="token"></param>
-        public static void SaveSession(string user, string token)
+        public void SaveSession(string user, string token)
         {
             if (!sessions.TryGetValue(user, out string token2))
             {
@@ -25,17 +31,9 @@ namespace CRL.RPC
             {
                 sessions[user] = token;
             }
-            Core.CallContext.SetData("newToken", string.Format("{0}@{1}", user, token));
         }
-        /// <summary>
-        /// 返回登录名
-        /// </summary>
-        /// <returns></returns>
-        public static string GetSession()
-        {
-            return Core.CallContext.GetData<string>("currentUser");
-        }
-        internal static bool CheckSession(string user,string token,out string error)
+
+        public bool CheckSession(string user, string token, out string error)
         {
             error = "";
             var exists = sessions.TryGetValue(user, out string v);
@@ -51,5 +49,6 @@ namespace CRL.RPC
             }
             return true;
         }
+
     }
 }

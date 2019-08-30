@@ -39,7 +39,7 @@ namespace RPCClient
         {
          
             var client = clientConnect.GetClient<ITest>();
-            //client.login();
+            client.login();
             long total = 0;
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using CRL.Remoting;
 namespace RPCServerTest
 {
     class Program
@@ -23,18 +23,18 @@ namespace RPCServerTest
             bool login();
             string Test1(string msg, out string error);
         }
-        public class Test : ITest
+        public class Test : AbsService, ITest
         {
-            [CRL.RPC.LoginPoint]
+            [LoginPoint]
             public bool login()
             {
-                CRL.RPC.SessionManage.SaveSession("user","token");
+                SaveSession("user","token");
                 return true;
             }
        
             public string Test1(string msg, out string error)
             {
-                var user = SessionManage.GetSession();
+                var user = GetUser();
                 error = "error";
                 return msg;
             }

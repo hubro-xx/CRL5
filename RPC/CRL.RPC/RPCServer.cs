@@ -1,4 +1,5 @@
 ﻿
+using CRL.Remoting;
 using DotNetty.Codecs;
 using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
@@ -17,7 +18,7 @@ namespace CRL.RPC
     public class RPCServer: IDisposable
     {
         int port;
-        Dictionary<string, object> serviceHandle = new Dictionary<string, object>();
+        Dictionary<string, AbsService> serviceHandle = new Dictionary<string, AbsService>();
         ConcurrentDictionary<string, MethodInfo> methods = new ConcurrentDictionary<string, MethodInfo>();
         ServerBootstrap serverBootstrap;
         IChannel serverChannel { get; set; }
@@ -38,9 +39,25 @@ namespace CRL.RPC
                     pipeline.AddLast(new ServerHandler(this));
                 }));
         }
-
-
-
+        public void Register<IService, Service>() where Service : AbsService, IService, new() where IService : class
+        {
+            serviceHandle.Add(typeof(IService).Name, new Service());
+        }
+        internal static ISessionManage sessionManage
+        {
+            get
+            {
+                return Setting.SessionManage;
+            }
+        }
+        /// <summary>
+        /// 自定义session管理
+        /// </summary>
+        /// <param name="_sessionManage"></param>
+        public void SetSessionManage(ISessionManage _sessionManage)
+        {
+            Setting.SessionManage = _sessionManage;
+        }
 
         internal ResponseMessage InvokeResult(RequestMessage request)
         {
@@ -48,7 +65,7 @@ namespace CRL.RPC
 
             try
             {
-                var a = serviceHandle.TryGetValue(request.Service, out object service);
+                var a = serviceHandle.TryGetValue(request.Service, out AbsService service);
                 if (!a)
                 {
                     return ResponseMessage.CreateError("未找到该服务", "404");
@@ -90,7 +107,7 @@ namespace CRL.RPC
                         return ResponseMessage.CreateError("token不合法 user@token", "401");
                         //throw new Exception("token不合法 user@token");
                     }
-                    var a2 = SessionManage.CheckSession(tokenArry[0], tokenArry[1], out string error);
+                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], out string error);
                     if (!a2)
                     {
                         return ResponseMessage.CreateError(error, "401");
@@ -129,7 +146,7 @@ namespace CRL.RPC
                 response.Outs = outs;
                 if (loginAttr != null)//登录方法后返回新TOKEN
                 {
-                    response.Token = Core.CallContext.GetData<string>("newToken");
+                    response.Token = service.GetToken();
                 }
             }
             catch (Exception ex)
@@ -141,11 +158,6 @@ namespace CRL.RPC
             }
 
             return response;
-        }
-
-        public void Register<IService, Service>() where Service : class, IService, new() where IService : class
-        {
-            serviceHandle.Add(typeof(IService).Name, new Service());
         }
 
         public void Start()

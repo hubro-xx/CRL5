@@ -5,17 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace CRL.DynamicWebApi
+namespace CRL.Remoting
 {
     public abstract class AbsService
     {
         static string __currentUser;
         static string __token;
-        internal void SetUser(string user)
+        public void SetUser(string user)
         {
             __currentUser = user;
         }
-        internal string GetToken()
+        public string GetToken()
         {
             return __token;
         }
@@ -33,7 +33,7 @@ namespace CRL.DynamicWebApi
         /// <param name="token"></param>
         protected void SaveSession(string user, string token)
         {
-            ApiServer.sessionManage.SaveSession(user, token);
+            Setting.SessionManage.SaveSession(user, token);
             __token = string.Format("{0}@{1}", user, token);
         }
 

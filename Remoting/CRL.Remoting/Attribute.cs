@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CRL.RPC
+namespace CRL.Remoting
 {
     /// <summary>
     /// 登录切入点

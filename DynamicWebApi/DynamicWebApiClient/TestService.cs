@@ -9,7 +9,6 @@ namespace DynamicWebApiClient
 {
     public interface ITestService
     {
-        [LoginPoint]
         string Login(string name, string pass);
         void SendData(string msg);
 
