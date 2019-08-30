@@ -1,4 +1,5 @@
 ﻿using CRL.Core.Extension;
+using CRL.Core.Remoting;
 using CRL.Core.Request;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CRL.DynamicWebApi
 {
-    class ApiClient: DynamicObject
+    class ApiClient: AbsClient
     {
         internal ApiClientConnect ApiClientConnect;
         public string Host;
@@ -93,16 +94,20 @@ namespace CRL.DynamicWebApi
                 return true;
             }
         }
-        void ShowError(string msg,string code)
+        protected override void ShowError(string msg, string code)
         {
             if (ApiClientConnect.OnError != null)
             {
-                ApiClientConnect.OnError(msg,code);
+                ApiClientConnect.OnError(msg, code);
             }
             else
             {
                 throw new Exception(msg);
             }
+        }
+        public override void Dispose()
+        {
+          
         }
     }
 }

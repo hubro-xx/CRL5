@@ -102,10 +102,6 @@
       <Project>{1255276c-756e-48aa-a09b-22e92d16d995}</Project>
       <Name>CRL.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Remoting\CRL.Remoting\CRL.Remoting.csproj">
-      <Project>{5018b73c-bfbf-42bf-b5e6-c8859a36d0af}</Project>
-      <Name>CRL.Remoting</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

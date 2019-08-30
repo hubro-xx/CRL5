@@ -1,4 +1,5 @@
-﻿using ImpromptuInterface;
+﻿using CRL.Core.Remoting;
+using ImpromptuInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CRL.DynamicWebApi
 {
-    public class ApiClientConnect
+    public class ApiClientConnect: IClientConnect
     {
         string host;
         public Action<string,string> OnError;
@@ -38,6 +39,11 @@ namespace CRL.DynamicWebApi
             instance = client.ActLike<T>();
             _services[key] = instance;
             return instance as T;
+        }
+
+        public void Dispose()
+        {
+           
         }
     }
 }

@@ -84,6 +84,13 @@
     <Compile Include="CookieHelper.cs" />
     <Compile Include="DelegateCache.cs" />
     <Compile Include="ExceptionHelper.cs" />
+    <Compile Include="Remoting\AbsServer.cs" />
+    <Compile Include="Remoting\AbsService.cs" />
+    <Compile Include="Remoting\Attribute.cs" />
+    <Compile Include="Remoting\AbsClient.cs" />
+    <Compile Include="Remoting\IClientConnect.cs" />
+    <Compile Include="Remoting\SessionManage.cs" />
+    <Compile Include="Remoting\Setting.cs" />
     <Compile Include="RequestLimiter.cs" />
     <Compile Include="Session\AbsSession.cs" />
     <Compile Include="RedisProvider\RedisClient.cs" />

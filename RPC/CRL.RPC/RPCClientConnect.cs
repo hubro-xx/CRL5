@@ -1,4 +1,5 @@
 ﻿
+using CRL.Core.Remoting;
 using ImpromptuInterface;
 using System;
 using System.Collections.Generic;
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 namespace CRL.RPC
 {
 
-    public class RPCClientConnect: IDisposable
+    public class RPCClientConnect: IClientConnect
     {
         string host;
         int port;

@@ -17,7 +17,7 @@ namespace CRL.RPC
         {
             var buffer = message as IByteBuffer;
             var request = RequestMessage.FromBuffer(buffer);
-            ResponseMessage response = server.InvokeResult(request);
+            var response = server.InvokeResult(request) as ResponseMessage;
             response.MsgId = request.MsgId;
             context.WriteAndFlushAsync(response.ToBuffer());
             //context.CloseAsync();

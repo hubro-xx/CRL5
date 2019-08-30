@@ -1,6 +1,6 @@
 ﻿
 using CRL.Core.Extension;
-using CRL.Remoting;
+using CRL.Core.Remoting;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,34 +11,23 @@ using System.Threading.Tasks;
 
 namespace CRL.DynamicWebApi
 {
-    public class ApiServer
+    public class ApiServer: AbsServer
     {
         static ApiServer()
         {
+            instance = new ApiServer();
         }
-        internal static Dictionary<string, AbsService> serviceHandle = new Dictionary<string, AbsService>();
-        static ConcurrentDictionary<string, MethodInfo> methods = new ConcurrentDictionary<string, MethodInfo>();
-        public void Register<IService, Service>() where Service : AbsService, IService, new() where IService : class
-        {
-            serviceHandle.Add(typeof(IService).Name, new Service());
-        }
-        internal static ISessionManage sessionManage
+        static ApiServer instance;
+        internal static ApiServer Instance
         {
             get
             {
-                return Setting.SessionManage;
+                return instance;
             }
         }
-        /// <summary>
-        /// 自定义session管理
-        /// </summary>
-        /// <param name="_sessionManage"></param>
-        public void SetSessionManage(ISessionManage _sessionManage)
+        public override object InvokeResult(object rq)
         {
-            Setting.SessionManage = _sessionManage;
-        }
-        internal static ResponseMessage InvokeResult(RequestMessage request)
-        {
+            var request = rq as RequestMessage;
             var response = new ResponseMessage();
 
             try
@@ -142,6 +131,16 @@ namespace CRL.DynamicWebApi
             }
  
             return response;
+        }
+
+        public override void Dispose()
+        {
+
+        }
+
+        public override void Start()
+        {
+
         }
     }
 }

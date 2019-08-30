@@ -50,9 +50,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Remoting\CRL.Remoting\CRL.Remoting.csproj">
-      <Project>{5018b73c-bfbf-42bf-b5e6-c8859a36d0af}</Project>
-      <Name>CRL.Remoting</Name>
+    <ProjectReference Include="..\..\CRL.Core\CRL.Core.csproj">
+      <Project>{1255276c-756e-48aa-a09b-22e92d16d995}</Project>
+      <Name>CRL.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\CRL.RPC\CRL.RPC.csproj">
       <Project>{a5f7c0ae-af7a-45f6-8f50-c3ae5616abbe}</Project>

@@ -1,5 +1,4 @@
-﻿
-using CRL.Remoting;
+﻿using CRL.Core.Remoting;
 using DotNetty.Codecs;
 using DotNetty.Transport.Bootstrapping;
 using DotNetty.Transport.Channels;
@@ -15,11 +14,10 @@ namespace CRL.RPC
     /// <summary>
     /// RPC服务端
     /// </summary>
-    public class RPCServer: IDisposable
+    public class RPCServer: AbsServer
     {
         int port;
-        Dictionary<string, AbsService> serviceHandle = new Dictionary<string, AbsService>();
-        ConcurrentDictionary<string, MethodInfo> methods = new ConcurrentDictionary<string, MethodInfo>();
+        
         ServerBootstrap serverBootstrap;
         IChannel serverChannel { get; set; }
         public RPCServer(int _port)
@@ -39,28 +37,11 @@ namespace CRL.RPC
                     pipeline.AddLast(new ServerHandler(this));
                 }));
         }
-        public void Register<IService, Service>() where Service : AbsService, IService, new() where IService : class
-        {
-            serviceHandle.Add(typeof(IService).Name, new Service());
-        }
-        internal static ISessionManage sessionManage
-        {
-            get
-            {
-                return Setting.SessionManage;
-            }
-        }
-        /// <summary>
-        /// 自定义session管理
-        /// </summary>
-        /// <param name="_sessionManage"></param>
-        public void SetSessionManage(ISessionManage _sessionManage)
-        {
-            Setting.SessionManage = _sessionManage;
-        }
 
-        internal ResponseMessage InvokeResult(RequestMessage request)
+
+        public override object InvokeResult(object rq)
         {
+            var request = rq as RequestMessage;
             var response = new ResponseMessage();
 
             try
@@ -160,18 +141,12 @@ namespace CRL.RPC
             return response;
         }
 
-        public void Start()
+        public override void Start()
         {
             serverChannel = serverBootstrap.BindAsync(port).Result;
             Console.WriteLine("RPCServer start at "+ port);
         }
-
-        public void Stop()
-        {
-            Dispose();
-        }
-
-        public void Dispose()
+        public override void Dispose()
         {
             serverChannel.CloseAsync();
         }

@@ -1,5 +1,5 @@
 ﻿using CRL.DynamicWebApi;
-using CRL.Remoting;
+using CRL.Core.Remoting;
 using System;
 using System.Collections.Generic;
 using System.Linq;

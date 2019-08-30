@@ -1,4 +1,5 @@
 ﻿
+using CRL.Core.Remoting;
 using DotNetty.Buffers;
 using DotNetty.Codecs;
 using DotNetty.Transport.Bootstrapping;
@@ -13,7 +14,7 @@ using System.Reflection;
 using System.Text;
 namespace CRL.RPC
 {
-    class RPCClient : DynamicObject,IDisposable
+    class RPCClient : AbsClient
     {
         public string Host;
         public int Port;
@@ -114,7 +115,7 @@ namespace CRL.RPC
             result = response.GetData(returnType);
             return true;
         }
-        void ShowError(string msg, string code)
+        protected override void ShowError(string msg, string code)
         {
             if (RPCClientConnect.OnError != null)
             {
@@ -125,7 +126,7 @@ namespace CRL.RPC
                 throw new Exception(msg);
             }
         }
-        public void Dispose()
+        public override void Dispose()
         {
             if (channel != null)
             {

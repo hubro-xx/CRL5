@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CRL.Remoting;
+using CRL.Core.Remoting;
 namespace RPCServerTest
 {
     class Program
@@ -12,7 +12,7 @@ namespace RPCServerTest
         static void Main(string[] args)
         {
             var rPCServer = new RPCServer(805);
-
+            rPCServer.SetSessionManage(new SessionManage());
             rPCServer.Register<ITest, Test>();
             rPCServer.Start();
             

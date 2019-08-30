@@ -49,7 +49,7 @@ namespace CRL.DynamicWebApi
                     var args = System.Text.Encoding.UTF8.GetString(data);
                     requestMsg.Args = args.ToObject<Dictionary<string, object>>();
                 }
-                var result = ApiServer.InvokeResult(requestMsg);
+                var result = ApiServer.Instance.InvokeResult(requestMsg);
                 response.Headers.Add("Access-Control-Allow-Origin", "*");
                 response.ContentType = "application/json";
                 response.Write(result.ToJson());
