@@ -9,7 +9,28 @@ namespace CRL.Core.Remoting
 {
     public abstract class AbsClient: DynamicObject, IDisposable
     {
-        protected abstract void ShowError(string msg, string code);
-        public abstract void Dispose();
+        public string Host;
+        public string ServiceName;
+        public Type ServiceType;
+        public AbsClient(AbsClientConnect _clientConnect)
+        {
+            clientConnect = _clientConnect;
+        }
+        protected AbsClientConnect clientConnect;
+        protected void ShowError(string msg, string code)
+        {
+            if (clientConnect.OnError != null)
+            {
+                clientConnect.OnError(msg, code);
+            }
+            else
+            {
+                throw new Exception(msg);
+            }
+        }
+        public virtual void Dispose()
+        {
+
+        }
     }
 }

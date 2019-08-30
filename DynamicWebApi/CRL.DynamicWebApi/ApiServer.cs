@@ -132,15 +132,5 @@ namespace CRL.DynamicWebApi
  
             return response;
         }
-
-        public override void Dispose()
-        {
-
-        }
-
-        public override void Start()
-        {
-
-        }
     }
 }

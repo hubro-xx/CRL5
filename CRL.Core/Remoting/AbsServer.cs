@@ -31,8 +31,14 @@ namespace CRL.Core.Remoting
         {
             Setting.SessionManage = _sessionManage;
         }
-        public abstract void Start();
-        public abstract void Dispose();
+        public virtual void Start()
+        {
+
+        }
+        public virtual void Dispose()
+        {
+
+        }
         public abstract object InvokeResult(object rq);
     }
 }

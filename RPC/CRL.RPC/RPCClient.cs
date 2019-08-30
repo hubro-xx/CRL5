@@ -16,17 +16,12 @@ namespace CRL.RPC
 {
     class RPCClient : AbsClient
     {
-        public string Host;
         public int Port;
-        public string ServiceName;
-        public Type ServiceType;
         static Bootstrap bootstrap;
-
-        internal RPCClientConnect RPCClientConnect;
         IChannel channel = null;
 
         static ResponseWaits allWaits = new ResponseWaits();
-        static RPCClient()
+        public RPCClient(AbsClientConnect _clientConnect) : base(_clientConnect)
         {
             bootstrap = new Bootstrap()
                 .Group(new MultithreadEventLoopGroup())
@@ -64,7 +59,7 @@ namespace CRL.RPC
                 MsgId = id,
                 Service = ServiceName,
                 Method = binder.Name,
-                Token = RPCClientConnect.Token
+                Token = clientConnect.Token
             };
             var dic = new Dictionary<string, byte[]>();
             var allArgs = method.GetParameters();
@@ -105,7 +100,7 @@ namespace CRL.RPC
             }
             if (!string.IsNullOrEmpty(response.Token))
             {
-                RPCClientConnect.Token = response.Token;
+                clientConnect.Token = response.Token;
             }
             if (returnType == typeof(void))
             {
@@ -114,17 +109,6 @@ namespace CRL.RPC
             }
             result = response.GetData(returnType);
             return true;
-        }
-        protected override void ShowError(string msg, string code)
-        {
-            if (RPCClientConnect.OnError != null)
-            {
-                RPCClientConnect.OnError(msg, code);
-            }
-            else
-            {
-                throw new Exception(msg);
-            }
         }
         public override void Dispose()
         {

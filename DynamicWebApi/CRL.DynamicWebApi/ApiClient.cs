@@ -13,12 +13,7 @@ namespace CRL.DynamicWebApi
 {
     class ApiClient: AbsClient
     {
-        internal ApiClientConnect ApiClientConnect;
-        public string Host;
-        public string ServiceName;
-        public Type ServiceType;
-
-        public ApiClient()
+        public ApiClient(AbsClientConnect _clientConnect):base(_clientConnect)
         {
 
         }
@@ -27,7 +22,7 @@ namespace CRL.DynamicWebApi
             var url = Host + $"/DynamicApi/{msg.Service}/{msg.Method}";
             var request = new ImitateWebRequest("orgsync", Encoding.UTF8);
             request.ContentType = "application/json";
-            request.SetHead("token", ApiClientConnect.Token);
+            request.SetHead("token", clientConnect.Token);
             var result = request.Post(url, msg.Args.ToJson());
             return result.ToObject<ResponseMessage>();
         }
@@ -39,7 +34,7 @@ namespace CRL.DynamicWebApi
             {
                 Service = ServiceName,
                 Method = binder.Name,
-                Token = ApiClientConnect.Token
+                Token = clientConnect.Token
             };
             var dic = new Dictionary<string, object>();
             var allArgs = method.GetParameters();
@@ -76,7 +71,7 @@ namespace CRL.DynamicWebApi
                 }
                 if (!string.IsNullOrEmpty(response.Token))
                 {
-                    ApiClientConnect.Token = response.Token;
+                    clientConnect.Token = response.Token;
                 }
                 if (returnType == typeof(void))
                 {
@@ -93,21 +88,6 @@ namespace CRL.DynamicWebApi
                 result = null;
                 return true;
             }
-        }
-        protected override void ShowError(string msg, string code)
-        {
-            if (ApiClientConnect.OnError != null)
-            {
-                ApiClientConnect.OnError(msg, code);
-            }
-            else
-            {
-                throw new Exception(msg);
-            }
-        }
-        public override void Dispose()
-        {
-          
         }
     }
 }

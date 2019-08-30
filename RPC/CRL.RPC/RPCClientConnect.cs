@@ -7,19 +7,17 @@ using System.Collections.Generic;
 namespace CRL.RPC
 {
 
-    public class RPCClientConnect: IClientConnect
+    public class RPCClientConnect: AbsClientConnect
     {
         string host;
         int port;
-        public Action<string, string> OnError;
-        internal string Token;
         public RPCClientConnect(string _host, int _port)
         {
             host = _host;
             port = _port;
         }
-        Dictionary<string, object> _services  = new Dictionary<string, object>();
-        public T GetClient<T>() where T : class
+
+        public override T GetClient<T>()
         {
             var serviceName = typeof(T).Name;
             var key = string.Format("{0}_{1}_{2}", host, port, serviceName);
@@ -28,13 +26,12 @@ namespace CRL.RPC
             {
                 return instance as T;
             }
-            var client = new RPCClient
+            var client = new RPCClient(this)
             {
                 Host = host,
                 Port = port,
                 ServiceType = typeof(T),
                 ServiceName = serviceName,
-                RPCClientConnect = this
             };
             //创建代理
             instance = client.ActLike<T>();
@@ -42,7 +39,7 @@ namespace CRL.RPC
             return instance as T;
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             foreach(var kv in _services)
             {
