@@ -51,6 +51,7 @@
     <Compile Include="ApiClient.cs" />
     <Compile Include="ApiClientConnect.cs" />
     <Compile Include="DynamicModule.cs" />
+    <Compile Include="Extension.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ApiServer.cs" />

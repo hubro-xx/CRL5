@@ -33,7 +33,7 @@ namespace CRL.Core.Remoting
         /// <param name="token"></param>
         protected void SaveSession(string user, string token)
         {
-            Setting.SessionManage.SaveSession(user, token);
+            ServerCreater.SessionManage.SaveSession(user, token);
             __token = string.Format("{0}@{1}", user, token);
         }
 

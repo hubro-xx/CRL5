@@ -11,11 +11,10 @@ namespace RPCServerTest
     {
         static void Main(string[] args)
         {
-            var rPCServer = new RPCServer(805);
+            var rPCServer = new ServerCreater().CreatetRPC(805);
             rPCServer.SetSessionManage(new SessionManage());
             rPCServer.Register<ITest, Test>();
             rPCServer.Start();
-            
             Console.ReadLine();
         }
         public interface ITest

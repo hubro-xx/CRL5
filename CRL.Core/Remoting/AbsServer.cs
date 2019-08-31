@@ -12,7 +12,7 @@ namespace CRL.Core.Remoting
     {
         protected static Dictionary<string, AbsService> serviceHandle = new Dictionary<string, AbsService>();
         protected static ConcurrentDictionary<string, MethodInfo> methods = new ConcurrentDictionary<string, MethodInfo>();
-        public void Register<IService, Service>() where Service : AbsService, IService, new() where IService : class
+        internal void Register<IService, Service>() where Service : AbsService, IService, new() where IService : class
         {
             serviceHandle.Add(typeof(IService).Name, new Service());
         }
@@ -20,16 +20,8 @@ namespace CRL.Core.Remoting
         {
             get
             {
-                return Setting.SessionManage;
+                return ServerCreater.SessionManage;
             }
-        }
-        /// <summary>
-        /// 自定义session管理
-        /// </summary>
-        /// <param name="_sessionManage"></param>
-        public void SetSessionManage(ISessionManage _sessionManage)
-        {
-            Setting.SessionManage = _sessionManage;
         }
         public virtual void Start()
         {

@@ -84,6 +84,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extension.cs" />
     <Compile Include="Handler\ClientHandler.cs" />
     <Compile Include="Handler\ServerHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

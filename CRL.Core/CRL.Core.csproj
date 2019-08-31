@@ -89,8 +89,8 @@
     <Compile Include="Remoting\Attribute.cs" />
     <Compile Include="Remoting\AbsClient.cs" />
     <Compile Include="Remoting\AbsClientConnect.cs" />
+    <Compile Include="Remoting\ServerCreater.cs" />
     <Compile Include="Remoting\SessionManage.cs" />
-    <Compile Include="Remoting\Setting.cs" />
     <Compile Include="RequestLimiter.cs" />
     <Compile Include="Session\AbsSession.cs" />
     <Compile Include="RedisProvider\RedisClient.cs" />

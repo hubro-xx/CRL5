@@ -1,10 +1,11 @@
-﻿using System;
+﻿using CRL.Core.Remoting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
 using System.Web.SessionState;
-
+using CRL.DynamicWebApi;
 namespace DynamicWebApiServerTest
 {
     public class Global : System.Web.HttpApplication
@@ -12,10 +13,10 @@ namespace DynamicWebApiServerTest
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            var server = new CRL.DynamicWebApi.ApiServer();
-            server.SetSessionManage(new CRL.Core.Remoting.SessionManage());
+            var server = new ServerCreater().CreatetApi();
+            server.SetSessionManage(new SessionManage());
             server.Register<ITestService, TestService>();
-            var listener = new CRL.DynamicWebApi.ServerListener();
+            var listener = new ServerListener();
             listener.Start("http://localhost:809/");
         }
 
