@@ -10,7 +10,7 @@ namespace DynamicWebApiClient
     public interface ITestService
     {
         string Login(string name, string pass);
-        void SendData(string msg);
+        void SendData(string msg, int? a);
 
     }
 }

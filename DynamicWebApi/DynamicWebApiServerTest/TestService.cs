@@ -11,7 +11,7 @@ namespace DynamicWebApiServerTest
     public interface ITestService
     {
         string Login(string name, string  pass);
-        void SendData(string msg);
+        void SendData(string msg, int? a);
 
     }
     public class argsTest
@@ -28,7 +28,7 @@ namespace DynamicWebApiServerTest
             return name;
         }
 
-        public void SendData(string msg)
+        public void SendData(string msg,int? a)
         {
             var user = GetUser();
             var file = GetPostFile();

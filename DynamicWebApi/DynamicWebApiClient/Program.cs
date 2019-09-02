@@ -19,7 +19,8 @@ namespace DynamicWebApiClient
         label1:
             var str = service.Login("user", "123");
             Console.WriteLine(str);
-            service.SendData("data");
+            int? a = 1;
+            service.SendData("data",a);
 
             Console.ReadLine();
             goto label1;

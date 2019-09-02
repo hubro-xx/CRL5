@@ -12,7 +12,7 @@ namespace CRL.DynamicWebApi
         public static ServerCreater CreatetApi(this ServerCreater serverCreater)
         {
             var server = new ApiServer();
-            serverCreater.Server = server;
+            serverCreater.SetServer(server);
             return serverCreater;
         }
     }

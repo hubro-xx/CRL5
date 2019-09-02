@@ -12,12 +12,7 @@ namespace CRL.RPC
         public static ServerCreater CreatetRPC(this ServerCreater serverCreater, int port)
         {
             var server = new RPCServer(port);
-            serverCreater.Server = server;
-            return serverCreater;
-        }
-        public static ServerCreater Start(this ServerCreater serverCreater)
-        {
-            serverCreater.Server.Start();
+            serverCreater.SetServer(server);
             return serverCreater;
         }
     }

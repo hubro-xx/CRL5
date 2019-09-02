@@ -8,12 +8,15 @@ namespace CRL.Core.Remoting
 {
     public class ServerCreater
     {
-        public AbsServer Server { get; set; }
+        AbsServer Server;
         internal static ISessionManage SessionManage
         {
             get; set;
         } = new SessionManage();
-
+        public void SetServer(AbsServer server)
+        {
+            Server = server;
+        }
         public ServerCreater SetSessionManage(ISessionManage _sessionManage)
         {
             SessionManage = _sessionManage;
@@ -23,6 +26,14 @@ namespace CRL.Core.Remoting
         {
             Server.Register<IService, Service>();
             return this;
+        }
+        public void Start()
+        {
+            Server.Start();
+        }
+        public void Dispose()
+        {
+            Server.Dispose();
         }
     }
 }

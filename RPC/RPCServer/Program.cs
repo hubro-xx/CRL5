@@ -19,13 +19,13 @@ namespace RPCServerTest
         }
         public interface ITest
         {
-            bool login();
+            bool login(int? a);
             string Test1(string msg, out string error);
         }
         public class Test : AbsService, ITest
         {
             [LoginPoint]
-            public bool login()
+            public bool login(int? a)
             {
                 SaveSession("user","token");
                 return true;

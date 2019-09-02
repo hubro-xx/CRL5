@@ -39,7 +39,8 @@ namespace RPCClient
         {
          
             var client = clientConnect.GetClient<ITest>();
-            client.login();
+            int? a=null;
+            client.login(a);
             long total = 0;
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
@@ -57,7 +58,7 @@ namespace RPCClient
 
     public interface ITest
     {
-        bool login();
+        bool login(int? a);
         string Test1(string msg,out string error);
     }
 }
