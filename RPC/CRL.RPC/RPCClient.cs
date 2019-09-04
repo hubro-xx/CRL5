@@ -49,7 +49,7 @@ namespace CRL.RPC
             }
             catch(Exception ero)
             {
-                throw new Exception("连接服务端失败:" + ero);
+                ThrowError("连接服务端失败:" + ero, "500");
             }
             var id = Guid.NewGuid().ToString();
             var method = ServiceType.GetMethod(binder.Name);
@@ -80,11 +80,11 @@ namespace CRL.RPC
             var response = allWaits.Wait(id).Response;
             if (response == null)
             {
-                ShowError("请求超时未响应", "500");
+                ThrowError("请求超时未响应", "500");
             }
             if (!response.Success)
             {
-                ShowError($"服务端处理错误：{response.Msg}", response.GetData(typeof(string)) + "");
+                ThrowError($"服务端处理错误：{response.Msg}", response.GetData(typeof(string)) + "");
             }
             var returnType = method.ReturnType;
             if (response.Outs != null && response.Outs.Count > 0)

@@ -17,16 +17,17 @@ namespace CRL.Core.Remoting
             clientConnect = _clientConnect;
         }
         protected AbsClientConnect clientConnect;
-        protected void ShowError(string msg, string code)
+        protected void ThrowError(string msg, string code)
         {
-            if (clientConnect.OnError != null)
-            {
-                clientConnect.OnError(msg, code);
-            }
-            else
-            {
-                throw new Exception(msg);
-            }
+            throw new RemotingEx(msg) { Code = code };
+            //if (clientConnect.OnError != null)
+            //{
+            //    clientConnect.OnError(msg, code);
+            //}
+            //else
+            //{
+            //    throw new RemotingEx(msg) { Code = code };
+            //}
         }
         public virtual void Dispose()
         {

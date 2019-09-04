@@ -30,6 +30,7 @@ namespace CRL.DynamicWebApi
         {
             var id = Guid.NewGuid().ToString();
             var method = ServiceType.GetMethod(binder.Name);
+            var returnType = method.ReturnType;
             var request = new RequestMessage
             {
                 Service = ServiceName,
@@ -49,45 +50,44 @@ namespace CRL.DynamicWebApi
                 }
             }
             request.Args = dic;
+            ResponseMessage response = null;
             try
             {
-                var response = SendRequest(request);
-                if (response == null)
-                {
-                    ShowError("请求超时未响应", "500");
-                }
-                if (!response.Success)
-                {
-                    ShowError($"服务端处理错误：{response.Msg}", response.Data);
-                }
-                var returnType = method.ReturnType;
-                if (response.Outs != null && response.Outs.Count > 0)
-                {
-                    foreach (var kv in response.Outs)
-                    {
-                        var find = outs[kv.Key];
-                        args[(int)find] = kv.Value;
-                    }
-                }
-                if (!string.IsNullOrEmpty(response.Token))
-                {
-                    clientConnect.Token = response.Token;
-                }
-                if (returnType == typeof(void))
-                {
-                    result = null;
-                    return true;
-                }
-                result = response.GetData(returnType);
-
-                return true;
+                response = SendRequest(request);
             }
-            catch( Exception ero)
+            catch (Exception ero)
             {
-                ShowError(ero.Message, "401");
+                ThrowError(ero.Message, "500");
+            }
+            if (response == null)
+            {
+                ThrowError("请求超时未响应", "500");
+            }
+            if (!response.Success)
+            {
+                ThrowError($"服务端处理错误：{response.Msg}", response.Data);
+            }
+            if (response.Outs != null && response.Outs.Count > 0)
+            {
+                foreach (var kv in response.Outs)
+                {
+                    var find = outs[kv.Key];
+                    args[(int)find] = kv.Value;
+                }
+            }
+            if (!string.IsNullOrEmpty(response.Token))
+            {
+                clientConnect.Token = response.Token;
+            }
+            if (returnType == typeof(void))
+            {
                 result = null;
                 return true;
             }
+            result = response.GetData(returnType);
+
+            return true;
+
         }
     }
 }

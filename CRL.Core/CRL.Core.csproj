@@ -89,6 +89,7 @@
     <Compile Include="Remoting\Attribute.cs" />
     <Compile Include="Remoting\AbsClient.cs" />
     <Compile Include="Remoting\AbsClientConnect.cs" />
+    <Compile Include="Remoting\RemotingEx.cs" />
     <Compile Include="Remoting\ServerCreater.cs" />
     <Compile Include="Remoting\SessionManage.cs" />
     <Compile Include="RequestLimiter.cs" />
