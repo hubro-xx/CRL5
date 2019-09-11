@@ -34,7 +34,7 @@ namespace CRL.RPC
     {
         public string Service { get; set; }
         public string Method { get; set; }
-        public Dictionary<string, byte[]> Args { get; set; }
+        public List<byte[]> Args { get; set; }
         public static RequestMessage FromBuffer(IByteBuffer buffer)
         {
             return FromBuffer<RequestMessage>(buffer);
@@ -51,7 +51,7 @@ namespace CRL.RPC
             response.SetData(typeof(string), code);
             return response;
         }
-        public Dictionary<string, byte[]> Outs
+        public Dictionary<int, byte[]> Outs
         {
             get; set;
         }

@@ -93,34 +93,34 @@ namespace CRL.RPC
                     {
                         return ResponseMessage.CreateError(error, "401");
                     }
-                    Core.CallContext.SetData("currentUser", tokenArry[0]);
+                    service.SetUser(tokenArry[0]);
                 }
 
                 var paramters = request.Args;
 
                 var methodParamters = method.GetParameters();
                 var args = new object[methodParamters.Length];
-                var outIndex = new Dictionary<string, int>();
+                var outIndex = new List<int>();
                 int i = 0;
                 foreach (var p in methodParamters)
                 {
-                    var find = paramters.TryGetValue(p.Name, out byte[] value);
+                    var value = paramters[i];
                     int offSet = 0;
                     args[i] = Core.BinaryFormat.FieldFormat.UnPack(p.ParameterType, value, ref offSet);
                     if (p.Attributes == ParameterAttributes.Out)
                     {
-                        outIndex.Add(p.Name, i);
+                        outIndex.Add(i);
                     }
                     i += 1;
                 }
                 //var args3 = paramters?.Select(b => b.Value)?.ToArray();
                 var result = method.Invoke(service, args);
-                var outs = new Dictionary<string, byte[]>();
-                foreach (var kv in outIndex)
+                var outs = new Dictionary<int, byte[]>();
+                foreach (var index in outIndex)
                 {
-                    var value = args[kv.Value];
-                    var type = methodParamters[kv.Value];
-                    outs[kv.Key] = Core.BinaryFormat.FieldFormat.Pack(type.ParameterType, value);
+                    var type = methodParamters[index];
+                    var value = args[index];
+                    outs[index] = Core.BinaryFormat.FieldFormat.Pack(type.ParameterType, value);
                 }
                 response.SetData(method.ReturnType, result);
                 response.Success = true;
