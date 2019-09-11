@@ -13,6 +13,7 @@ namespace DynamicWebApiServerTest
 
         protected void Application_Start(object sender, EventArgs e)
         {
+            Type type = typeof(TestService);
             var server = new ServerCreater().CreatetApi();
             server.SetSessionManage(new SessionManage());
             server.Register<ITestService, TestService>();

@@ -12,7 +12,7 @@ namespace DynamicWebApiServerTest
     {
         string Login(string name, string  pass);
         void SendData(string msg, int? a);
-
+        bool CancelOrder(string orderNo, decimal refoundAmount, string passWord, string merchantSecre, out string error);
     }
     public class argsTest
     {
@@ -21,16 +21,22 @@ namespace DynamicWebApiServerTest
     }
     public class TestService : AbsService, ITestService
     {
+        public bool CancelOrder(string orderNo, decimal refoundAmount, string passWord, string merchantSecre, out string error)
+        {
+            error = "";
+            return true;
+        }
+
         [LoginPoint]
         public string Login(string name, string pass)
         {
-            SaveSession("hubro","7777777777");
+            SaveSession("hubro", "7777777777", "test");
             return name;
         }
 
         public void SendData(string msg,int? a)
         {
-            var user = GetUser();
+            var user = GetUser(out object tag);
             var file = GetPostFile();
         }
     }

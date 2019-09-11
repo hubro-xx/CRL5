@@ -47,7 +47,7 @@ namespace CRL.DynamicWebApi
                     var data = new byte[request.ContentLength];
                     ms.Read(data, 0, data.Length);
                     var args = System.Text.Encoding.UTF8.GetString(data);
-                    requestMsg.Args = args.ToObject<Dictionary<string, object>>();
+                    requestMsg.Args = args.ToObject<List<object>>();
                 }
                 var result = ApiServer.Instance.InvokeResult(requestMsg);
                 response.Headers.Add("Access-Control-Allow-Origin", "*");

@@ -37,16 +37,16 @@ namespace CRL.DynamicWebApi
                 Method = binder.Name,
                 Token = clientConnect.Token
             };
-            var dic = new Dictionary<string, object>();
+            var dic = new List<object>();
             var allArgs = method.GetParameters();
-            var outs = new Dictionary<string, object>();
+            //var outs = new Dictionary<int, object>();
             for (int i = 0; i < allArgs.Length; i++)
             {
                 var p = allArgs[i];
-                dic.Add(p.Name, args[i]);
+                dic.Add(args[i]);
                 if (p.Attributes == ParameterAttributes.Out)
                 {
-                    outs.Add(p.Name, i);
+                    //outs.Add(i, null);
                 }
             }
             request.Args = dic;
@@ -71,8 +71,7 @@ namespace CRL.DynamicWebApi
             {
                 foreach (var kv in response.Outs)
                 {
-                    var find = outs[kv.Key];
-                    args[(int)find] = kv.Value;
+                    args[kv.Key] = kv.Value;
                 }
             }
             if (!string.IsNullOrEmpty(response.Token))

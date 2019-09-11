@@ -17,7 +17,8 @@ namespace DynamicWebApiClient
             Console.WriteLine(str);
             int? a = 1;
             service.SendData("data",a);
-
+            var error = "";
+            service.CancelOrder("", 2, "", null, out error);
             Console.ReadLine();
             goto label1;
         }

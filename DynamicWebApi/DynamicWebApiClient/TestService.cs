@@ -11,6 +11,6 @@ namespace DynamicWebApiClient
     {
         string Login(string name, string pass);
         void SendData(string msg, int? a);
-
+        bool CancelOrder(string orderNo, decimal refoundAmount, string passWord, string merchantSecre, out string error);
     }
 }

@@ -13,14 +13,17 @@ namespace CRL.Core.Request
     /// </summary>
     public class ImitateWebRequest
     {
-       
         /// <summary>
         /// 创建附带COOKIE的请求
         /// </summary>
         /// <param name="_cookieName">指定识别同一网站的COOKIE名</param>
         /// <param name="_encoding"></param>
-        public ImitateWebRequest(string _cookieName, Encoding _encoding)
+        public ImitateWebRequest(string _cookieName, Encoding _encoding = null)
         {
+            if (_encoding == null)
+            {
+                _encoding = Encoding.UTF8;
+            }
             cookieName = _cookieName;
             ContentEncoding = _encoding;
         }

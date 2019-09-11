@@ -22,7 +22,10 @@ namespace CRL.DynamicWebApi
     {
         public string Service { get; set; }
         public string Method { get; set; }
-        public Dictionary<string, object> Args { get; set; }
+        /// <summary>
+        /// 按索引
+        /// </summary>
+        public List<object> Args { get; set; }
         public static RequestMessage FromBuffer(string buffer)
         {
             return buffer.ToObject<RequestMessage>();
@@ -41,7 +44,7 @@ namespace CRL.DynamicWebApi
         {
             return Data.ToObject(type);
         }
-        public Dictionary<string, object> Outs
+        public Dictionary<int,object> Outs
         {
             get; set;
         }

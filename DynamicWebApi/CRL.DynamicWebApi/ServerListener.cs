@@ -70,7 +70,7 @@ namespace CRL.DynamicWebApi
                 var data = new byte[request.ContentLength64];
                 ms.Read(data, 0, data.Length);
                 var args = System.Text.Encoding.UTF8.GetString(data);
-                requestMsg.Args = args.ToObject<Dictionary<string, object>>();
+                requestMsg.Args = args.ToObject<List<object>>();
             }
             var result = ApiServer.Instance.InvokeResult(requestMsg);
             byte[] res = Encoding.UTF8.GetBytes(result.ToJson());

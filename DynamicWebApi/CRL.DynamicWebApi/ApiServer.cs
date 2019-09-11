@@ -84,34 +84,38 @@ namespace CRL.DynamicWebApi
                 }
                 var paramters = request.Args;
                 var methodParamters = method.GetParameters();
-                var outs = new Dictionary<string,object>();
+                if(request.Args.Count!= methodParamters.Count())
+                {
+                    return ResponseMessage.CreateError("参数计数不正确" + request.ToJson(), "500");
+                }
+                var outs = new Dictionary<int,object>();
                 int i = 0;
                 foreach (var p in methodParamters)
                 {
-                    var find = paramters.TryGetValue(p.Name, out object value);
-                    if (find && value != null)
+                    var value = paramters[i];
+                    if (value != null)
                     {
                         if (value.GetType() != p.ParameterType)
                         {
                             var value2 = value.ToJson().ToObject(p.ParameterType);
-                            paramters[p.Name] = value2;
+                            paramters[i] = value2;
                         }
                     }
                     else
                     {
-                        paramters[p.Name] = null;
+                        paramters[i] = value;
                     }
                     if (p.Attributes == ParameterAttributes.Out)
                     {
-                        outs.Add(p.Name, i);
+                        outs.Add(i,null);
                     }
                     i += 1;
                 }
-                var args3 = paramters?.Select(b => b.Value)?.ToArray();
+                var args3 = paramters?.ToArray();
                 var result = method.Invoke(service, args3);
-                foreach (var kv in new Dictionary<string, object>(outs))
+                foreach (var kv in new Dictionary<int, object>(outs))
                 {
-                    var value = args3[(int)kv.Value];
+                    var value = args3[kv.Key];
                     outs[kv.Key] = value;
                 }
                 response.SetData(result);
@@ -127,7 +131,8 @@ namespace CRL.DynamicWebApi
                 response.Success = false;
                 response.Msg = ex.Message;
                 Console.WriteLine(ex.ToString());
-                return ResponseMessage.CreateError("服务端处理错误:" + ex.Message, "500");
+                CRL.Core.EventLog.Log(ex.ToString(), request.Service);
+                return ResponseMessage.CreateError(ex.Message, "500");
             }
  
             return response;
