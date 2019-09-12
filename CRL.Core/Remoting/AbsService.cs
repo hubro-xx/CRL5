@@ -22,6 +22,15 @@ namespace CRL.Core.Remoting
         /// <summary>
         /// 当前用户
         /// </summary>
+        protected string GetUser()
+        {
+            return GetUser(out object tag);
+        }
+        /// <summary>
+        /// 当前用户
+        /// </summary>
+        /// <param name="tag">自定义数据</param>
+        /// <returns></returns>
         protected string GetUser(out object tag)
         {
             var v = ServerCreater.SessionManage.GetSession(__currentUser);
