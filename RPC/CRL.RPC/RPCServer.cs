@@ -54,6 +54,7 @@ namespace CRL.RPC
                 var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
                 a = methods.TryGetValue(methodKey, out MethodInfo method);
                 var serviceType = service.GetType();
+                service = System.Activator.CreateInstance(serviceType) as AbsService;
                 if (!a)
                 {
                     method = serviceType.GetMethod(request.Method);

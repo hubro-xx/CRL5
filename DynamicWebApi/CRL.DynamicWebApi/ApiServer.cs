@@ -38,6 +38,7 @@ namespace CRL.DynamicWebApi
                     return ResponseMessage.CreateError("未找到该服务", "404");
                 }
                 var serviceType = service.GetType();
+                service = System.Activator.CreateInstance(serviceType) as AbsService;
                 var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
                 a = methods.TryGetValue(methodKey, out MethodInfo method);
                 if (!a)
