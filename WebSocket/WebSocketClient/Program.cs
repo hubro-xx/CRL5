@@ -15,6 +15,7 @@ namespace WebSocketClient
             {
                 Console.WriteLine("OnMessage:" + obj.ToJson());
             };
+            clientConnect.StartPing();
             var service = clientConnect.GetClient<ITestService>();
             var str = service.Login("user", "123");
         label1:

@@ -53,6 +53,7 @@ namespace CRL.WebSocket
         }
         public Action<ResponseMessage> OnMessage;
 
+        CRL.Core.ThreadWork pingWork;
         void Start()
         {
             var builder = new UriBuilder
@@ -113,6 +114,21 @@ namespace CRL.WebSocket
             handler.HandshakeCompletion.Wait();
 
             Console.WriteLine("WebSocket handshake completed.");
+
+            pingWork = new CRL.Core.ThreadWork();
+        }
+        /// <summary>
+        /// 开启ping保持连接
+        /// </summary>
+        public void StartPing()
+        {
+            pingWork.Start("sendPing", () =>
+            {
+                var frame = new PingWebSocketFrame(Unpooled.WrappedBuffer(new byte[] { 8, 1, 8, 1 }));
+                channel.WriteAndFlushAsync(frame);
+                //Console.WriteLine("sendPing");
+                return true;
+            }, 3);
         }
         internal ResponseMessage SendRequest(RequestMessage msg)
         {
@@ -133,6 +149,7 @@ namespace CRL.WebSocket
 
         public override void Dispose()
         {
+            pingWork?.Stop();
             channel.CloseAsync().Wait();
             group.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1)).Wait();
         }
