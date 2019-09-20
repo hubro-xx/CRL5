@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using CRL.Core.Extension;
 namespace WebSocketClient
 {
     class Program
@@ -11,9 +11,14 @@ namespace WebSocketClient
         static void Main(string[] args)
         {
             var clientConnect = new CRL.WebSocket.WebSocketClientConnect("127.0.0.1", 8015);
+            clientConnect.OnMessage += (obj) =>
+            {
+                Console.WriteLine("OnMessage:" + obj.ToJson());
+            };
             var service = clientConnect.GetClient<ITestService>();
-        label1:
             var str = service.Login("user", "123");
+        label1:
+ 
             Console.WriteLine(str);
             int? a = 1;
             service.SendData("data", a);

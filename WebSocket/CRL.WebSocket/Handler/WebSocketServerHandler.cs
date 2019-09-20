@@ -96,12 +96,15 @@ namespace CRL.WebSocket
             if (frame is CloseWebSocketFrame)
             {
                 this.handshaker.CloseAsync(ctx.Channel, (CloseWebSocketFrame)frame.Retain());
+                server.RemoveClient(ctx);
                 return;
             }
 
             if (frame is PingWebSocketFrame)
             {
-                ctx.WriteAsync(new PongWebSocketFrame((IByteBuffer)frame.Content.Retain()));
+                //ctx.WriteAsync(new PongWebSocketFrame((IByteBuffer)frame.Content.Retain()));
+                //Console.WriteLine("PingWebSocketFrame");
+                //server.AddClient(ctx);
                 return;
             }
 
@@ -112,7 +115,11 @@ namespace CRL.WebSocket
                 //Console.WriteLine("收到消息:" + data);
                 var request = RequestMessage.FromBuffer(data);
                 // Echo the frame
-                var result = server.InvokeResult(request) as ResponseMessage;
+                var result = server.InvokeResult2(ctx, request) as ResponseMessage;
+                if (result == null)
+                {
+                    return;
+                }
                 result.MsgId = request.MsgId;
                 var frame2 = new TextWebSocketFrame(result.ToBuffer());
                 ctx.WriteAsync(frame2);
@@ -149,8 +156,9 @@ namespace CRL.WebSocket
 
         public override void ExceptionCaught(IChannelHandlerContext ctx, Exception e)
         {
-            Console.WriteLine($"{nameof(WebSocketServerHandler)} {0}", e);
+            //Console.WriteLine($"{nameof(WebSocketServerHandler)} {0}", e);
             ctx.CloseAsync();
+            server.RemoveClient(ctx);
         }
 
         static string GetWebSocketLocation(IFullHttpRequest req)

@@ -17,7 +17,7 @@ using DotNetty.Transport.Channels.Sockets;
 using System.Reflection;
 using System.Linq;
 using System.Collections.Generic;
-
+using DotNetty.Codecs.Http.WebSockets;
 
 namespace CRL.WebSocket
 {
@@ -60,7 +60,7 @@ namespace CRL.WebSocket
             //}
             try
             {
-                var bootstrap = new ServerBootstrap();
+                bootstrap = new ServerBootstrap();
                 bootstrap.Group(bossGroup, workGroup);
 
                 bootstrap.Channel<TcpServerSocketChannel>();
@@ -79,7 +79,7 @@ namespace CRL.WebSocket
                         pipeline.AddLast(new WebSocketServerHandler(this));
                     }));
 
-                IChannel bootstrapChannel =  bootstrap.BindAsync(IPAddress.Loopback, port).Result;
+                bootstrapChannel =  bootstrap.BindAsync(IPAddress.Loopback, port).Result;
 
                 Console.WriteLine("Open your web browser and navigate to "
                     + $"{(false ? "https" : "http")}"
@@ -87,14 +87,14 @@ namespace CRL.WebSocket
                 Console.WriteLine("Listening on "
                     + $"{(false ? "wss" : "ws")}"
                     + $"://127.0.0.1:{port}/websocket");
-                Console.ReadLine();
+                //Console.ReadLine();
 
-                bootstrapChannel.CloseAsync().Wait();
+                //bootstrapChannel.CloseAsync().Wait();
             }
             finally
             {
-                workGroup.ShutdownGracefullyAsync().Wait();
-                bossGroup.ShutdownGracefullyAsync().Wait();
+                //workGroup.ShutdownGracefullyAsync().Wait();
+                //bossGroup.ShutdownGracefullyAsync().Wait();
             }
 
         }
@@ -102,8 +102,11 @@ namespace CRL.WebSocket
         {
             bootstrapChannel.CloseAsync().Wait();
         }
-
         public override object InvokeResult(object rq)
+        {
+            return InvokeResult2(null, rq);
+        }
+        public object InvokeResult2(IChannelHandlerContext ctx, object rq)
         {
             var request = rq as RequestMessage;
             var response = new ResponseMessage();
@@ -116,6 +119,7 @@ namespace CRL.WebSocket
                     return ResponseMessage.CreateError("未找到该服务", "404");
                 }
                 var serviceType = service.GetType();
+                service = System.Activator.CreateInstance(serviceType) as AbsService;
                 var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
                 a = methods.TryGetValue(methodKey, out MethodInfo method);
                 if (!a)
@@ -157,7 +161,6 @@ namespace CRL.WebSocket
                     {
                         return ResponseMessage.CreateError(error, "401");
                     }
-                    //Core.CallContext.SetData("currentUser", tokenArry[0]);
                     service.SetUser(tokenArry[0]);
                 }
                 var paramters = request.Args;
@@ -202,6 +205,8 @@ namespace CRL.WebSocket
                 if (loginAttr != null)//登录方法后返回新TOKEN
                 {
                     response.Token = service.GetToken();
+                    var arry = response.Token.Split('@');
+                    AddClient(ctx, arry[0]);
                 }
             }
             catch (Exception ex)
@@ -215,5 +220,47 @@ namespace CRL.WebSocket
  
             return response;
         }
+
+        Dictionary<string, IChannelHandlerContext> clientKeys = new Dictionary<string, IChannelHandlerContext>();
+        internal void AddClient(IChannelHandlerContext ctx,string key)
+        {
+            Console.WriteLine("AddClient:"+ctx.Channel.Id);
+            clientKeys.Remove(key);
+            clientKeys.Add(key, ctx);
+        }
+        internal void RemoveClient(IChannelHandlerContext ctx)
+        {
+            Console.WriteLine("RemoveClient:" + ctx.Channel.Id);
+            string key="!!!";
+            foreach (var item in clientKeys)
+            {
+                if (item.Value.Channel.Id == ctx.Channel.Id)
+                {
+                    key = item.Key;
+                    break;
+                }
+            }
+            //clients.Remove(ctx.Channel.Id);
+            clientKeys.Remove(key);
+        }
+        public bool SendMessage<T>(string clientKey, T msg, out string error)
+        {
+            error = "";
+            var a = clientKeys.TryGetValue(clientKey, out IChannelHandlerContext ctx);
+            if (!a)
+            {
+                error = "找不到客户端连接";
+                return false;
+            }
+            var response = new ResponseMessage() { Data = msg.ToJson(), MessageType = typeof(T).Name };
+            var frame2 = new TextWebSocketFrame(response.ToJson());
+            ctx.WriteAndFlushAsync(frame2);
+            return true;
+        }
+    }
+    class clientInfo
+    {
+        public string key;
+        public IChannelHandlerContext ctx;
     }
 }

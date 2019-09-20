@@ -17,6 +17,10 @@ namespace CRL.Core.Remoting
         {
             Server = server;
         }
+        public AbsServer GetServer()
+        {
+            return Server;
+        }
         public ServerCreater SetSessionManage(ISessionManage _sessionManage)
         {
             SessionManage = _sessionManage;

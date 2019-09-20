@@ -12,14 +12,18 @@ namespace CRL.WebSocket
     using DotNetty.Common.Utilities;
     using DotNetty.Transport.Channels;
     using CRL.Core.Extension;
+    using CRL.Core.Remoting;
+
     class WebSocketClientHandler : SimpleChannelInboundHandler<object>
     {
         readonly WebSocketClientHandshaker handshaker;
         readonly TaskCompletionSource completionSource;
         ResponseWaits waits { get; }
-        public WebSocketClientHandler(WebSocketClientHandshaker handshaker, ResponseWaits _waits)
+        WebSocketClientConnect clientConnect;
+        public WebSocketClientHandler(WebSocketClientHandshaker handshaker, ResponseWaits _waits, AbsClientConnect _clientConnect)
         {
             this.handshaker = handshaker;
+            clientConnect = _clientConnect as WebSocketClientConnect;
             this.completionSource = new TaskCompletionSource();
             waits = _waits;
         }
@@ -67,7 +71,14 @@ namespace CRL.WebSocket
                 //Console.WriteLine($"WebSocket Client received message: {json}");
                 //发送返回信号
                 var response2 = ResponseMessage.FromBuffer(json);
-                waits.Set(response2.MsgId, response2);
+                if (!string.IsNullOrEmpty(response2.MsgId))
+                {
+                    waits.Set(response2.MsgId, response2);
+                }
+                else
+                {
+                    clientConnect.OnMessage(response2);
+                }
             }
             else if (msg is PongWebSocketFrame)
             {
