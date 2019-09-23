@@ -51,7 +51,16 @@ namespace CRL.WebSocket
             _services[key] = instance;
             return instance as T;
         }
-        public Action<ResponseMessage> OnMessage;
+        internal void OnMessage(ResponseMessage msg)
+        {
+            var a = subs.TryGetValue(msg.MessageType, out methodType method);
+            if (a)
+            {
+                var dg = method.action;
+                var data = msg.GetData(method.type);
+                dg.DynamicInvoke(data);
+            }
+        }
 
         CRL.Core.ThreadWork pingWork;
         void Start()
@@ -152,6 +161,17 @@ namespace CRL.WebSocket
             pingWork?.Stop();
             channel.CloseAsync().Wait();
             group.ShutdownGracefullyAsync(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1)).Wait();
+        }
+        Dictionary<string, methodType> subs = new Dictionary<string, methodType>();
+        public void SubscribeMessage<T>(Action<T> action) where T : class
+        {
+            var name = typeof(T).Name;
+            subs.Add(name, new methodType() { action = action, type = typeof(T) });
+        }
+        class methodType
+        {
+            public Delegate action;
+            public Type type;
         }
     }
 }

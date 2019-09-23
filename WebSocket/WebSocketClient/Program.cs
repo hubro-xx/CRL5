@@ -8,13 +8,20 @@ namespace WebSocketClient
 {
     class Program
     {
+        class socketMsg
+        {
+            public string name
+            {
+                get;set;
+            }
+        }
         static void Main(string[] args)
         {
             var clientConnect = new CRL.WebSocket.WebSocketClientConnect("127.0.0.1", 8015);
-            clientConnect.OnMessage += (obj) =>
+            clientConnect.SubscribeMessage<socketMsg>((obj) =>
             {
                 Console.WriteLine("OnMessage:" + obj.ToJson());
-            };
+            });
             clientConnect.StartPing();
             var service = clientConnect.GetClient<ITestService>();
             var str = service.Login("user", "123");

@@ -9,6 +9,13 @@ namespace WebSocketServer
 {
     class Program
     {
+        class socketMsg
+        {
+            public string name
+            {
+                get; set;
+            }
+        }
         static void Main(string[] args)
         {
             var server = new ServerCreater().CreatetWebSocket(8015);
@@ -18,7 +25,7 @@ namespace WebSocketServer
             new CRL.Core.ThreadWork().Start("send", () =>
             {
                 var socket = server.GetServer() as CRL.WebSocket.WebSocketServer;
-                socket.SendMessage("hubro", 1000, out string error);
+                socket.SendMessage("hubro", new socketMsg() { name = DateTime.Now.ToString() }, out string error);
                 Console.WriteLine("send msg");
                 return true;
             }, 10);

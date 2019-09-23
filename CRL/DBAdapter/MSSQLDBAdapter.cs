@@ -61,7 +61,7 @@ end", spName, script);
             dic.Add(typeof(System.Int32), "int");
             dic.Add(typeof(System.Int16), "SMALLINT");
             dic.Add(typeof(System.Enum), "int");
-            dic.Add(typeof(System.Byte), "[tinyint]");
+            dic.Add(typeof(System.Byte), "tinyint");
             dic.Add(typeof(System.DateTime), "datetime");
             dic.Add(typeof(System.UInt16), "SMALLINT");
             dic.Add(typeof(System.Int64), "bigint");

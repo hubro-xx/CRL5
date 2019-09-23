@@ -234,7 +234,7 @@ namespace CRL
                             reader.Close();
                             reader.Dispose();
                             var columnType = ac.FieldAttribute;
-                            throw new CRLException($"反射赋值时发生错误,在:{mainType }  字段:{columnType.MapingName} {value.GetType()} 类型:{columnType.PropertyType },请检查数据库字段类型与对象是否一致");
+                            throw new CRLException($"反射赋值时发生错误,在:{mainType }  字段:{columnType.MapingName} [{value}] 类型:{columnType.PropertyType },请检查数据库字段类型与对象是否一致");
                         }
                     }
                     #region 剩下的放索引
@@ -345,7 +345,7 @@ namespace CRL
                     reader.Dispose();
                     queryInfo = null;
                     var columnType = dataContainer._GetCurrentColumnName();
-                    throw new CRLException($"反射赋值时发生错误,在:{type }  字段:{columnType.name} 类型:{columnType.typeName },请检查数据库字段类型与对象是否一致");
+                    throw new CRLException($"反射赋值时发生错误,在:{type }  字段:{columnType.name} 类型:{columnType.typeName },请检查数据库字段类型与对象是否一致 {ero.Message}");
                 }
                 #region 剩下的放索引
                 //按IModel算

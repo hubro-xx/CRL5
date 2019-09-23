@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using System.Data.SqlClient;
-using Loogn.OrmLite;
+//using Loogn.OrmLite;
 using SqlSugar;
 using System.Data.Common;
 using System.Configuration;
@@ -39,14 +39,14 @@ namespace TestConsole
     }
     class MappingSpeedTest
     {
-        public static void LoognQueryTest(int takeCount)
-        {
-            using (var db = new SqlConnection(DbHelper.ConnectionString))
-            {
-                string sql = string.Format("select top {0} * from TestEntity" + (takeCount == 1 ? " where id<" + id2 + " and id>" + id : ""), takeCount.ToString());
-                var list = db.SelectFmt<TestEntityCRL>(sql);
-            }
-        }
+        //public static void LoognQueryTest(int takeCount)
+        //{
+        //    using (var db = new SqlConnection(DbHelper.ConnectionString))
+        //    {
+        //        string sql = string.Format("select top {0} * from TestEntity" + (takeCount == 1 ? " where id<" + id2 + " and id>" + id : ""), takeCount.ToString());
+        //        var list = db.SelectFmt<TestEntityCRL>(sql);
+        //    }
+        //}
         public static int id = 20;
         public static int id2 = 30;
         public static string name = "123";
