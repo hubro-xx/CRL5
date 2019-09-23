@@ -112,6 +112,10 @@ namespace CRL.DynamicWebApi
                     }
                     i += 1;
                 }
+                if (request.httpPostedFile != null)
+                {
+                    service.SetPostFile(request.httpPostedFile);
+                }
                 var args3 = paramters?.ToArray();
                 var result = method.Invoke(service, args3);
                 foreach (var kv in new Dictionary<int, object>(outs))

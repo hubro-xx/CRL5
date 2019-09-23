@@ -20,12 +20,28 @@ namespace WebTest
     public partial class Default : System.Web.UI.Page
     {
         int id = 20;
+        void getCallcontext()
+        {
+            var d = CRL.Core.CallContext2.GetData<int>("sss");
+        }
+        void getCallcontext2()
+        {
+            var d = CRL.Core.CallContext2.GetData<int>("sss");
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             //var result = ProductDataManage.Instance.QueryItem(1);
 
             //testThread();
             //return;
+            CRL.Core.CallContext2.SetData("sss",1);
+            getCallcontext();
+            
+            System.Threading.Tasks.Task.Run(()=>
+            {
+                getCallcontext2();
+            });
             var query2 = ProductDataManage.Instance.GetLambdaQuery();
             query2.Where(b => b.Id == 10);
             query2.Join<Member>((a, b) => a.SupplierId == "10" && b.Name == "123");

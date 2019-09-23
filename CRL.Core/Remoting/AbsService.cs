@@ -48,14 +48,18 @@ namespace CRL.Core.Remoting
             ServerCreater.SessionManage.SaveSession(user, token, tag);
             __token = string.Format("{0}@{1}", user, token);
         }
-
+        HttpPostedFile postFile;
+        public void SetPostFile(HttpPostedFile file)
+        {
+            postFile = file;
+        }
         /// <summary>
         /// 获取发送的文件
         /// </summary>
         /// <returns></returns>
         protected HttpPostedFile GetPostFile()
         {
-            return Core.CallContext.GetData<HttpPostedFile>("postFile");
+            return postFile;
         }
     }
 }

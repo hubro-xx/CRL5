@@ -15,6 +15,11 @@ namespace WebSocketClient
                 get;set;
             }
         }
+        static void showId()
+        {
+            var id = System.Threading.Thread.CurrentThread.ManagedThreadId;
+            Console.WriteLine(id);
+        }
         static void Main(string[] args)
         {
             var clientConnect = new CRL.WebSocket.WebSocketClientConnect("127.0.0.1", 8015);

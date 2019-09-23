@@ -30,6 +30,7 @@ namespace CRL.DynamicWebApi
         {
             return buffer.ToObject<RequestMessage>();
         }
+        internal HttpPostedFile httpPostedFile;
 
     }
     class ResponseMessage : MessageBase
