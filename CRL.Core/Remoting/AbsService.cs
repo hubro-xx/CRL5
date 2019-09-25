@@ -9,34 +9,37 @@ namespace CRL.Core.Remoting
 {
     public abstract class AbsService
     {
-        static string __currentUser;
         static string __token;
+        protected string CurrentUserName;
+        protected object CurrentUserTag;
         public void SetUser(string user)
         {
-            __currentUser = user;
+            var v = ServerCreater.SessionManage.GetSession(user);
+            CurrentUserTag = v.Item2;
+            CurrentUserName= user;
         }
         public string GetToken()
         {
             return __token;
         }
-        /// <summary>
-        /// 当前用户
-        /// </summary>
-        protected string GetUser()
-        {
-            return GetUser(out object tag);
-        }
-        /// <summary>
-        /// 当前用户
-        /// </summary>
-        /// <param name="tag">自定义数据</param>
-        /// <returns></returns>
-        protected string GetUser(out object tag)
-        {
-            var v = ServerCreater.SessionManage.GetSession(__currentUser);
-            tag = v.Item2;
-            return v.Item1;
-        }
+        ///// <summary>
+        ///// 当前用户
+        ///// </summary>
+        //protected string GetUser()
+        //{
+        //    return GetUser(out object tag);
+        //}
+        ///// <summary>
+        ///// 当前用户
+        ///// </summary>
+        ///// <param name="tag">自定义数据</param>
+        ///// <returns></returns>
+        //protected string GetUser(out object tag)
+        //{
+        //    var v = ServerCreater.SessionManage.GetSession(__currentUser);
+        //    tag = v.Item2;
+        //    return v.Item1;
+        //}
         /// <summary>
         /// 保存Session
         /// </summary>

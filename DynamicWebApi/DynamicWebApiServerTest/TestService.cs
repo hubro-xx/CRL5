@@ -21,6 +21,10 @@ namespace DynamicWebApiServerTest
     }
     public class TestService : AbsService, ITestService
     {
+        public TestService()
+        {
+
+        }
         public bool CancelOrder(string orderNo, decimal refoundAmount, string passWord, string merchantSecre, out string error)
         {
             error = "";
@@ -36,7 +40,8 @@ namespace DynamicWebApiServerTest
 
         public void SendData(string msg,int? a)
         {
-            var user = GetUser(out object tag);
+            var user = CurrentUserName;
+            var tag = CurrentUserTag;
             var file = GetPostFile();
         }
     }

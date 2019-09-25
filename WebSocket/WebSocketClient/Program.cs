@@ -22,6 +22,7 @@ namespace WebSocketClient
         }
         static void Main(string[] args)
         {
+
             var clientConnect = new CRL.WebSocket.WebSocketClientConnect("127.0.0.1", 8015);
             clientConnect.SubscribeMessage<socketMsg>((obj) =>
             {

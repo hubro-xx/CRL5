@@ -36,8 +36,9 @@ namespace WebSocketServer
 
         public void SendData(string msg,int? a)
         {
-            var user = GetUser(out object tag);
- 
+            var user = CurrentUserName;
+            var tag = CurrentUserTag;
+
         }
     }
 }

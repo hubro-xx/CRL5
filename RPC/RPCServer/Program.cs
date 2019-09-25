@@ -33,7 +33,8 @@ namespace RPCServerTest
        
             public string Test1(string msg, out string error)
             {
-                var user = GetUser(out object tag);
+                var user = CurrentUserName;
+                var tag = CurrentUserTag;
                 error = "error";
                 return msg;
             }

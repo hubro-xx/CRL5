@@ -19,11 +19,9 @@ namespace CRL.Core.Remoting
         protected AbsClientConnect clientConnect;
         protected void ThrowError(string msg, string code)
         {
+            clientConnect.OnError?.Invoke(msg, code);
             throw new RemotingEx(msg) { Code = code };
-            //if (clientConnect.OnError != null)
-            //{
-            //    clientConnect.OnError(msg, code);
-            //}
+
             //else
             //{
             //    throw new RemotingEx(msg) { Code = code };

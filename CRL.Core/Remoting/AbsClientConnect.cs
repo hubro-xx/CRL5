@@ -9,7 +9,7 @@ namespace CRL.Core.Remoting
     public abstract class AbsClientConnect : IDisposable
     {
         public string Token = "";
-        //public Action<string, string> OnError;
+        public Action<string, string> OnError;
         protected Dictionary<string, object> _services = new Dictionary<string, object>();
         public virtual void Dispose()
         {
