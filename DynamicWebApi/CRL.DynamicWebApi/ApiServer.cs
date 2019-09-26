@@ -134,10 +134,10 @@ namespace CRL.DynamicWebApi
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Msg = ex.Message;
+                response.Msg = ex.InnerException?.Message;
                 Console.WriteLine(ex.ToString());
                 CRL.Core.EventLog.Log(ex.ToString(), request.Service);
-                return ResponseMessage.CreateError(ex.Message, "500");
+                return ResponseMessage.CreateError(ex.InnerException?.Message, "500");
             }
  
             return response;

@@ -134,9 +134,9 @@ namespace CRL.RPC
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Msg = ex.Message;
+                response.Msg = ex.InnerException?.Message;
                 Console.WriteLine(ex.ToString());
-                return ResponseMessage.CreateError("服务端处理错误:" + ex.Message, "500");
+                return ResponseMessage.CreateError("服务端处理错误:" + ex.InnerException?.Message, "500");
             }
 
             return response;
