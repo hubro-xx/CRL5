@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="fastJSON, Version=2.2.3.0, Culture=neutral, PublicKeyToken=6b75a806b86095cd, processorArchitecture=MSIL">
-      <HintPath>..\packages\fastJSON.2.2.4\lib\net40\fastJSON.dll</HintPath>
+    <Reference Include="Dynamitey, Version=2.0.9.136, Culture=neutral, PublicKeyToken=cbf53ea3aeb972c6, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dynamitey.2.0.9.136\lib\net40\Dynamitey.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -84,6 +84,21 @@
     <Compile Include="CookieHelper.cs" />
     <Compile Include="DelegateCache.cs" />
     <Compile Include="ExceptionHelper.cs" />
+    <Compile Include="ImpromptuInterface\ActLikeCaster.cs" />
+    <Compile Include="ImpromptuInterface\Attributes\AliasAttribute.cs" />
+    <Compile Include="ImpromptuInterface\Attributes\NonRecursiveInterfaceAttribute.cs" />
+    <Compile Include="ImpromptuInterface\Attributes\UseNamedArgumentAttribute.cs" />
+    <Compile Include="ImpromptuInterface\EmitProxy\ActLikeProxy.cs" />
+    <Compile Include="ImpromptuInterface\EmitProxy\ActLikeProxyAttribute.cs" />
+    <Compile Include="ImpromptuInterface\EmitProxy\ActLikeProxySerializationHelper.cs" />
+    <Compile Include="ImpromptuInterface\EmitProxy\BuildProxy.cs" />
+    <Compile Include="ImpromptuInterface\EmitProxy\EmitExtensions.cs" />
+    <Compile Include="ImpromptuInterface\EmitProxy\TypeHash.cs" />
+    <Compile Include="ImpromptuInterface\IActLikeProxy.cs" />
+    <Compile Include="ImpromptuInterface\Impromptu.cs" />
+    <Compile Include="ImpromptuInterface\Optimization\BareBonesList.cs" />
+    <Compile Include="ImpromptuInterface\Optimization\BinderHash.cs" />
+    <Compile Include="ImpromptuInterface\Optimization\Util.cs" />
     <Compile Include="Remoting\AbsServer.cs" />
     <Compile Include="Remoting\AbsService.cs" />
     <Compile Include="Remoting\Attribute.cs" />
