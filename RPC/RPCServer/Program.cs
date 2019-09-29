@@ -36,6 +36,7 @@ namespace RPCServerTest
                 var user = CurrentUserName;
                 var tag = CurrentUserTag;
                 error = "error";
+           
                 return msg;
             }
         }

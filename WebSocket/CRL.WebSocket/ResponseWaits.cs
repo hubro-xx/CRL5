@@ -15,7 +15,7 @@ namespace CRL.WebSocket
         }
         public void Wait()
         {
-            autoReset.WaitOne();
+            autoReset.WaitOne(3000);
         }
     }
     class ResponseWaits

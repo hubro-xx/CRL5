@@ -19,7 +19,10 @@ namespace CRL.RPC
             var response = ResponseMessage.FromBuffer(buffer);
             waits.Set(response.MsgId, response);
         }
-        public override void ChannelReadComplete(IChannelHandlerContext context) => context.Flush();
+        public override void ChannelReadComplete(IChannelHandlerContext context)
+        {
+            context.Flush();
+        }
 
         public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
         {

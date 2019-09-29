@@ -117,7 +117,7 @@ namespace CRL.Core.BinaryFormat
             }));
             #endregion
         }
-        static int lenSaveLength = 2;
+        static int lenSaveLength = 3;
         static Type ReturnType(Type type)
         {
             if (type.FullName.StartsWith("System.Nullable"))

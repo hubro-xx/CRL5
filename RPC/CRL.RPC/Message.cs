@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using System.Linq;
 namespace CRL.RPC
 {
     abstract class MessageBase
@@ -13,8 +13,11 @@ namespace CRL.RPC
         }
         public IByteBuffer ToBuffer()
         {
-            //var data = this.ToByte();
             var data = Core.BinaryFormat.ClassFormat.Pack(GetType(), this);
+            if (data.Length > ushort.MaxValue)
+            {
+                throw new Exception("发送数据长度超过了DotNetty最大包长度" + ushort.MaxValue);
+            }
             return Unpooled.WrappedBuffer(data);
         }
         public string Token

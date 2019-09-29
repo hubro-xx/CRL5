@@ -26,6 +26,7 @@ namespace CRL.RPC
         public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
         {
             Console.WriteLine("ExceptionCaught: " + exception);
+            CRL.Core.EventLog.Error(exception.ToString());
             context.CloseAsync();
         }
     }
