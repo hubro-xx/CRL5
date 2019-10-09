@@ -24,7 +24,7 @@ namespace WebSocketClient
         {
 
             var clientConnect = new CRL.WebSocket.WebSocketClientConnect("127.0.0.1", 8015);
-            clientConnect.UseSign = true;
+            clientConnect.UseSign();
             clientConnect.SubscribeMessage<socketMsg>((obj) =>
             {
                 Console.WriteLine("OnMessage:" + obj.ToJson());

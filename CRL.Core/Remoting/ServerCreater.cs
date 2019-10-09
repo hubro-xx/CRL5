@@ -15,6 +15,7 @@ namespace CRL.Core.Remoting
         internal static bool __CheckSign = false;
         /// <summary>
         /// 验证签名
+        /// 参数都会以ToString计算,注意类型问题
         /// </summary>
         /// <returns></returns>
         public ServerCreater CheckSign()

@@ -77,12 +77,7 @@ namespace CRL.RPC
             }
             request.Args = dic;
             var token = request.Token;
-            if (clientConnect.UseSign && !string.IsNullOrEmpty(token))
-            {
-                var arry = token.Split('@');
-                var sign = SignCheck.CreateSign(arry[1], allArgs, args.ToList());
-                request.Token = string.Format("{0}@{1}", arry[0], sign);
-            }
+            request.Token = GetToken(allArgs, args.ToList(), token);
 
             channel.WriteAndFlushAsync(request.ToBuffer());
             //等待返回

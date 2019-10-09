@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,6 +31,16 @@ namespace CRL.Core.Remoting
         public virtual void Dispose()
         {
 
+        }
+        protected string GetToken(ParameterInfo[] argsName, List<object> args,string token)
+        {
+            if (clientConnect.__UseSign && !string.IsNullOrEmpty(token))
+            {
+                var arry = token.Split('@');
+                var sign = SignCheck.CreateSign(arry[1], argsName, args);
+                token = string.Format("{0}@{1}", arry[0], sign);
+            }
+            return token;
         }
     }
 }

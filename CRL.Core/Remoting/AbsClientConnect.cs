@@ -10,10 +10,16 @@ namespace CRL.Core.Remoting
     {
         public string Token = "";
         public Action<string, string> OnError;
+
+        internal bool __UseSign = false;
         /// <summary>
         /// 使用签名
+        /// 参数都会以ToString计算,注意类型问题
         /// </summary>
-        public bool UseSign = false;
+        public void UseSign()
+        {
+            __UseSign = true;
+        }
         protected Dictionary<string, object> _services = new Dictionary<string, object>();
         public virtual void Dispose()
         {

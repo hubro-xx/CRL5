@@ -16,7 +16,7 @@ namespace RPCClient
             //var clientConnect = new RPCClientConnect("47.105.88.113", 805);
 
             var clientConnect = new RPCClientConnect("127.0.0.1", 805);
-            clientConnect.UseSign = true;
+            clientConnect.UseSign();
         label1:
             try
             {
