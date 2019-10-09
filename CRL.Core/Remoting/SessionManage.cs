@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -11,8 +12,31 @@ namespace CRL.Core.Remoting
     public interface ISessionManage
     {
         void SaveSession(string user, string token, object tag = null);
-        bool CheckSession(string user, string token, out string error);
+        bool CheckSession(string user, string token, ParameterInfo[] argsName, List<object> args, out string error);
         Tuple<string, object> GetSession(string user);
+    }
+    public class SignCheck
+    {
+        public static string CreateSign(string key, ParameterInfo[] argsName, List<object> args)
+        {
+            var dic = new SortedDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            var list = new List<string>();
+            for (int i = 0; i < argsName.Length; i++)
+            {
+                if (argsName[i].Name.ToLower() == "token")
+                {
+                    continue;
+                }
+                dic.Add(argsName[i].Name, args[i]);
+            }
+            foreach (var kv in dic)
+            {
+                list.Add(string.Format("{0}={1}", kv.Key, kv.Value));
+            }
+            var str = string.Join("&", list);
+            var sign = Core.StringHelper.EncryptMD5(str + "&" + key);
+            return sign;
+        }
     }
     public class SessionManage : ISessionManage
     {
@@ -35,7 +59,7 @@ namespace CRL.Core.Remoting
             }
         }
 
-        public bool CheckSession(string user, string token, out string error)
+        public bool CheckSession(string user, string token, ParameterInfo[] argsName, List<object> args, out string error)
         {
             error = "";
             var exists = sessions.TryGetValue(user, out Tuple<string, object> v);
@@ -44,7 +68,12 @@ namespace CRL.Core.Remoting
                 error = "API未登录";
                 return false;
             }
-            if (token != v.Item1)
+            var serverToken = v.Item1;
+            if (ServerCreater.__CheckSign)//使用简单签名
+            {
+                serverToken = SignCheck.CreateSign(serverToken, argsName, args);
+            }
+            if (token != serverToken)
             {
                 error = "token验证失败";
                 return false;

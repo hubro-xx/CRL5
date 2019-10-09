@@ -12,6 +12,7 @@ namespace RPCServerTest
         static void Main(string[] args)
         {
             var server = new ServerCreater().CreatetRPC(805);
+            server.CheckSign();
             server.SetSessionManage(new SessionManage());
             server.Register<ITest, Test>();
             server.Start();

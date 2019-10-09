@@ -13,16 +13,23 @@ namespace CRL.DynamicWebApi
 {
     class ApiClient: AbsClient
     {
-        public ApiClient(AbsClientConnect _clientConnect):base(_clientConnect)
+        public ApiClient(AbsClientConnect _clientConnect) : base(_clientConnect)
         {
 
         }
-        ResponseMessage SendRequest(RequestMessage msg)
+        ResponseMessage SendRequest(ParameterInfo[] argsName, RequestMessage msg)
         {
             var url = Host + $"/DynamicApi/{msg.Service}/{msg.Method}";
             var request = new ImitateWebRequest("orgsync", Encoding.UTF8);
             request.ContentType = "application/json";
-            request.SetHead("token", clientConnect.Token);
+            var token = clientConnect.Token;
+            if (clientConnect.UseSign && !string.IsNullOrEmpty(token))
+            {
+                var arry = token.Split('@');
+                var sign = SignCheck.CreateSign(arry[1], argsName, msg.Args);
+                token = string.Format("{0}@{1}", arry[0], sign);
+            }
+            request.SetHead("token", token);
             var result = request.Post(url, msg.Args.ToJson());
             return result.ToObject<ResponseMessage>();
         }
@@ -30,6 +37,7 @@ namespace CRL.DynamicWebApi
         {
             var id = Guid.NewGuid().ToString();
             var method = ServiceType.GetMethod(binder.Name);
+            var methodParamters = method.GetParameters();
             var returnType = method.ReturnType;
             var request = new RequestMessage
             {
@@ -53,7 +61,7 @@ namespace CRL.DynamicWebApi
             ResponseMessage response = null;
             try
             {
-                response = SendRequest(request);
+                response = SendRequest(methodParamters, request);
             }
             catch (Exception ero)
             {
@@ -71,6 +79,8 @@ namespace CRL.DynamicWebApi
             {
                 foreach (var kv in response.Outs)
                 {
+                    var p = allArgs[kv.Key];
+                    //var obj = kv.Value.ToString().ToObject(p.ParameterType);
                     args[kv.Key] = kv.Value;
                 }
             }

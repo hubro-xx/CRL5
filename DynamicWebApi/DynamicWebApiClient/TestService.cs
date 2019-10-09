@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace DynamicWebApiClient
 {
+    public class outObj
+    {
+        public string name
+        {
+            get; set;
+        }
+    }
     public interface ITestService
     {
         string Login(string name, string pass);

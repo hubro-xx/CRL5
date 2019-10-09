@@ -9,6 +9,19 @@ namespace CRL.Core.Remoting
     public class ServerCreater
     {
         AbsServer Server;
+        /// <summary>
+        /// 验证签名
+        /// </summary>
+        internal static bool __CheckSign = false;
+        /// <summary>
+        /// 验证签名
+        /// </summary>
+        /// <returns></returns>
+        public ServerCreater CheckSign()
+        {
+            __CheckSign = true;
+            return this;
+        }
         internal static ISessionManage SessionManage
         {
             get; set;

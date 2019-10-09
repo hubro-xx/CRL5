@@ -62,6 +62,13 @@ namespace CRL.DynamicWebApi
                 {
                     checkToken = false;
                 }
+                var paramters = request.Args;
+                var methodParamters = method.GetParameters();
+                if (request.Args.Count != methodParamters.Count())
+                {
+                    return ResponseMessage.CreateError("参数计数不正确" + request.ToJson(), "500");
+                }
+
                 if (checkToken)//登录切入点不验证
                 {
                     if (string.IsNullOrEmpty(request.Token))
@@ -75,7 +82,7 @@ namespace CRL.DynamicWebApi
                         return ResponseMessage.CreateError("token不合法 user@token", "401");
                         //throw new Exception("token不合法 user@token");
                     }
-                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], out string error);
+                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], methodParamters, request.Args, out string error);
                     if (!a2)
                     {
                         return ResponseMessage.CreateError(error, "401");
@@ -83,12 +90,7 @@ namespace CRL.DynamicWebApi
                     //Core.CallContext.SetData("currentUser", tokenArry[0]);
                     service.SetUser(tokenArry[0]);
                 }
-                var paramters = request.Args;
-                var methodParamters = method.GetParameters();
-                if(request.Args.Count!= methodParamters.Count())
-                {
-                    return ResponseMessage.CreateError("参数计数不正确" + request.ToJson(), "500");
-                }
+  
                 var outs = new Dictionary<int,object>();
                 int i = 0;
                 foreach (var p in methodParamters)

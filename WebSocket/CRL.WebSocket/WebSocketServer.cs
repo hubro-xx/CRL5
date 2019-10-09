@@ -134,6 +134,9 @@ namespace CRL.WebSocket
                 var checkToken = true;
                 var allowAnonymous = serviceType.GetCustomAttribute<AllowAnonymousAttribute>();
                 var allowAnonymous2 = method.GetCustomAttribute<AllowAnonymousAttribute>();
+                var paramters = request.Args;
+                var methodParamters = method.GetParameters();
+
                 if (allowAnonymous != null || allowAnonymous2 != null)
                 {
                     checkToken = false;
@@ -156,15 +159,14 @@ namespace CRL.WebSocket
                         return ResponseMessage.CreateError("token不合法 user@token", "401");
                         //throw new Exception("token不合法 user@token");
                     }
-                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], out string error);
+                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], methodParamters, paramters, out string error);
                     if (!a2)
                     {
                         return ResponseMessage.CreateError(error, "401");
                     }
                     service.SetUser(tokenArry[0]);
                 }
-                var paramters = request.Args;
-                var methodParamters = method.GetParameters();
+     
                 if(request.Args.Count!= methodParamters.Count())
                 {
                     return ResponseMessage.CreateError("参数计数不正确" + request.ToJson(), "500");

@@ -32,6 +32,7 @@ namespace CRL.RPC
                 {
                     var pipeline = channel.Pipeline;
                     pipeline.AddLast("framing-enc", new LengthFieldPrepender(2));
+                    //数据包最大长度
                     pipeline.AddLast("framing-dec", new LengthFieldBasedFrameDecoder(ushort.MaxValue, 0, 2, 0, 2));
 
                     pipeline.AddLast(new ServerHandler(this));
@@ -67,7 +68,27 @@ namespace CRL.RPC
                 var checkToken = true;
                 var allowAnonymous = serviceType.GetCustomAttribute<AllowAnonymousAttribute>();
                 var allowAnonymous2 = method.GetCustomAttribute<AllowAnonymousAttribute>();
-                if(allowAnonymous!=null || allowAnonymous2!=null)
+
+                var paramters = request.Args;
+
+                var methodParamters = method.GetParameters();
+
+                var args = new object[methodParamters.Length];
+                var outIndex = new List<int>();
+                int i = 0;
+                foreach (var p in methodParamters)
+                {
+                    var value = paramters[i];
+                    int offSet = 0;
+                    args[i] = Core.BinaryFormat.FieldFormat.UnPack(p.ParameterType, value, ref offSet);
+                    if (p.Attributes == ParameterAttributes.Out)
+                    {
+                        outIndex.Add(i);
+                    }
+                    i += 1;
+                }
+
+                if (allowAnonymous!=null || allowAnonymous2!=null)
                 {
                     checkToken = false;
                 }
@@ -89,7 +110,7 @@ namespace CRL.RPC
                         return ResponseMessage.CreateError("token不合法 user@token", "401");
                         //throw new Exception("token不合法 user@token");
                     }
-                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], out string error);
+                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], methodParamters, args.ToList(), out string error);
                     if (!a2)
                     {
                         return ResponseMessage.CreateError(error, "401");
@@ -97,23 +118,8 @@ namespace CRL.RPC
                     service.SetUser(tokenArry[0]);
                 }
 
-                var paramters = request.Args;
+ 
 
-                var methodParamters = method.GetParameters();
-                var args = new object[methodParamters.Length];
-                var outIndex = new List<int>();
-                int i = 0;
-                foreach (var p in methodParamters)
-                {
-                    var value = paramters[i];
-                    int offSet = 0;
-                    args[i] = Core.BinaryFormat.FieldFormat.UnPack(p.ParameterType, value, ref offSet);
-                    if (p.Attributes == ParameterAttributes.Out)
-                    {
-                        outIndex.Add(i);
-                    }
-                    i += 1;
-                }
                 //var args3 = paramters?.Select(b => b.Value)?.ToArray();
                 var result = method.Invoke(service, args);
                 var outs = new Dictionary<int, byte[]>();

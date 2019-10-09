@@ -15,10 +15,11 @@ namespace DynamicWebApiServerTest
         {
             Type type = typeof(TestService);
             var server = new ServerCreater().CreatetApi();
+            server.CheckSign();
             server.SetSessionManage(new SessionManage());
             server.Register<ITestService, TestService>();
             var listener = new ServerListener();
-            listener.Start("http://localhost:809/");
+            //listener.Start("http://localhost:809/");
         }
 
     }
