@@ -41,17 +41,10 @@ namespace CRL.WebSocket
                 Method = binder.Name,
                 Token = clientConnect.Token
             };
-            var dic = new List<object>();
             var allArgs = method.GetParameters();
             var token = request.Token;
             request.Token = GetToken(allArgs, args.ToList(), token);
-
-            for (int i = 0; i < allArgs.Length; i++)
-            {
-                var p = allArgs[i];
-                dic.Add(args[i]);
-            }
-            request.Args = dic;
+            request.Args = args.ToList();
             ResponseMessage response = null;
             try
             {
@@ -73,7 +66,15 @@ namespace CRL.WebSocket
             {
                 foreach (var kv in response.Outs)
                 {
-                    args[kv.Key] = kv.Value;
+                    var p = allArgs[kv.Key];
+                    var value = kv.Value;
+                    if (p.Name.EndsWith("&"))
+                    {
+                        var name = p.Name.Replace("&", "");
+                        var type2 = Type.GetType(name);
+                        value = value.ToString().ToObject(type2);
+                    }
+                    args[kv.Key] = value;
                 }
             }
             if (!string.IsNullOrEmpty(response.Token))

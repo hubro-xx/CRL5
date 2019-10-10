@@ -137,6 +137,34 @@ namespace CRL.WebSocket
                 var paramters = request.Args;
                 var methodParamters = method.GetParameters();
 
+                var outs = new Dictionary<int, object>();
+                int i = 0;
+                foreach (var p in methodParamters)
+                {
+                    var value = paramters[i];
+          
+                    if (p.Attributes == ParameterAttributes.Out)
+                    {
+                        outs.Add(i, null);
+                    }
+                    else
+                    {
+                        if (value != null)
+                        {
+                            if (value.GetType() != p.ParameterType)
+                            {
+                                var value2 = value.ToJson().ToObject(p.ParameterType);
+                                paramters[i] = value2;
+                            }
+                        }
+                        else
+                        {
+                            paramters[i] = value;
+                        }
+                    }
+                    i += 1;
+                }
+
                 if (allowAnonymous != null || allowAnonymous2 != null)
                 {
                     checkToken = false;
@@ -171,29 +199,7 @@ namespace CRL.WebSocket
                 {
                     return ResponseMessage.CreateError("参数计数不正确" + request.ToJson(), "500");
                 }
-                var outs = new Dictionary<int,object>();
-                int i = 0;
-                foreach (var p in methodParamters)
-                {
-                    var value = paramters[i];
-                    if (value != null)
-                    {
-                        if (value.GetType() != p.ParameterType)
-                        {
-                            var value2 = value.ToJson().ToObject(p.ParameterType);
-                            paramters[i] = value2;
-                        }
-                    }
-                    else
-                    {
-                        paramters[i] = value;
-                    }
-                    if (p.Attributes == ParameterAttributes.Out)
-                    {
-                        outs.Add(i,null);
-                    }
-                    i += 1;
-                }
+    
                 var args3 = paramters?.ToArray();
                 var result = method.Invoke(service, args3);
                 foreach (var kv in new Dictionary<int, object>(outs))

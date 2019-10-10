@@ -64,16 +64,11 @@ namespace CRL.RPC
             };
             var dic = new List<byte[]>();
             var allArgs = method.GetParameters();
-            var outs = new Dictionary<string, object>();
+ 
             for (int i = 0; i < allArgs.Length; i++)
             {
                 var p = allArgs[i];
-                //dic.Add(p.Name, args[i]);
                 dic.Add(Core.BinaryFormat.FieldFormat.Pack(p.ParameterType, args[i]));
-                if (p.Attributes == ParameterAttributes.Out)
-                {
-                    outs.Add(p.Name, i);
-                }
             }
             request.Args = dic;
             var token = request.Token;

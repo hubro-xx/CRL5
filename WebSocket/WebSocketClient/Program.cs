@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CRL.Core.Extension;
+using CRL.Core.Remoting;
+
 namespace WebSocketClient
 {
     class Program
@@ -31,14 +33,16 @@ namespace WebSocketClient
             });
             clientConnect.StartPing();
             var service = clientConnect.GetClient<ITestService>();
-            var str = service.Login("user", "123");
         label1:
- 
-            Console.WriteLine(str);
+
+            service.Login();
+            Console.WriteLine("loginOk");
             int? a = 1;
-            service.SendData("data", a);
-            var error = "";
-            service.CancelOrder("", 2, "", null, out error);
+            string error;
+            service.Test1(1, a, out error);
+            Console.WriteLine("error:" + error);
+            var obj2 = service.Test2(new TestObj() { Name = "test" });
+            Console.WriteLine("obj2:" + obj2.ToJson());
             Console.ReadLine();
             goto label1;
         }

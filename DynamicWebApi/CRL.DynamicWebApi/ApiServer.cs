@@ -64,6 +64,38 @@ namespace CRL.DynamicWebApi
                 }
                 var paramters = request.Args;
                 var methodParamters = method.GetParameters();
+                var outs = new Dictionary<int, object>();
+                int i = 0;
+                foreach (var p in methodParamters)
+                {
+                    var value = paramters[i];
+         
+                    if (p.Attributes == ParameterAttributes.Out)
+                    {
+                        outs.Add(i, null);
+                    }
+                    else
+                    {
+                        if (value != null)
+                        {
+                            if (value.GetType() != p.ParameterType)
+                            {
+                                var value2 = value.ToJson().ToObject(p.ParameterType);
+                                paramters[i] = value2;
+                            }
+                        }
+                        else
+                        {
+                            paramters[i] = value;
+                        }
+                    }
+                    i += 1;
+                }
+                if (request.httpPostedFile != null)
+                {
+                    service.SetPostFile(request.httpPostedFile);
+                }
+
                 if (request.Args.Count != methodParamters.Count())
                 {
                     return ResponseMessage.CreateError("参数计数不正确" + request.ToJson(), "500");
@@ -82,7 +114,7 @@ namespace CRL.DynamicWebApi
                         return ResponseMessage.CreateError("token不合法 user@token", "401");
                         //throw new Exception("token不合法 user@token");
                     }
-                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], methodParamters, request.Args, out string error);
+                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], methodParamters, paramters, out string error);
                     if (!a2)
                     {
                         return ResponseMessage.CreateError(error, "401");
@@ -91,33 +123,7 @@ namespace CRL.DynamicWebApi
                     service.SetUser(tokenArry[0]);
                 }
   
-                var outs = new Dictionary<int,object>();
-                int i = 0;
-                foreach (var p in methodParamters)
-                {
-                    var value = paramters[i];
-                    if (value != null)
-                    {
-                        if (value.GetType() != p.ParameterType)
-                        {
-                            var value2 = value.ToJson().ToObject(p.ParameterType);
-                            paramters[i] = value2;
-                        }
-                    }
-                    else
-                    {
-                        paramters[i] = value;
-                    }
-                    if (p.Attributes == ParameterAttributes.Out)
-                    {
-                        outs.Add(i,null);
-                    }
-                    i += 1;
-                }
-                if (request.httpPostedFile != null)
-                {
-                    service.SetPostFile(request.httpPostedFile);
-                }
+
                 var args3 = paramters?.ToArray();
                 var result = method.Invoke(service, args3);
                 foreach (var kv in new Dictionary<int, object>(outs))

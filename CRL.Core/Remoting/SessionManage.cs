@@ -17,22 +17,44 @@ namespace CRL.Core.Remoting
     }
     public class SignCheck
     {
-        public static string CreateSign(string key, ParameterInfo[] argsName, List<object> args)
+        static string getObjSign(Type type, object obj)
         {
+            string sign = "";
             var dic = new SortedDictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            var list = new List<string>();
-            for (int i = 0; i < argsName.Length; i++)
+            if (obj == null)
             {
-                if (argsName[i].Name.ToLower() == "token")
-                {
-                    continue;
-                }
-                dic.Add(argsName[i].Name, args[i]);
+                return sign;
             }
+            var pro = type.GetProperties();
+            foreach (var p in pro)
+            {
+                dic.Add(p.Name, p.GetValue(obj));
+            }
+            var list = new List<string>();
             foreach (var kv in dic)
             {
                 list.Add(string.Format("{0}={1}", kv.Key, kv.Value));
             }
+            sign = string.Join("&", list);
+            return sign;
+        }
+        public static string CreateSign(string key, ParameterInfo[] argsName, List<object> args)
+        {
+            var list = new List<string>();
+            for (int i = 0; i < argsName.Length; i++)
+            {
+                var p = argsName[i];
+                var value = args[i];
+                if(p.ParameterType.IsClass)
+                {
+                    list.Add(getObjSign(p.ParameterType, value));
+                }
+                else
+                {
+                    list.Add(string.Format("{0}={1}", p.Name, value));
+                }
+            }
+            list.RemoveAll(b => b == "");
             var str = string.Join("&", list);
             var sign = Core.StringHelper.EncryptMD5(str + "&" + key);
             return sign;

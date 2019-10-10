@@ -14,32 +14,9 @@ namespace RPCServerTest
             var server = new ServerCreater().CreatetRPC(805);
             server.CheckSign();
             server.SetSessionManage(new SessionManage());
-            server.Register<ITest, Test>();
+            server.Register<ITestService, TestService>();
             server.Start();
             Console.ReadLine();
-        }
-        public interface ITest
-        {
-            bool login(int? a);
-            string Test1(string msg, out string error);
-        }
-        public class Test : AbsService, ITest
-        {
-            [LoginPoint]
-            public bool login(int? a)
-            {
-                SaveSession("user","token");
-                return true;
-            }
-       
-            public string Test1(string msg, out string error)
-            {
-                var user = CurrentUserName;
-                var tag = CurrentUserTag;
-                error = "error";
-           
-                return msg;
-            }
         }
     }
 }

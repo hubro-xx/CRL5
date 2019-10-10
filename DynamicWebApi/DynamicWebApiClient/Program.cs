@@ -1,9 +1,10 @@
-﻿using System;
+﻿using CRL.Core.Remoting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using CRL.Core.Extension;
 namespace DynamicWebApiClient
 {
     class Program
@@ -14,14 +15,16 @@ namespace DynamicWebApiClient
             //var clientConnect = new CRL.DynamicWebApi.ApiClientConnect("http://localhost:8022");
             clientConnect.UseSign();
             var service = clientConnect.GetClient<ITestService>();
+        
         label1:
-            outObj obj2;
-            var str = service.Login("user", "123");
-            Console.WriteLine(str);
+            service.Login();
+            Console.WriteLine("loginOk");
             int? a = 1;
-            service.SendData("data",a);
-            var error = "";
-            service.CancelOrder("", 2, "", null, out error);
+            string error;
+            service.Test1(1, a, out error);
+            Console.WriteLine("error:" + error);
+            var obj2 = service.Test2(new TestObj() { Name = "test" });
+            Console.WriteLine("obj2:" + obj2.ToJson());
             Console.ReadLine();
             goto label1;
         }

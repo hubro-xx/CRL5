@@ -1,4 +1,6 @@
-﻿using CRL.RPC;
+﻿using CRL.Core.Extension;
+using CRL.Core.Remoting;
+using CRL.RPC;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,51 +13,22 @@ namespace RPCClient
     {
         static void Main(string[] args)
         {
-            var user = "user";
-            string token = "123";
-            //var clientConnect = new RPCClientConnect("47.105.88.113", 805);
 
             var clientConnect = new RPCClientConnect("127.0.0.1", 805);
             clientConnect.UseSign();
+            var service = clientConnect.GetClient<ITestService>();
         label1:
-            try
-            {
-                Test2(clientConnect);
-
-            }
-            catch(Exception ero)
-            {
-                Console.WriteLine(ero.ToString());
-            }
-
+            service.Login();
+            Console.WriteLine("loginOk");
+            int? a = 1;
+            string error;
+            service.Test1(1, a, out error);
+            Console.WriteLine("error:" + error);
+            var obj2 = service.Test2(new TestObj() { Name = "test" });
+            Console.WriteLine("obj2:" + obj2.ToJson());
             Console.ReadLine();
-            //clientConnect.Dispose();
             goto label1;
         }
-        static void Test2(RPCClientConnect clientConnect)
-        {
-         
-            var client = clientConnect.GetClient<ITest>();
-            int? a=null;
-            client.login(a);
-            long total = 0;
-            var sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
-            for (int i = 0; i < 1; i++)
-            {
-                string error = "";
-                var str = client.Test1("aaa",out error);
-                Console.WriteLine($"return:{str} out:{error}");
-            }
-            sw.Stop();
-            var el = sw.ElapsedMilliseconds;
-          
-        }
     }
 
-    public interface ITest
-    {
-        bool login(int? a);
-        string Test1(string msg,out string error);
-    }
 }
