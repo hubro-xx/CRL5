@@ -65,76 +65,43 @@ namespace CRL.RPC
                     }
                     methods.TryAdd(methodKey, method);
                 }
-                var checkToken = true;
-                var allowAnonymous = serviceType.GetCustomAttribute<AllowAnonymousAttribute>();
-                var allowAnonymous2 = method.GetCustomAttribute<AllowAnonymousAttribute>();
+
 
                 var paramters = request.Args;
 
                 var methodParamters = method.GetParameters();
 
                 var args = new object[methodParamters.Length];
-                var outIndex = new List<int>();
-                int i = 0;
-                foreach (var p in methodParamters)
+
+                for (int i = 0; i < methodParamters.Length; i++)
                 {
+                    var p = methodParamters[i];
                     var value = paramters[i];
                     int offSet = 0;
                     args[i] = Core.BinaryFormat.FieldFormat.UnPack(p.ParameterType, value, ref offSet);
-                    if (p.Attributes == ParameterAttributes.Out)
-                    {
-                        outIndex.Add(i);
-                    }
-                    i += 1;
                 }
 
-                if (allowAnonymous!=null || allowAnonymous2!=null)
+                var msgBase = new Core.Remoting.MessageBase() { Args = args.ToList(), Method = request.Method, Service = request.Service, Token = request.Token };
+                var errorInfo = InvokeMessage(msgBase, out object result, out Dictionary<int, object> outs2, out string token);
+                if (errorInfo != null)
                 {
-                    checkToken = false;
-                }
-                var loginAttr = method.GetCustomAttribute<LoginPointAttribute>();
-                if (loginAttr != null)
-                {
-                    checkToken = false;
-                }
-                if (checkToken)//登录切入点不验证
-                {
-                    if (string.IsNullOrEmpty(request.Token))
-                    {
-                        return ResponseMessage.CreateError("请求token为空,请先登录", "401");
-                        //throw new Exception("token为空");
-                    }
-                    var tokenArry = request.Token.Split('@');
-                    if (tokenArry.Length < 2)
-                    {
-                        return ResponseMessage.CreateError("token不合法 user@token", "401");
-                        //throw new Exception("token不合法 user@token");
-                    }
-                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], methodParamters, args.ToList(), out string error);
-                    if (!a2)
-                    {
-                        return ResponseMessage.CreateError(error, "401");
-                    }
-                    service.SetUser(tokenArry[0]);
-                }
-
- 
-
-                //var args3 = paramters?.Select(b => b.Value)?.ToArray();
-                var result = method.Invoke(service, args);
-                var outs = new Dictionary<int, byte[]>();
-                foreach (var index in outIndex)
-                {
-                    var type = methodParamters[index];
-                    var value = args[index];
-                    outs[index] = Core.BinaryFormat.FieldFormat.Pack(type.ParameterType, value);
+                    return ResponseMessage.CreateError(errorInfo.msg, errorInfo.code);
                 }
                 response.SetData(method.ReturnType, result);
                 response.Success = true;
-                response.Outs = outs;
-                if (loginAttr != null)//登录方法后返回新TOKEN
+
+                var outs = new Dictionary<int, byte[]>();
+                foreach (var kv in outs2)
                 {
-                    response.Token = service.GetToken();
+                    var type = methodParamters[kv.Key];
+                    var value = kv.Value;
+                    outs[kv.Key] = Core.BinaryFormat.FieldFormat.Pack(type.ParameterType, value);
+                }
+
+                response.Outs = outs;
+                if (!string.IsNullOrEmpty(token))//登录方法后返回新TOKEN
+                {
+                    response.Token = token;
                 }
             }
             catch (Exception ex)

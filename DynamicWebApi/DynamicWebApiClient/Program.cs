@@ -11,7 +11,7 @@ namespace DynamicWebApiClient
     {
         static void Main(string[] args)
         {
-            var clientConnect = new CRL.DynamicWebApi.ApiClientConnect("http://localhost:53065");
+            var clientConnect = new CRL.DynamicWebApi.ApiClientConnect("http://localhost:809");
             //var clientConnect = new CRL.DynamicWebApi.ApiClientConnect("http://localhost:8022");
             clientConnect.UseSign();
             var service = clientConnect.GetClient<ITestService>();

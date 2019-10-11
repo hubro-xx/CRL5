@@ -32,111 +32,18 @@ namespace CRL.DynamicWebApi
 
             try
             {
-                var a = serviceHandle.TryGetValue(request.Service, out AbsService service);
-                if (!a)
+                var msgBase = new Core.Remoting.MessageBase() { Args = request.Args, Method = request.Method, Service = request.Service, Token = request.Token };
+                var errorInfo = InvokeMessage(msgBase, out object result, out Dictionary<int, object> outs, out string token);
+                if (errorInfo != null)
                 {
-                    return ResponseMessage.CreateError("未找到该服务", "404");
-                }
-                var serviceType = service.GetType();
-                service = System.Activator.CreateInstance(serviceType) as AbsService;
-                var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
-                a = methods.TryGetValue(methodKey, out MethodInfo method);
-                if (!a)
-                {
-                    method = serviceType.GetMethod(request.Method);
-                    if (method == null)
-                    {
-                        return ResponseMessage.CreateError("未找到该方法", "404");
-                    }
-                    methods.TryAdd(methodKey, method);
-                }
-                var checkToken = true;
-                var allowAnonymous = serviceType.GetCustomAttribute<AllowAnonymousAttribute>();
-                var allowAnonymous2 = method.GetCustomAttribute<AllowAnonymousAttribute>();
-                if (allowAnonymous != null || allowAnonymous2 != null)
-                {
-                    checkToken = false;
-                }
-                var loginAttr = method.GetCustomAttribute<LoginPointAttribute>();
-                if (loginAttr != null)
-                {
-                    checkToken = false;
-                }
-                var paramters = request.Args;
-                var methodParamters = method.GetParameters();
-                var outs = new Dictionary<int, object>();
-                int i = 0;
-                foreach (var p in methodParamters)
-                {
-                    var value = paramters[i];
-         
-                    if (p.Attributes == ParameterAttributes.Out)
-                    {
-                        outs.Add(i, null);
-                    }
-                    else
-                    {
-                        if (value != null)
-                        {
-                            if (value.GetType() != p.ParameterType)
-                            {
-                                var value2 = value.ToJson().ToObject(p.ParameterType);
-                                paramters[i] = value2;
-                            }
-                        }
-                        else
-                        {
-                            paramters[i] = value;
-                        }
-                    }
-                    i += 1;
-                }
-                if (request.httpPostedFile != null)
-                {
-                    service.SetPostFile(request.httpPostedFile);
-                }
-
-                if (request.Args.Count != methodParamters.Count())
-                {
-                    return ResponseMessage.CreateError("参数计数不正确" + request.ToJson(), "500");
-                }
-
-                if (checkToken)//登录切入点不验证
-                {
-                    if (string.IsNullOrEmpty(request.Token))
-                    {
-                        return ResponseMessage.CreateError("请求token为空,请先登录", "401");
-                        //throw new Exception("token为空");
-                    }
-                    var tokenArry = request.Token.Split('@');
-                    if (tokenArry.Length < 2)
-                    {
-                        return ResponseMessage.CreateError("token不合法 user@token", "401");
-                        //throw new Exception("token不合法 user@token");
-                    }
-                    var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], methodParamters, paramters, out string error);
-                    if (!a2)
-                    {
-                        return ResponseMessage.CreateError(error, "401");
-                    }
-                    //Core.CallContext.SetData("currentUser", tokenArry[0]);
-                    service.SetUser(tokenArry[0]);
-                }
-  
-
-                var args3 = paramters?.ToArray();
-                var result = method.Invoke(service, args3);
-                foreach (var kv in new Dictionary<int, object>(outs))
-                {
-                    var value = args3[kv.Key];
-                    outs[kv.Key] = value;
+                    return ResponseMessage.CreateError(errorInfo.msg, errorInfo.code);
                 }
                 response.SetData(result);
                 response.Success = true;
                 response.Outs = outs;
-                if (loginAttr != null)//登录方法后返回新TOKEN
+                if (!string.IsNullOrEmpty(token))//登录方法后返回新TOKEN
                 {
-                    response.Token = service.GetToken();
+                    response.Token = token;
                 }
             }
             catch (Exception ex)
