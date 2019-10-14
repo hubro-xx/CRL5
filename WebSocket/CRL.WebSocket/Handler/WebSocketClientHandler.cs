@@ -70,7 +70,7 @@ namespace CRL.WebSocket
                 var json = textFrame.Text();
                 //Console.WriteLine($"WebSocket Client received message: {json}");
                 //发送返回信号
-                var response2 = ResponseMessage.FromBuffer(json);
+                var response2 = ResponseJsonMessage.FromBuffer(json);
                 if (!string.IsNullOrEmpty(response2.MsgId))
                 {
                     waits.Set(response2.MsgId, response2);

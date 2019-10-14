@@ -17,7 +17,7 @@ namespace CRL.DynamicWebApi
         {
 
         }
-        ResponseMessage SendRequest(ParameterInfo[] argsName, RequestMessage msg)
+        ResponseJsonMessage SendRequest(ParameterInfo[] argsName, RequestJsonMessage msg)
         {
             var url = Host + $"/DynamicApi/{msg.Service}/{msg.Method}";
             var request = new ImitateWebRequest("orgsync", Encoding.UTF8);
@@ -27,7 +27,7 @@ namespace CRL.DynamicWebApi
 
             request.SetHead("token", token);
             var result = request.Post(url, msg.Args.ToJson());
-            return result.ToObject<ResponseMessage>();
+            return result.ToObject<ResponseJsonMessage>();
         }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
@@ -35,7 +35,7 @@ namespace CRL.DynamicWebApi
             var method = ServiceType.GetMethod(binder.Name);
             var methodParamters = method.GetParameters();
             var returnType = method.ReturnType;
-            var request = new RequestMessage
+            var request = new RequestJsonMessage
             {
                 Service = ServiceName,
                 Method = binder.Name,
@@ -43,7 +43,7 @@ namespace CRL.DynamicWebApi
             };
             var allArgs = method.GetParameters();
             request.Args = args.ToList();
-            ResponseMessage response = null;
+            ResponseJsonMessage response = null;
             try
             {
                 response = SendRequest(methodParamters, request);

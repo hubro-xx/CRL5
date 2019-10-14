@@ -108,8 +108,8 @@ namespace CRL.WebSocket
         }
         public object InvokeResult2(IChannelHandlerContext ctx, object rq)
         {
-            var request = rq as RequestMessage;
-            var response = new ResponseMessage();
+            var request = rq as RequestJsonMessage;
+            var response = new ResponseJsonMessage();
 
             try
             {
@@ -117,7 +117,7 @@ namespace CRL.WebSocket
                 var errorInfo = InvokeMessage(msgBase, out object result, out Dictionary<int, object> outs, out string token);
                 if (errorInfo != null)
                 {
-                    return ResponseMessage.CreateError(errorInfo.msg, errorInfo.code);
+                    return ResponseJsonMessage.CreateError(errorInfo.msg, errorInfo.code);
                 }
                 response.SetData(result);
                 response.Success = true;
@@ -135,7 +135,7 @@ namespace CRL.WebSocket
                 response.Msg = ex.InnerException?.Message;
                 Console.WriteLine(ex.ToString());
                 CRL.Core.EventLog.Log(ex.ToString(), request.Service);
-                return ResponseMessage.CreateError(ex.InnerException?.Message, "500");
+                return ResponseJsonMessage.CreateError(ex.InnerException?.Message + $" 在{request.Service}/{request.Method}", "500");
             }
  
             return response;
@@ -172,7 +172,7 @@ namespace CRL.WebSocket
                 error = "找不到客户端连接";
                 return false;
             }
-            var response = new ResponseMessage() { Data = msg.ToJson(), MessageType = typeof(T).Name };
+            var response = new ResponseJsonMessage() { Data = msg.ToJson(), MsgType = typeof(T).Name };
             var frame2 = new TextWebSocketFrame(response.ToJson());
             ctx.WriteAndFlushAsync(frame2);
             return true;

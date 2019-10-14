@@ -28,7 +28,16 @@ namespace CRL.Core.Remoting
             var pro = type.GetProperties();
             foreach (var p in pro)
             {
-                dic.Add(p.Name, p.GetValue(obj));
+                var value = p.GetValue(obj);
+                if (p.PropertyType.IsEnum || p.PropertyType == typeof(bool))
+                {
+                    value = Convert.ToInt32(value);
+                }
+                else if (p.PropertyType == typeof(DateTime))
+                {
+                    value = ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
+                }
+                dic.Add(p.Name, value);
             }
             var list = new List<string>();
             foreach (var kv in dic)

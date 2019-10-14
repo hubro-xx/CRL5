@@ -51,9 +51,9 @@ namespace CRL.WebSocket
             _services[key] = instance;
             return instance as T;
         }
-        internal void OnMessage(ResponseMessage msg)
+        internal void OnMessage(ResponseJsonMessage msg)
         {
-            var a = subs.TryGetValue(msg.MessageType, out methodType method);
+            var a = subs.TryGetValue(msg.MsgType, out methodType method);
             if (a)
             {
                 var dg = method.action;
@@ -139,7 +139,7 @@ namespace CRL.WebSocket
                 return true;
             }, 3);
         }
-        internal ResponseMessage SendRequest(RequestMessage msg)
+        internal ResponseJsonMessage SendRequest(RequestJsonMessage msg)
         {
             var id = Guid.NewGuid().ToString();
             allWaits.Add(id);

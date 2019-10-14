@@ -27,8 +27,8 @@ namespace CRL.DynamicWebApi
         }
         public override object InvokeResult(object rq)
         {
-            var request = rq as RequestMessage;
-            var response = new ResponseMessage();
+            var request = rq as RequestJsonMessage;
+            var response = new ResponseJsonMessage();
 
             try
             {
@@ -36,7 +36,7 @@ namespace CRL.DynamicWebApi
                 var errorInfo = InvokeMessage(msgBase, out object result, out Dictionary<int, object> outs, out string token);
                 if (errorInfo != null)
                 {
-                    return ResponseMessage.CreateError(errorInfo.msg, errorInfo.code);
+                    return ResponseJsonMessage.CreateError(errorInfo.msg, errorInfo.code);
                 }
                 response.SetData(result);
                 response.Success = true;
@@ -52,7 +52,7 @@ namespace CRL.DynamicWebApi
                 response.Msg = ex.InnerException?.Message;
                 Console.WriteLine(ex.ToString());
                 CRL.Core.EventLog.Log(ex.ToString(), request.Service);
-                return ResponseMessage.CreateError(ex.InnerException?.Message, "500");
+                return ResponseJsonMessage.CreateError(ex.InnerException?.Message + $" 在{request.Service}/{request.Method}", "500");
             }
  
             return response;

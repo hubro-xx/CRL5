@@ -109,7 +109,7 @@ namespace CRL.RPC
                 response.Success = false;
                 response.Msg = ex.InnerException?.Message;
                 Console.WriteLine(ex.ToString());
-                return ResponseMessage.CreateError("服务端处理错误:" + ex.InnerException?.Message, "500");
+                return ResponseMessage.CreateError(ex.InnerException?.Message + $" 在{request.Service}/{request.Method}", "500");
             }
 
             return response;

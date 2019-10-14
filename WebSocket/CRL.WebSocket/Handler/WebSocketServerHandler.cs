@@ -16,6 +16,7 @@ namespace CRL.WebSocket
     using static DotNetty.Codecs.Http.HttpVersion;
     using static DotNetty.Codecs.Http.HttpResponseStatus;
     using CRL.Core.Extension;
+    using CRL.Core.Remoting;
 
     public sealed class WebSocketServerHandler : SimpleChannelInboundHandler<object>
     {
@@ -113,9 +114,9 @@ namespace CRL.WebSocket
                 
                 var data = ((TextWebSocketFrame)frame).Text();
                 //Console.WriteLine("收到消息:" + data);
-                var request = RequestMessage.FromBuffer(data);
+                var request = RequestJsonMessage.FromBuffer(data);
                 // Echo the frame
-                var result = server.InvokeResult2(ctx, request) as ResponseMessage;
+                var result = server.InvokeResult2(ctx, request) as ResponseJsonMessage;
                 if (result == null)
                 {
                     return;

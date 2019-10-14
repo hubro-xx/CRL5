@@ -89,7 +89,6 @@
     <Compile Include="WebSocketConnect.cs" />
     <Compile Include="WebSocketServer.cs" />
     <Compile Include="Extension.cs" />
-    <Compile Include="Message.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Handler\WebSocketClientHandler.cs" />
     <Compile Include="Handler\WebSocketServerBenchmarkPage.cs" />

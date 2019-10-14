@@ -9,6 +9,7 @@ namespace CRL.Core.Remoting
     public class TestObj
     {
         public string Name { get; set; }
+        public bool b { get; set; }
     }
     public interface ITestService
     {
@@ -26,6 +27,7 @@ namespace CRL.Core.Remoting
 
         public bool Test1(int a, int? b, out string error)
         {
+            //throw new Exception("ss");
             var user = CurrentUserName;
             var tag = CurrentUserTag;
 
@@ -39,6 +41,25 @@ namespace CRL.Core.Remoting
         {
             Console.WriteLine(obj.ToJson());
             return obj;
+        }
+    }
+    public class TestFactory
+    {
+        public static void RunTest(ITestService service)
+        {
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            service.Login();
+            Console.WriteLine("loginOk");
+            int? a = 1;
+            string error;
+            service.Test1(1, a, out error);
+            Console.WriteLine("error:" + error);
+            var obj2 = service.Test2(new TestObj() { Name = "test" });
+            Console.WriteLine("obj2:" + obj2.ToJson());
+            sw.Stop();
+            var el = sw.ElapsedMilliseconds;
+            Console.WriteLine("el:" + el);
         }
     }
 }

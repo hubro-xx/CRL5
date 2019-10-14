@@ -186,7 +186,9 @@ namespace CRL.Core
         /// <returns></returns>
         public static string SerializerToJson<T>(T obj)
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+            var iso = new Newtonsoft.Json.Converters.IsoDateTimeConverter();
+            iso.DateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+            return Newtonsoft.Json.JsonConvert.SerializeObject(obj, iso);
             //return fastJSON.JSON.ToJSON(obj, new fastJSON.JSONParameters() { EnableAnonymousTypes = true, SerializeNullValues = false,  UseEscapedUnicode=false });
         }
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using DotNetty.Buffers;
+﻿using CRL.Core.Remoting;
+using DotNetty.Buffers;
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +9,7 @@ namespace CRL.WebSocket
     class ResponseWait
     {
         AutoResetEvent autoReset = new AutoResetEvent(false);
-        public ResponseMessage Response;
+        public ResponseJsonMessage Response;
         public void Set()
         {
             autoReset.Set();
@@ -25,7 +26,7 @@ namespace CRL.WebSocket
         {
             waits[id] = new ResponseWait();
         }
-        public void Set(string key, ResponseMessage response)
+        public void Set(string key, ResponseJsonMessage response)
         {
             var wait = waits[key];
             wait.Response = response;

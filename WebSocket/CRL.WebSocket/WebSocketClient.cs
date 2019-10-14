@@ -35,7 +35,7 @@ namespace CRL.WebSocket
             var id = Guid.NewGuid().ToString();
             var method = ServiceType.GetMethod(binder.Name);
             var returnType = method.ReturnType;
-            var request = new RequestMessage
+            var request = new RequestJsonMessage
             {
                 Service = ServiceName,
                 Method = binder.Name,
@@ -45,7 +45,7 @@ namespace CRL.WebSocket
             var token = request.Token;
             request.Token = GetToken(allArgs, args.ToList(), token);
             request.Args = args.ToList();
-            ResponseMessage response = null;
+            ResponseJsonMessage response = null;
             try
             {
                 response = ((WebSocketClientConnect)clientConnect).SendRequest(request);

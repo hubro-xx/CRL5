@@ -1,4 +1,5 @@
 ﻿using CRL.Core.Extension;
+using CRL.Core.Remoting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace CRL.DynamicWebApi
                 var token = request.Headers["token"];
                 var apiServer = ApiServer.Instance;
   
-                var requestMsg = new RequestMessage()
+                var requestMsg = new RequestJsonMessage()
                 {
                     Service = service,
                     Method = method,

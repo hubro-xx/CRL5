@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-
+using CRL.Core.Extension;
 namespace CRLTest
 {
     class testClass
@@ -45,15 +45,10 @@ namespace CRLTest
     {
         static void Main(string[] args)
         {
-            var obj = new { name="test"};
-            var obj2 = obj.ToType<b>();
-            //var s2= ConvertObject(typeof(CRL.DBAccess.DBType), "1");
-            //var s3 = ConvertObject(typeof(decimal), "");
-            var num2 = 20000;
-            var d2 = BitConverter.GetBytes(num2);
-            
-            
-
+            var obj = new testClass() { time = DateTime.Now };
+            var json = obj.ToJson();
+            Console.WriteLine(json);
+            Console.ReadLine();
             //自定义定位
             CRL.Sharding.LocationManage.Register<Code.Sharding.MemberSharding>((t, a) =>
             {
