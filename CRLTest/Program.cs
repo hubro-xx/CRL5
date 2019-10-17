@@ -40,15 +40,19 @@ namespace CRLTest
         {
             get;set;
         }
+        public string name2
+        {
+            get; set;
+        }
     }
     class Program
     {
         static void Main(string[] args)
         {
-            var obj = new testClass() { time = DateTime.Now };
-            var json = obj.ToJson();
-            Console.WriteLine(json);
-            Console.ReadLine();
+            //var obj = new testClass() { time = DateTime.Now };
+            //var json = obj.ToJson();
+            //Console.WriteLine(json);
+            //Console.ReadLine();
             //自定义定位
             CRL.Sharding.LocationManage.Register<Code.Sharding.MemberSharding>((t, a) =>
             {
@@ -72,12 +76,15 @@ namespace CRLTest
             };
 
 
-        //Code.MemberManage.Instance.QueryItem(1);
-        //Code.OrderManage.Instance.QueryItem(1);
-        //Code.ProductDataManage.Instance.QueryItem(1);
+            //Code.MemberManage.Instance.QueryItem(1);
+            //Code.OrderManage.Instance.QueryItem(1);
+            //Code.ProductDataManage.Instance.QueryItem(1);
+            string str = "111";
         label1:
 
-            testFormat();
+            //testFormat();
+            Code.TestAll.TestSelect();
+
             Console.ReadLine();
             goto label1;
             Console.ReadLine();

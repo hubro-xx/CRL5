@@ -122,6 +122,7 @@
     <Compile Include="DBAccess\MySqlHelper.cs" />
     <Compile Include="DBAccess\OracleHelper.cs" />
     <Compile Include="DBAccess\SqlHelper.cs" />
+    <Compile Include="ExtensionMethod\Compare.cs" />
     <Compile Include="ExtensionMethod\IModelEx.cs" />
     <Compile Include="ExtensionMethod\DateTime.cs" />
     <Compile Include="ExtensionMethod\IsNull.cs" />

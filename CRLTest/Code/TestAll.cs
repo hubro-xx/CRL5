@@ -20,6 +20,7 @@ namespace CRLTest.Code
             var time = DateTime.Now;
             //select 测试
             var query = ProductDataManage.Instance.GetLambdaQuery();
+
             query.Take(3);
             //query.Where(b => DateTime.Parse("2016-02-11 12:56") == b.AddTime);
             //query.Where(b => b.CategoryName != null);
@@ -37,6 +38,7 @@ namespace CRLTest.Code
                 time = time,
                 aa = DateTime.Parse("2016-02-11 12:56"),
                 aa2 = Convert.ToDateTime(times),
+                times = times,
                 field = "field"
             }).ToList();
             var sql = query.ToString();
@@ -85,6 +87,8 @@ namespace CRLTest.Code
             query.Where(b => b.Id.ToString() == "123");//支持Cast转换
             query.Where(b => Convert.ToString(b.Id) == "123");//支持Cast转换
             query.Where(b => int.Parse(b.InterFaceUser) == 123);//支持Cast转换
+            query.Where(b => b.ProductName.LessThan("sss"));
+            query.Where(b => b.ProductName.GreaterThan("sss"));
             //query.Where(b => b.CategoryName != null);
             query.Page(2, 1);
             query.OrderBy(b => b.Id * 1);

@@ -82,10 +82,49 @@ namespace CRL.LambdaQuery
                 methodDic.Add("Replace", Replace);
                 methodDic.Add("DistinctField", DistinctField);
                 methodDic.Add("DistinctCount", DistinctCount);
+                methodDic.Add("GreaterThan", GreaterThan);
+                methodDic.Add("LessThan", LessThan);
+                methodDic.Add("GreaterThanOrEqual", GreaterThanOrEqual);
+                methodDic.Add("LessThanOrEqual", LessThanOrEqual);
             }
             return methodDic;
         }
+        #region compare
+        string compare(MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame, string op)
+        {
+            var field = methodInfo.MemberQueryName;
+            var args = methodInfo.Args;
+            string parName = GetParamName("cmp", parIndex);
+            var args1 = args[0];
+            if (args1 is ExpressionValueObj)
+            {
+                parName = args1.ToString();
+            }
+            else
+            {
+                addParame(parName, args1);
+            }
+            parIndex += 1;
+            return $"{field}{op}{parName}";
+        }
+        private string GreaterThan(MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            return compare(methodInfo, ref parIndex, addParame, ">");
+        }
+        private string GreaterThanOrEqual(MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            return compare(methodInfo, ref parIndex, addParame, ">=");
+        }
+        private string LessThan(MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            return compare(methodInfo, ref parIndex, addParame, "<");
+        }
+        private string LessThanOrEqual(MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            return compare(methodInfo, ref parIndex, addParame, "<=");
+        }
 
+        #endregion
         private string DistinctCount(MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
             var field = methodInfo.MemberQueryName;

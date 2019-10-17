@@ -37,6 +37,10 @@ namespace CRL.Core.Remoting
                 {
                     value = ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
                 }
+                else if (p.PropertyType == typeof(decimal))
+                {
+                    value = ((decimal)value).ToString("F");
+                }
                 dic.Add(p.Name, value);
             }
             var list = new List<string>();
