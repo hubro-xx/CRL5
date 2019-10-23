@@ -41,7 +41,7 @@ namespace CRL.Core.Remoting
                 {
                     value = ((decimal)value).ToString("F");
                 }
-                dic.Add(p.Name, value);
+                dic.Add(p.Name.ToLower(), value);
             }
             var list = new List<string>();
             foreach (var kv in dic)

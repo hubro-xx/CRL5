@@ -26,7 +26,8 @@ namespace CRL.DynamicWebApi
             token = GetToken(argsName, msg.Args, token);
 
             request.SetHead("token", token);
-            var result = request.Post(url, msg.Args.ToJson());
+            var json = msg.Args.ToJson();
+            var result = request.Post(url, json);
             return result.ToObject<ResponseJsonMessage>();
         }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)

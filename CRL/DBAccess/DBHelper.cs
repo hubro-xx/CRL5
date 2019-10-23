@@ -329,6 +329,7 @@ namespace CRL.DBAccess
             var time = DateTime.Now;
             CreateConn();
             DbCommand cmd = createCmd_(text, currentConn);
+            cmd.CommandTimeout = 180;
             if (_trans != null)
             {
                 cmd.Transaction = _trans;
