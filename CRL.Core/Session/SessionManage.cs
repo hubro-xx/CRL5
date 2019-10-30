@@ -9,14 +9,14 @@ namespace CRL.Core.Session
 {
     public class SessionManage
     {
-        public static bool UseRedis = false;
+        public static Func<HttpContextBase,AbsSession> __SessionCreater;
         public static AbsSession GetSessionClient(HttpContextBase context)
         {
-            if (UseRedis)
+            if (__SessionCreater == null)
             {
-                return new RedisSession(context);
+                return new WebSession(context);
             }
-            return new WebSession(context);
+            return __SessionCreater(context);
         }
     }
 }

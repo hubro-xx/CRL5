@@ -90,16 +90,6 @@ namespace CRL
         }
         #region 设置
         /// <summary>
-        /// 内置REDIS连接
-        /// </summary>
-        public static string RedisConn
-        {
-            set
-            {
-                Core.RedisProvider.RedisClient.GetRedisConn = () => value;
-            }
-        }
-        /// <summary>
         /// 是否使用属性更改通知
         /// 如果使用了,在查询时就不设置源对象克隆
         /// 在实现了属性构造后,可设为true

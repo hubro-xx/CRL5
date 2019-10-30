@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using CRL.Core.Extension;
+using CRL.Core.RedisProvider;
 namespace CRLTest
 {
     class testClass
@@ -53,6 +54,9 @@ namespace CRLTest
             //var json = obj.ToJson();
             //Console.WriteLine(json);
             //Console.ReadLine();
+            var configBuilder = new CRL.Core.ConfigBuilder();
+            configBuilder.UseRedis("passs@127.0.0.0:27017")
+                .UseRedisSession();
             //自定义定位
             CRL.Sharding.LocationManage.Register<Code.Sharding.MemberSharding>((t, a) =>
             {

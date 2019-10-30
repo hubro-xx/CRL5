@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CRL</RootNamespace>
     <AssemblyName>CRL</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -237,6 +237,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CRL.Core.RedisProvider\CRL.Core.RedisProvider.csproj">
+      <Project>{62ac0217-6a60-4c29-99ca-18dd9c0bf8bf}</Project>
+      <Name>CRL.Core.RedisProvider</Name>
+    </ProjectReference>
     <ProjectReference Include="..\CRL.Core\CRL.Core.csproj">
       <Project>{1255276c-756e-48aa-a09b-22e92d16d995}</Project>
       <Name>CRL.Core</Name>

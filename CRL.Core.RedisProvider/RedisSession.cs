@@ -1,11 +1,12 @@
 ﻿using CRL.Core.RedisProvider;
+using CRL.Core.Session;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
 
-namespace CRL.Core.Session
+namespace CRL.Core.RedisProvider
 {
     /// <summary>
     /// 用户状态管理
