@@ -83,18 +83,14 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public List<TResult> ToList()
         {
-            //todo MongoDB未实现
-            var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
-            if (db is DBExtend.MongoDBEx.MongoDBExt)
-            {
-                throw new NotSupportedException("MongoDB暂未实现");
-            }
+
             if (resultSelectorBody is MemberInitExpression)
             {
                 var memberInitExp = (resultSelectorBody as MemberInitExpression);
                 resultSelectorBody = memberInitExp.NewExpression;
             }
-
+            var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
+            
             if (resultSelectorBody is NewExpression)
             {
                 var newExpression = resultSelectorBody as NewExpression;
@@ -124,6 +120,18 @@ namespace CRL.LambdaQuery
                 throw new NotSupportedException("MongoDB暂未实现");
             }
             return db.QueryDynamic(BaseQuery);
+        }
+        /// <summary>
+        /// mongodb专用
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public LambdaQueryResultSelect<TResult> HavingCount(Expression<Func<TResult, bool>> expression)
+        {
+            BaseQuery.GetPrefix(typeof(TResult));
+            var crlExpression = BaseQuery.__Visitor.RouteExpressionHandler(expression.Body);
+            BaseQuery.mongoHavingCount = crlExpression;
+            return this;
         }
     }
 }

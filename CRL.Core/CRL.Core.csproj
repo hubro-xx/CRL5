@@ -55,6 +55,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiProxy\ApiClient.cs" />
+    <Compile Include="ApiProxy\ApiClientConnect.cs" />
+    <Compile Include="ApiProxy\Attribute.cs" />
     <Compile Include="AsyncInvoke.cs" />
     <Compile Include="BinaryFormat\DicFormat.cs" />
     <Compile Include="BinaryFormat\FieldFormat.cs" />

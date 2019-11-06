@@ -114,12 +114,19 @@ namespace CRL.Core
         }
         public static T XmlDeserialize<T>(string xml, Encoding encode) where T : class
         {
-            var arry = encode.GetBytes(xml);
-            var ms = new System.IO.MemoryStream(arry);
-            var obj = CRL.Core.SerializeHelper.XmlDeserialize<T>(ms);
-            ms.Close();
-            return obj;
+            return XmlDeserialize(typeof(T), xml, encode) as T;
         }
+        public static object XmlDeserialize(Type type, string xml, Encoding encode)
+        {
+            var arry = encode.GetBytes(xml);
+            using (var ms = new System.IO.MemoryStream(arry))
+            {
+                XmlSerializer xmlSer = new XmlSerializer(type);
+                object obj = xmlSer.Deserialize(ms);
+                return obj;
+            }
+        }
+
         /// <summary>
         /// 从流反序列化对象
         /// </summary>

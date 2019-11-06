@@ -198,3 +198,4 @@ FakesAssemblies/
 /RoleControl/Config/LocalConnection.config
 /NoteForCode.exe
 /packages
+/CRLTest/Config/CustomSetting.config

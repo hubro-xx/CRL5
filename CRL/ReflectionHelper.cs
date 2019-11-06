@@ -213,7 +213,7 @@ namespace CRL
                 {
                     DoSet(obj, value);
                 }
-                catch
+                catch(Exception ero)
                 {
                     throw new CRLException(string.Format("将值 {0} 赋值给类型{1}.{2}时失败,请检查对象类型和数据表字段类型是否一致", value + " " + value.GetType(), obj.GetType(), _prop));
                 }

@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{251D0528-06AE-4FF5-82BA-344C273EF148}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>CRLTest</RootNamespace>
-    <AssemblyName>CRLTest</AssemblyName>
+    <ProjectGuid>{C13F7A54-0CF8-4888-AD93-44312E211E6B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CRL.Core.RabbitMQ</RootNamespace>
+    <AssemblyName>CRL.Core.RabbitMQ</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,11 +21,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="RabbitMQ.Client, Version=3.6.9.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
+      <HintPath>..\packages\RabbitMQ.Client.3.6.9\lib\net45\RabbitMQ.Client.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -48,43 +44,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Code\Member.cs" />
-    <Compile Include="Code\MemberManage.cs" />
-    <Compile Include="Code\MongoModel.cs" />
-    <Compile Include="Code\Order.cs" />
-    <Compile Include="Code\OrderManage.cs" />
-    <Compile Include="Code\ProductData.cs" />
-    <Compile Include="Code\ProductDataManage.cs" />
-    <Compile Include="Code\Sharding\MemberManage.cs" />
-    <Compile Include="Code\Sharding\OrderManage.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="AbsRabbitMQ.cs" />
+    <Compile Include="DirectRabbitMQ.cs" />
+    <Compile Include="FanoutRabbitMQ.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Code\TestAll.cs" />
+    <Compile Include="TopicRabbitMQ.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="Config\CustomSetting.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CRL.Core.QuartzScheduler\CRL.Core.QuartzScheduler.csproj">
-      <Project>{89a602b5-446e-4f7b-aa96-2e3b90358ef2}</Project>
-      <Name>CRL.Core.QuartzScheduler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CRL.Core.RedisProvider\CRL.Core.RedisProvider.csproj">
-      <Project>{62ac0217-6a60-4c29-99ca-18dd9c0bf8bf}</Project>
-      <Name>CRL.Core.RedisProvider</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CRL.Core\CRL.Core.csproj">
       <Project>{1255276c-756e-48aa-a09b-22e92d16d995}</Project>
       <Name>CRL.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CRL\CRL.csproj">
-      <Project>{221a152b-1136-46a0-bf49-37d8e8ef19a0}</Project>
-      <Name>CRL</Name>
-    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

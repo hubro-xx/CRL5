@@ -38,6 +38,11 @@ namespace CRL.LambdaQuery
             __MongoDBFilter = __MongoDBFilter & filterData.Filter;
             return this;
         }
+        internal FilterDefinition<T> HavingCount(CRLExpression.CRLExpression crlExpression)
+        {
+            var filterData = RouteCRLExpression(crlExpression);
+            return filterData.Filter;
+        }
         #region 生成filter
         class FilterData
         {

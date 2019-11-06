@@ -12,31 +12,7 @@ using System.Web;
 
 namespace CRLTest.Code
 {
-    [CRL.Attribute.Table( TableName = "MongoDBModel3")]
-    public class MongoDBModel2:CRL.IModelBase
-    {
-        public string OrderId
-        {
-            get;
-            set;
-        }
-        public int Status
-        {
-            get;
-            set;
-        }
-        public string name
-        {
-            get;set;
-        }
-    }
-    public class MongoDBTestManage : CRL.BaseProvider<MongoDBModel2>
-    {
-        public static MongoDBTestManage Instance
-        {
-            get { return new MongoDBTestManage(); }
-        }
-    }
+
     /// <summary>
     /// OrderManage
     /// </summary>

@@ -26,8 +26,8 @@ namespace CRL.DBAdapter
             if (!inited)
             {
                 inited = true;
-                var serializer = new DateTimeSerializer(DateTimeKind.Local, BsonType.DateTime);
-                BsonSerializer.RegisterSerializer(typeof(DateTime), serializer);
+                //var serializer = new DateTimeSerializer(DateTimeKind.Local, BsonType.DateTime);
+                //BsonSerializer.RegisterSerializer(typeof(DateTime), serializer);
             }
         }
         public override DBType DBType

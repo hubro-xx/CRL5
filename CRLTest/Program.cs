@@ -46,10 +46,15 @@ namespace CRLTest
             get; set;
         }
     }
+    public class MyGenericClass<T>
+    {
+
+    }
     class Program
     {
         static void Main(string[] args)
         {
+            Type classType = Type.GetType("CRLTest.MyGenericClass`1, CRLTest");
             //var obj = new testClass() { time = DateTime.Now };
             //var json = obj.ToJson();
             //Console.WriteLine(json);
@@ -71,6 +76,12 @@ namespace CRLTest
             });
             CRL.SettingConfig.GetDbAccess = (dbLocation) =>
             {
+                if(dbLocation.ManageName=="mongo")
+                {
+                    var conn = CRL.Core.CustomSetting.GetConfigKey("mongodb");
+                    return new CRL.DBAccessBuild(DBType.MongoDB, conn);
+
+                }
                 //定位库
                 if (dbLocation.ShardingLocation != null)
                 {
@@ -85,9 +96,9 @@ namespace CRLTest
             //Code.ProductDataManage.Instance.QueryItem(1);
             string str = "111";
         label1:
-
+            MongoDBTestManage.Instance.GroupTest();
             //testFormat();
-            Code.TestAll.TestSelect();
+            //Code.TestAll.TestSelect();
 
             Console.ReadLine();
             goto label1;

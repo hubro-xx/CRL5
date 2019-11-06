@@ -15,6 +15,8 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Linq.Expressions;
 using MongoDB.Driver.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace CRL.DBExtend.MongoDBEx
 {
@@ -28,7 +30,7 @@ namespace CRL.DBExtend.MongoDBEx
         {
             var query = query1 as MongoDBLambdaQuery<TModel>;
             //var selectField = query.__QueryFields;
-            var selectField = query._CurrentSelectFieldCache.mapping;
+            var selectField = query1.GetFieldMapping();
             var collection = GetCollection<TModel>();
             var pageIndex = query1.SkipPage-1;
             var pageSize = query1.TakeNum;
@@ -41,37 +43,88 @@ namespace CRL.DBExtend.MongoDBEx
             if (query.__GroupFields != null)
             {
                 #region group
-                var groupField = query.__GroupFields.FirstOrDefault();//只支持一个字段
-                groupField.CheckNull("groupField");
 
                 var groupInfo = new BsonDocument();
-                groupInfo.Add("_id", "$" + groupField);
+                var groupField = new BsonDocument();
+                foreach (var f in query.__GroupFields)
+                {
+                    groupField.Add(f.FieldName, "$" + f.FieldName);
+                }
+
+                groupInfo.Add("_id", groupField);
+                var projection = new BsonDocument();
                 foreach (var f in selectField)
                 {
                     var method = f.MethodName.ToLower();
                     object sumField = 1;
-                    if (method == "sum")
+                    if (!string.IsNullOrEmpty(method))
                     {
-                        groupInfo.Add(f.ResultName, new BsonDocument("$sum", "$" + f.FieldName));
-                    }
-                    else if (method == "count")
-                    {
-                        groupInfo.Add(f.ResultName, new BsonDocument("$sum", 1));
+                        if (method == "count")
+                        {
+                            groupInfo.Add(f.ResultName, new BsonDocument("$sum", 1));
+                        }
+                        else
+                        {
+                            var memberName = f.QueryField;
+                            memberName = System.Text.RegularExpressions.Regex.Replace(memberName, @"\w+\((\w+)\)", "$1");
+                            groupInfo.Add(f.ResultName, new BsonDocument("$" + method.ToLower(), "$" + memberName));
+                        }
+                        projection.Add(f.ResultName, "$" + f.ResultName);
                     }
                     else
                     {
-                        throw new CRLException("不支持此方法" + method);
+                        projection.Add(f.ResultName, "$_id." + f.FieldName);
                     }
                 }
-                var aggregate = collection.Aggregate().Match(query.__MongoDBFilter).Group(groupInfo);
+
+                var havingExp = query.mongoHavingCount;
+                var filter = query.__MongoDBFilter;
+                var aggregate = collection.Aggregate(new AggregateOptions() { AllowDiskUse = true }).Match(filter).Group(groupInfo).Project(projection);
+                if(havingExp!=null)
+                {
+                    //var filter2 = query.HavingCount(havingExp);
+                    var having = new BsonDocument();
+                    var op = "";
+                    #region op
+                    switch (havingExp.ExpType)
+                    {
+                        case ExpressionType.Equal:
+                            op = "eq";
+                            break;
+                        case ExpressionType.GreaterThan:
+                            op = "gt";
+                            break;
+                        case ExpressionType.GreaterThanOrEqual:
+                            op = "gte";
+                            break;
+                        case ExpressionType.LessThan:
+                            op = "lt";
+                            break;
+                        case ExpressionType.LessThanOrEqual:
+                            op = "lte";
+                            break;
+                        case ExpressionType.NotEqual:
+                            op = "ne";
+                            break;
+                        default:
+                            throw new InvalidCastException("不支持的运算符");
+                    }
+                    #endregion
+                    having.AddRange(new BsonDocument()
+                        .Add(havingExp.Left.Data.ToString(), new BsonDocument()
+                                .Add("$" + op, new BsonInt64(Convert.ToInt64(havingExp.Right.Data)))
+                        ));
+                    aggregate = aggregate.Match(having);
+                }
+                var str = aggregate.ToString();
                 if (query.TakeNum > 0)
                 {
-                    aggregate.Limit(pageSize);
                     if (skip > 0)
                     {
-                        aggregate.Skip(skip);
+                        aggregate = aggregate.Skip(skip);
                     }
-                    rowNum = collection.Count(query.__MongoDBFilter);//todo 总行数
+                    aggregate = aggregate.Limit(pageSize);
+                    //rowNum = collection.Count(query.__MongoDBFilter);//todo 总行数
                 }
 
                 var result = aggregate.ToList();
@@ -87,11 +140,9 @@ namespace CRL.DBExtend.MongoDBEx
                     foreach (var f in selectField)
                     {
                         string columnName = f.ResultName;
-                        object value = item[columnName];
+                        object value = BsonTypeMapper.MapToDotNetValue(item[columnName]);
                         dict.Add(columnName, value);
                     }
-                    dict.Add(groupField.ResultName, item["_id"]);
-                    //dict.Add(groupField, item["_id"]);
                     list.Add(obj);
                 }
                 return list;
@@ -151,11 +202,21 @@ namespace CRL.DBExtend.MongoDBEx
 
         #region QueryResult
 
+        /// <summary>
+        /// 按select返回指定类型
+        /// </summary>
+        /// <typeparam name="TResult"></typeparam>
+        /// <param name="query"></param>
+        /// <returns></returns>
         public override List<TResult> QueryResult<TResult>(LambdaQueryBase query)
         {
-            throw new NotSupportedException("MongoDB暂未实现此方法");
+            var typeDb = this.GetType();
+            var method = typeDb.GetMethod(nameof(QueryResultByType), BindingFlags.NonPublic | BindingFlags.Instance);
+            var result = method.MakeGenericMethod(new Type[] { query.__MainType, typeof(TResult) }).Invoke(this, new object[] { query });
+            return result as List<TResult>;
+
         }
-        public List<TResult> QueryResult<TModel, TResult>(LambdaQuery.LambdaQuery<TModel> query) where TModel : IModel, new()
+        List<TResult> QueryResultByType<TModel, TResult>(LambdaQuery.LambdaQuery<TModel> query) where TModel : IModel, new()
         {
             var result = GetDynamicResult(query);
             var type = typeof(TResult);
@@ -184,18 +245,83 @@ namespace CRL.DBExtend.MongoDBEx
 
         public override List<TResult> QueryResult<TResult>(LambdaQuery.LambdaQueryBase query, NewExpression newExpression)
         {
-            throw new NotSupportedException("MongoDB暂未实现此方法");
+            var typeDb = this.GetType();
+            var method = typeDb.GetMethod(nameof(QueryResultNewExpression), BindingFlags.NonPublic | BindingFlags.Instance);
+            var result = method.MakeGenericMethod(new Type[] { query.__MainType, typeof(TResult) }).Invoke(this, new object[] { query, newExpression });
+            return result as List<TResult>;
         }
-        public List<TResult> QueryResult<TModel, TResult>(LambdaQuery.LambdaQuery<TModel> query, NewExpression newExpression) where TModel : IModel, new()
+
+        static Func<ObjContainer, T> CreateObjectGenerator<T>(ConstructorInfo constructor)
         {
-            query.Select(newExpression);
-            var result = GetDynamicResult(query);
-            List<TResult> list = new List<TResult>();
-            var par = Expression.Parameter(typeof(TModel), "b");
-            var resultSelector = newExpression.ToLambda<Func<TModel, TResult>>(par);
-            foreach (var item in result)
+            var type = typeof(ObjContainer);
+            var parame = Expression.Parameter(type, "par");
+            var parameters = constructor.GetParameters();
+            List<Expression> arguments = new List<Expression>(parameters.Length);
+            foreach (var parameter in parameters)
             {
-                var obj = resultSelector.Compile()(item);
+                var method = ObjContainer.GetMethod(parameter.ParameterType, true);
+                var getValue = Expression.Call(parame, method, Expression.Constant(parameter.Name));
+                arguments.Add(getValue);
+            }
+            var body = Expression.New(constructor, arguments);
+            var ret = Expression.Lambda<Func<ObjContainer, T>>(body, parame).Compile();
+            return ret;
+        }
+
+
+        static Func<ObjContainer, T> CreateObjectGeneratorFromMapping<T>(IEnumerable<Attribute.FieldMapping> mapping)
+        {
+            var objectType = typeof(T);
+            var fields = TypeCache.GetProperties(objectType, true);
+            var parame = Expression.Parameter(typeof(ObjContainer), "par");
+            var memberBindings = new List<MemberBinding>();
+            //按顺序生成Binding
+            //int i = 0;
+            foreach (var mp in mapping)
+            {
+                if (!fields.ContainsKey(mp.FieldName))
+                {
+                    continue;
+                }
+                var m = fields[mp.FieldName].GetPropertyInfo();
+                var method = ObjContainer.GetMethod(m.PropertyType, true);
+                //Expression getValue = Expression.Call(method, parame);
+                var getValue = parame.Call(method.Name, Expression.Constant(mp.ResultName));
+                if (m.PropertyType.IsEnum)
+                {
+                    getValue = Expression.Convert(getValue, m.PropertyType);
+                }
+                var bind = (MemberBinding)Expression.Bind(m, getValue);
+                memberBindings.Add(bind);
+                //i += 1;
+            }
+            Expression expr = Expression.MemberInit(Expression.New(objectType), memberBindings);
+            var ret = Expression.Lambda<Func<ObjContainer, T>>(expr, parame);
+            return ret.Compile();
+        }
+
+
+        List<TResult> QueryResultNewExpression<TModel, TResult>(LambdaQuery.LambdaQuery<TModel> query, NewExpression newExpression) where TModel : IModel, new()
+        {
+            //query.Select(newExpression);
+            var result = GetDynamicResult(query);
+            var list = new List<TResult>();
+            Func<ObjContainer, TResult> objCreater;
+            var parameters = newExpression.Constructor.GetParameters();
+            //当匿名类型指定了类型,没有构造参数
+            if (parameters.Length > 0)
+            {
+                objCreater = CreateObjectGenerator<TResult>(newExpression.Constructor);
+            }
+            else
+            {
+                objCreater = CreateObjectGeneratorFromMapping<TResult>(query.GetFieldMapping());
+            }
+                
+            foreach (IDictionary<string, object> item in result)
+            {
+                var objC = new ObjContainer(item);
+                var obj = objCreater(objC);
                 list.Add(obj);
             }
             return list;

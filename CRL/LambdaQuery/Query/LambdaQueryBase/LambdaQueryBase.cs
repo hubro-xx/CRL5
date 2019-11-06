@@ -35,6 +35,8 @@ namespace CRL.LambdaQuery
                 return __Visitor.QueryParames;
             }
         }
+
+        internal CRLExpression.CRLExpression mongoHavingCount;
         /// <summary>
         /// 条件
         /// </summary>
@@ -50,12 +52,12 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 获取记录条数
         /// </summary>
-        public int TakeNum = 0;
+        internal int TakeNum = 0;
 
         /// <summary>
         /// 分页索引,要分页,设为大于0
         /// </summary>
-        public int SkipPage = 0;
+        internal int SkipPage = 0;
 
 
         /// <summary>
