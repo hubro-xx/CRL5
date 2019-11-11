@@ -14,7 +14,7 @@ namespace CRL.Core.ApiProxy
         string host;
         //internal Dictionary<string, string> heads = new Dictionary<string, string>();
 
-        internal Action<ImitateWebRequest, SortedDictionary<string, object>> OnBeforRequest;
+        internal Action<ImitateWebRequest, Dictionary<string, object>> OnBeforRequest;
         internal string Apiprefix = "api";
         internal Encoding Encoding = Encoding.UTF8;
         internal string ContentType = "application/json";
@@ -27,10 +27,15 @@ namespace CRL.Core.ApiProxy
             ContentType = "application/xml";
             return this;
         }
+        public ApiClientConnect UseFormContentType()
+        {
+            ContentType = "application/x-www-form-urlencoded";
+            return this;
+        }
         /// <summary>
         /// 发送前处理
         /// </summary>
-        public ApiClientConnect UseBeforRequest(Action<ImitateWebRequest, SortedDictionary<string, object>> action)
+        public ApiClientConnect UseBeforRequest(Action<ImitateWebRequest, Dictionary<string, object>> action)
         {
             OnBeforRequest = action;
             return this;
@@ -39,16 +44,6 @@ namespace CRL.Core.ApiProxy
         public ApiClientConnect(string _host)
         {
             host = _host;
-        }
-        /// <summary>
-        /// api前辍
-        /// </summary>
-        /// <param name="apiprefix"></param>
-        /// <returns></returns>
-        public ApiClientConnect UseApiprefix(string apiprefix="api")
-        {
-            Apiprefix = apiprefix;
-            return this;
         }
         /// <summary>
         /// 设置编码

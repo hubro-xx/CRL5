@@ -509,5 +509,9 @@ namespace CRL.DBAdapter
             var script = string.Format("create index `{1}` on `{0}` ({2})", tableName, indexName, string.Join(",", columns.ToArray()));
             return script;
         }
+        public override string DateTimeFormat(string field, string format)
+        {
+            return string.Format("date_format({0},'{1}')", field, format);
+        }
     }
 }

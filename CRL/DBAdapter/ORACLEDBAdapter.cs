@@ -430,5 +430,9 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
             var script = string.Format("create index {1} on {0} ({2}) TABLESPACE users", tableName, indexName, string.Join(",", columns.ToArray()));
             return script;
         }
+        public override string DateTimeFormat(string field, string format)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

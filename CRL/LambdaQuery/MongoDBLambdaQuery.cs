@@ -108,6 +108,15 @@ namespace CRL.LambdaQuery
                         }
                         filter = builder.In(field, list2);
                         break;
+                    case "NotIn":
+                        var _list = args.FirstOrDefault() as IEnumerable;
+                        var _list2 = new List<object>();
+                        foreach (var s in _list)
+                        {
+                            _list2.Add(s);
+                        }
+                        filter = builder.Nin(field, _list2);
+                        break;
                     case "Substring":
                         throw new NotSupportedException(methodInfo.MethodName);
                     case "Equals":

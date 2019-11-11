@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-
+using CRL.Core.Extension;
 namespace CRL.Core.Request
 {
     /// <summary>
@@ -235,7 +235,21 @@ namespace CRL.Core.Request
         public string Post(string url, string data, out string now_url)
         {
             string str = "";
-            HttpWebResponse response = CreateWebRequest(url, data).GetResponse() as HttpWebResponse;
+            HttpWebResponse response;
+            //var response = CreateWebRequest(url, data).GetResponse() as HttpWebResponse;
+            try
+            {
+                response = CreateWebRequest(url, data).GetResponse() as HttpWebResponse;
+            }
+            catch (WebException ex)
+            {
+                response = (HttpWebResponse)ex.Response;
+            }
+            var errorCodes = new int[] { 404, 500 };
+            if (errorCodes.Contains((int)response.StatusCode))
+            {
+                throw new Exception("服务器返回内部错误"+ response.StatusCode);
+            }
             SaveCookies(response.Cookies);
             now_url = response.ResponseUri.ToString();
             if (response.StatusCode == HttpStatusCode.Found)
@@ -301,7 +315,7 @@ namespace CRL.Core.Request
             }
             else
             {
-                request.Proxy = WebRequest.GetSystemWebProxy();
+                //request.Proxy = WebRequest.GetSystemWebProxy();
             }
 
             request.KeepAlive = true;
@@ -337,6 +351,7 @@ namespace CRL.Core.Request
             {
                 request.ContentType = ContentType;
                 request.Method = "POST";
+                //EventLog.Log(request.ToJson(), "post");
                 byte[] b = ContentEncoding.GetBytes(postData);
                 request.ContentLength = b.Length;
                 using (Stream sw = request.GetRequestStream())

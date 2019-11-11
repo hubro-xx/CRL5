@@ -86,6 +86,7 @@ namespace CRL.LambdaQuery
                 methodDic.Add("LessThan", LessThan);
                 methodDic.Add("GreaterThanOrEqual", GreaterThanOrEqual);
                 methodDic.Add("LessThanOrEqual", LessThanOrEqual);
+                methodDic.Add("FormatTo", DateTimeFormat);
             }
             return methodDic;
         }
@@ -125,6 +126,11 @@ namespace CRL.LambdaQuery
         }
 
         #endregion
+        private string DateTimeFormat(MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
+        {
+            var field = methodInfo.MemberQueryName;
+            return dBAdapter.DateTimeFormat(field, methodInfo.Args[0].ToString());
+        }
         private string DistinctCount(MethodCallObj methodInfo, ref int parIndex, AddParameHandler addParame)
         {
             var field = methodInfo.MemberQueryName;

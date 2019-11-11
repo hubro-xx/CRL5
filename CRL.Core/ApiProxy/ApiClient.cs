@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,29 +20,47 @@ namespace CRL.Core.ApiProxy
         {
 
         }
-        object SendRequest(Type returnType, ParameterInfo[] argsName, RequestJsonMessage msg, bool isPost)
+        object SendRequest(Type returnType, ParameterInfo[] argsName, RequestJsonMessage msg, MethodAttribute methodAttribute)
         {
             var apiClientConnect = clientConnect as ApiClientConnect;
-            var url = Host + $"/{apiClientConnect.Apiprefix}";
-            if (!string.IsNullOrEmpty(apiClientConnect.Apiprefix))
+            var httpMethod = HttpMethod.POST;
+            var requestPath = $"/{apiClientConnect.Apiprefix}/{msg.Service}/{msg.Method}";
+            if (methodAttribute != null)
             {
-                url += "/";
+                httpMethod = methodAttribute.Method;
+                if(!string.IsNullOrEmpty(methodAttribute.Path))
+                {
+                    requestPath = methodAttribute.Path;
+                    if (!requestPath.StartsWith("/"))
+                    {
+                        requestPath = "/" + requestPath;
+                    }
+                }
             }
-            url+=$"{msg.Service}/{msg.Method}";
-            var request = new ImitateWebRequest(Host, apiClientConnect.Encoding);
 
+            var url = Host + requestPath;
+            var request = new ImitateWebRequest(ServiceName, apiClientConnect.Encoding);
             string result;
             var firstArgs = msg.Args.FirstOrDefault();
-            var members = new SortedDictionary<string, object>();
+            var members = new Dictionary<string, object>();
             #region 提交前参数回调处理
-            if (isPost)
+            if (httpMethod== HttpMethod.POST&& msg.Args.Count==1)//只有一个参数的POST
             {
-                if (firstArgs != null)
+                var type = firstArgs.GetType();
+                var pro = type.GetProperties();
+                if (firstArgs is System.Collections.IDictionary)
                 {
-                    var pro = firstArgs.GetType().GetProperties();
+                    var dic = firstArgs as System.Collections.IDictionary;
+                    foreach (string key in dic.Keys)
+                    {
+                        members.Add(key,dic[key]);
+                    }
+                }
+                else
+                {
                     foreach (var p in pro)
                     {
-                        members.Add(p.Name.ToLower(), p.GetValue(firstArgs));
+                        members.Add(p.Name, p.GetValue(firstArgs));
                     }
                 }
             }
@@ -54,16 +75,23 @@ namespace CRL.Core.ApiProxy
                 }
             }
             #endregion
-            apiClientConnect.OnBeforRequest?.Invoke(request, members);
+            try
+            {
+                apiClientConnect.OnBeforRequest?.Invoke(request, members);
+            }
+            catch(Exception ero)
+            {
+                throw new Exception("设置请求头信息时发生错误:" + ero.Message);
+            }
             request.ContentType = apiClientConnect.ContentType;
-            if (isPost)
+            if (httpMethod == HttpMethod.POST)
             {
                 string data = "";
                 if (firstArgs != null)
                 {
-                    if (request.ContentType == "application/json")
+                    if (apiClientConnect.ContentType == "application/json")
                     {
-                        data = firstArgs.ToJson();
+                        data = members.ToJson();
                     }
                     else
                     {
@@ -75,17 +103,14 @@ namespace CRL.Core.ApiProxy
             else
             {
                 var list = new List<string>();
-                var args = msg.Args;
-                for (int i = 0; i < argsName.Length; i++)
+                foreach (var kv in members)
                 {
-                    var p = argsName[i];
-                    var value = args[i];
-                    list.Add(string.Format("{0}={1}", p.Name, value));
+                    list.Add(string.Format("{0}={1}", kv.Key, kv.Value));
                 }
                 var str = string.Join("&", list);
                 result = request.Get($"{url}?{str}");
             }
-            if (request.ContentType == "application/json")
+            if (apiClientConnect.ContentType == "application/json")
             {
                 return SerializeHelper.DeserializeFromJson(result, returnType);
             }
@@ -96,14 +121,9 @@ namespace CRL.Core.ApiProxy
         }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {
-            var control = ServiceType.GetCustomAttribute<ControlAttribute>();
             var controlName = ServiceName;
-            if (control != null)
-            {
-                controlName = control.Name;
-            }
             var method = ServiceType.GetMethod(binder.Name);
-            var isPost = method.GetCustomAttribute<HttpGetAttribute>() == null;
+            var methodAttribute = method.GetCustomAttribute<MethodAttribute>();
             var methodParamters = method.GetParameters();
             var returnType = method.ReturnType;
             var request = new RequestJsonMessage
@@ -116,7 +136,7 @@ namespace CRL.Core.ApiProxy
             object response = null;
             try
             {
-                response = SendRequest(returnType, methodParamters, request, isPost);
+                response = SendRequest(returnType, methodParamters, request, methodAttribute);
             }
             catch (Exception ero)
             {

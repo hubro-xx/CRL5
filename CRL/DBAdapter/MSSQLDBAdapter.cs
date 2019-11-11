@@ -574,6 +574,10 @@ set  nocount  on
             var script = string.Format("create index [{1}] on [{0}] ({2}) with (drop_existing = on)", tableName, indexName, string.Join(",", columns.ToArray()));
             return script;
         }
+        public override string DateTimeFormat(string field, string format)
+        {
+            return string.Format("CONVERT(varchar(100), {0}, {1})", field, format);
+        }
     }
 
     internal class MSSQL2000DBAdapter : MSSQLDBAdapter

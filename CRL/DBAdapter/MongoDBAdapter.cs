@@ -162,5 +162,9 @@ namespace CRL.DBAdapter
         {
             throw new NotImplementedException();
         }
+        public override string DateTimeFormat(string field, string format)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

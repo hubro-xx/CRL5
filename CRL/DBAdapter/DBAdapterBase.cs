@@ -160,6 +160,8 @@ namespace CRL.DBAdapter
         /// <param name="details"></param>
         /// <param name="keepIdentity">否保持自增主键</param>
         public abstract void BatchInsert(DbContext dbContext, System.Collections.IList details, bool keepIdentity = false);
+        public abstract string DateTimeFormat(string field,string format);
+
         /// <summary>
         /// 查询表所有字段名
         /// </summary>

@@ -26,7 +26,7 @@ namespace CRL.DBExtend.MongoDBEx
     /// </summary>
     public sealed partial class MongoDBExt
     {
-        List<dynamic> GetDynamicResult<TModel>(LambdaQuery.LambdaQuery<TModel> query1) where TModel : IModel, new()
+        List<dynamic> GetDynamicResult<TModel>(LambdaQuery<TModel> query1) where TModel : IModel, new()
         {
             var query = query1 as MongoDBLambdaQuery<TModel>;
             //var selectField = query.__QueryFields;
@@ -189,11 +189,11 @@ namespace CRL.DBExtend.MongoDBEx
             }
         }
         #region QueryDynamic
-        public override List<dynamic> QueryDynamic(LambdaQuery.LambdaQueryBase query)
+        public override List<dynamic> QueryDynamic(LambdaQueryBase query)
         {
             throw new NotSupportedException("MongoDB暂未实现此方法");
         }
-        public List<dynamic> QueryDynamic<TModel>(LambdaQuery.LambdaQuery<TModel> query) where TModel : IModel, new()
+        public List<dynamic> QueryDynamic<TModel>(LambdaQuery<TModel> query) where TModel : IModel, new()
         {
             var result = GetDynamicResult(query);
             return result;
@@ -243,7 +243,7 @@ namespace CRL.DBExtend.MongoDBEx
         }
 
 
-        public override List<TResult> QueryResult<TResult>(LambdaQuery.LambdaQueryBase query, NewExpression newExpression)
+        public override List<TResult> QueryResult<TResult>(LambdaQueryBase query, NewExpression newExpression)
         {
             var typeDb = this.GetType();
             var method = typeDb.GetMethod(nameof(QueryResultNewExpression), BindingFlags.NonPublic | BindingFlags.Instance);
@@ -301,7 +301,7 @@ namespace CRL.DBExtend.MongoDBEx
         }
 
 
-        List<TResult> QueryResultNewExpression<TModel, TResult>(LambdaQuery.LambdaQuery<TModel> query, NewExpression newExpression) where TModel : IModel, new()
+        List<TResult> QueryResultNewExpression<TModel, TResult>(LambdaQuery<TModel> query, NewExpression newExpression) where TModel : IModel, new()
         {
             //query.Select(newExpression);
             var result = GetDynamicResult(query);
@@ -340,11 +340,11 @@ namespace CRL.DBExtend.MongoDBEx
                 var pageIndex = query1.SkipPage-1;
                 var pageSize = query1.TakeNum;
                 var skip = pageSize * pageIndex;
-                query2.Limit(pageSize);
                 if (skip > 0)
                 {
                     query2.Skip(skip);
                 }
+                query2.Limit(pageSize);
                 rowNum = collection.Count(query.__MongoDBFilter);
             }
             var result = query2.ToList();

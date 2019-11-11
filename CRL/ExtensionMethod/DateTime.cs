@@ -88,6 +88,18 @@ namespace CRL
         }
         #endregion
         /// <summary>
+        /// 时间格式化
+        /// mysql为 date_format
+        /// mssql为 CONVERT
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        public static DateTime FormatTo(this DateTime origin,string format)
+        {
+            return origin;
+        }
+        /// <summary>
         /// DateDiff
         /// </summary>
         /// <param name="time"></param>

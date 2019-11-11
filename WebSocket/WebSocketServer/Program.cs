@@ -21,7 +21,8 @@ namespace WebSocketServer
             var server = new ServerCreater().CreatetWebSocket(8015);
             server.CheckSign();
             server.SetSessionManage(new SessionManage());
-            server.Register<ITestService, TestService>();
+            //server.Register<ITestService, TestService>();
+            server.RegisterAll(typeof(TestService));
             server.Start();
             new CRL.Core.ThreadWork().Start("send", () =>
             {

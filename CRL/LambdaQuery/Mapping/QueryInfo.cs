@@ -176,7 +176,11 @@ namespace CRL.LambdaQuery.Mapping
                 generator.Emit(OpCodes.Ldloc, result);
                 generator.Emit(OpCodes.Ldarg_0);
                 generator.Emit(OpCodes.Ldc_I4, i);
-                var method2 = CRL.LambdaQuery.Mapping.DataContainer.GetMethod(pro.PropertyType);
+                var method2 = DataContainer.GetMethod(pro.PropertyType);
+                if (method2 == null)
+                {
+                    throw new CRLException($"找不到对应类型的解析方法{pro.Name} {pro.PropertyType} ");
+                }
                 generator.Emit(OpCodes.Call, method2);
                 generator.Emit(OpCodes.Callvirt, pro.GetSetMethod());
                 generator.MarkLabel(endIfLabel);

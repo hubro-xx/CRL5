@@ -15,10 +15,12 @@ namespace ServerTest
             var server = new ServerCreater().CreatetApi();
             server.CheckSign();
             server.SetSessionManage(new SessionManage());
-            server.Register<ITestService, TestService>();
+            //server.Register<ITestService, TestService>();
+            server.RegisterAll(typeof(TestService));
             var listener = new ServerListener();
             listener.Start("http://localhost:809/");
             Console.ReadLine();
         }
+      
     }
 }

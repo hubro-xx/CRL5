@@ -6,23 +6,29 @@ using System.Threading.Tasks;
 
 namespace CRL.Core.ApiProxy
 {
+    /// <summary>
+    /// 表示请求特性
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public sealed class HttpPostAttribute : Attribute
+    public sealed class MethodAttribute : Attribute
     {
-       
-    }
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public sealed class HttpGetAttribute : Attribute
-    {
-
-    }
-
-    [AttributeUsage(AttributeTargets.Interface, AllowMultiple = false, Inherited = true)]
-    public sealed class ControlAttribute : Attribute
-    {
-        public string Name
+        /// <summary>
+        /// 指定请求路径
+        /// </summary>
+        public string Path
         {
-            get;set;
+            get; set;
         }
+        /// <summary>
+        /// 指定提交方式
+        /// </summary>
+        public HttpMethod Method
+        {
+            get; set;
+        }
+    }
+    public enum HttpMethod
+    {
+        POST,GET
     }
 }
