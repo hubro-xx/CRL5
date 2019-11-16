@@ -8,6 +8,7 @@
 using CRL.Core;
 using CRL.DBAccess;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,7 +33,7 @@ namespace CRL.MemoryDataCache
         /// <summary>
         /// 要更新的数据
         /// </summary>
-        public List<object> UpdatedData;
+        public IEnumerable UpdatedData;
         public int Count;
         /// <summary>
         /// 对象类型

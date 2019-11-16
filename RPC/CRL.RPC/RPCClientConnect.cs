@@ -19,19 +19,20 @@ namespace CRL.RPC
 
         public override T GetClient<T>()
         {
-            var serviceName = typeof(T).Name;
+            var type = typeof(T);
+            var serviceName = type.Name;
             var key = string.Format("{0}_{1}_{2}", host, port, serviceName);
             var a = _services.TryGetValue(key, out object instance);
             if(a)
             {
                 return instance as T;
             }
+            var info = serviceInfo.GetServiceInfo(type);
             var client = new RPCClient(this)
             {
                 Host = host,
                 Port = port,
-                ServiceType = typeof(T),
-                ServiceName = serviceName,
+                serviceInfo = info,
             };
             //创建代理
             instance = client.ActLike<T>();

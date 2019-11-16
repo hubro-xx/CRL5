@@ -7,6 +7,28 @@ using System.Threading.Tasks;
 namespace CRL.Core.ApiProxy
 {
     /// <summary>
+    /// 表示service特性
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Interface, AllowMultiple = false, Inherited = true)]
+    public sealed class ServiceAttribute : Attribute
+    {
+        /// <summary>
+        /// 名称
+        /// </summary>
+        public string Name
+        {
+            get;set;
+        }
+        /// <summary>
+        /// 发送内容类型
+        /// </summary>
+        public ContentType ContentType
+        {
+            get; set;
+        }
+    }
+
+    /// <summary>
     /// 表示请求特性
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
@@ -26,9 +48,27 @@ namespace CRL.Core.ApiProxy
         {
             get; set;
         }
+        /// <summary>
+        /// 发送内容类型
+        /// </summary>
+        public ContentType ContentType
+        {
+            get; set;
+        }
+        /// <summary>
+        /// 返回内容类型
+        /// </summary>
+        public ContentType ResponseContentType
+        {
+            get; set;
+        }
     }
     public enum HttpMethod
     {
         POST,GET
+    }
+    public enum ContentType
+    {
+        NONE,JSON,XML,FORM
     }
 }

@@ -4,6 +4,7 @@ using ImpromptuInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,30 +13,14 @@ namespace CRL.Core.ApiProxy
     public class ApiClientConnect: AbsClientConnect
     {
         string host;
-        //internal Dictionary<string, string> heads = new Dictionary<string, string>();
 
-        internal Action<ImitateWebRequest, Dictionary<string, object>> OnBeforRequest;
+        internal Action<ImitateWebRequest, Dictionary<string, object>,string> OnBeforRequest;
         internal string Apiprefix = "api";
         internal Encoding Encoding = Encoding.UTF8;
-        internal string ContentType = "application/json";
-        /// <summary>
-        /// 使用xml发送
-        /// </summary>
-        /// <returns></returns>
-        public ApiClientConnect UseXmlContentType()
-        {
-            ContentType = "application/xml";
-            return this;
-        }
-        public ApiClientConnect UseFormContentType()
-        {
-            ContentType = "application/x-www-form-urlencoded";
-            return this;
-        }
         /// <summary>
         /// 发送前处理
         /// </summary>
-        public ApiClientConnect UseBeforRequest(Action<ImitateWebRequest, Dictionary<string, object>> action)
+        public ApiClientConnect UseBeforRequest(Action<ImitateWebRequest, Dictionary<string, object>,string> action)
         {
             OnBeforRequest = action;
             return this;
@@ -58,19 +43,19 @@ namespace CRL.Core.ApiProxy
 
         public override T GetClient<T>()
         {
-            var serviceName = typeof(T).Name;
+            var type = typeof(T);
+            var serviceName = type.Name;
             var key = string.Format("{0}_{1}", host, serviceName);
             var a = _services.TryGetValue(key, out object instance);
             if (a)
             {
                 return instance as T;
             }
+            var info = serviceInfo.GetServiceInfo(type);
             var client = new ApiClient(this)
             {
                 Host = host,
-                ServiceType = typeof(T),
-                ServiceName = serviceName,
-                //Token = string.Format("{0}@{1}", user, token)
+                serviceInfo = info,
             };
             //创建代理
             instance = client.ActLike<T>();

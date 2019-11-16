@@ -106,6 +106,7 @@
     <Compile Include="Remoting\MessageBase.cs" />
     <Compile Include="Remoting\RemotingEx.cs" />
     <Compile Include="Remoting\ServerCreater.cs" />
+    <Compile Include="Remoting\serviceInfo.cs" />
     <Compile Include="Remoting\SessionManage.cs" />
     <Compile Include="RequestLimiter.cs" />
     <Compile Include="Session\AbsSession.cs" />

@@ -17,19 +17,19 @@ namespace CRL.DynamicWebApi
         }
         public override T GetClient<T>()
         {
-            var serviceName = typeof(T).Name;
+            var type = typeof(T);
+            var serviceName = type.Name;
             var key = string.Format("{0}_{1}", host, serviceName);
             var a = _services.TryGetValue(key, out object instance);
             if (a)
             {
                 return instance as T;
             }
+            var info = serviceInfo.GetServiceInfo(type);
             var client = new ApiClient(this)
             {
                 Host = host,
-                ServiceType = typeof(T),
-                ServiceName = serviceName,
-                //Token = string.Format("{0}@{1}", user, token)
+                serviceInfo = info,
             };
             //创建代理
             instance = client.ActLike<T>();

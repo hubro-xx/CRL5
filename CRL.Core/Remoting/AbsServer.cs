@@ -9,60 +9,13 @@ using System.Threading.Tasks;
 
 namespace CRL.Core.Remoting
 {
-    #region obj
-    public class serviceInfo
-    {
-        public Type ServiceType;
-        public List<methodInfo> Methods = new List<methodInfo>();
-        public List<Attribute> Attributes = new List<Attribute>();
-        public T GetAttribute<T>() where T : Attribute
-        {
-            foreach (var item in Attributes)
-            {
-                if (item is T)
-                {
-                    return item as T;
-                }
-            }
-            return null;
-        }
-        public methodInfo GetMethod(string name)
-        {
-            return Methods.Find(b => b.MethodInfo.Name == name);
-        }
-    }
-    public class methodInfo
-    {
-        public MethodInfo MethodInfo;
-        public List<Attribute> Attributes = new List<Attribute>();
-        public T GetAttribute<T>() where T : Attribute
-        {
-            foreach (var item in Attributes)
-            {
-                if (item is T)
-                {
-                    return item as T;
-                }
-            }
-            return null;
-        }
-    }
-    #endregion
     public abstract class AbsServer: IDisposable
     {
         protected static Dictionary<string, serviceInfo> serviceHandle = new Dictionary<string, serviceInfo>();
         internal void Register<IService, Service>() where Service : AbsService, IService, new() where IService : class
         {
             var type = typeof(Service);
-            var info = new serviceInfo() { ServiceType = type, Attributes = type.GetCustomAttributes().ToList() };
-            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
-            var methodInfoList = new List<methodInfo>();
-            foreach(var m in methods)
-            {
-                var mInfo = new methodInfo() { Attributes = m.GetCustomAttributes().ToList(), MethodInfo = m };
-                methodInfoList.Add(mInfo);
-            }
-            info.Methods = methodInfoList;
+            var info = serviceInfo.GetServiceInfo(type);
             serviceHandle.Add(typeof(IService).Name, info);
         }
         protected ISessionManage sessionManage

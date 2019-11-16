@@ -11,8 +11,21 @@ namespace CRL.Core.Remoting
     public abstract class AbsClient: DynamicObject, IDisposable
     {
         public string Host;
-        public string ServiceName;
-        public Type ServiceType;
+        public string ServiceName
+        {
+            get
+            {
+                return serviceInfo.ServiceType.Name;
+            }
+        }
+        public Type ServiceType
+        {
+            get
+            {
+                return serviceInfo.ServiceType;
+            }
+        }
+        public serviceInfo serviceInfo;
         public AbsClient(AbsClientConnect _clientConnect)
         {
             clientConnect = _clientConnect;

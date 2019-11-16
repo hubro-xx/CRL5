@@ -73,7 +73,6 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public List<TResult2> ToList<TResult2>()
         {
-            //todo MongoDB未实现
             var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
             return db.QueryResult<TResult2>(BaseQuery);
         }

@@ -179,7 +179,7 @@ namespace CRL
         /// <param name="mapping"></param>
         /// <param name="runTime"></param>
         /// <returns></returns>
-        internal static List<object> DataReaderToObjectList(DbDataReader reader, Type mainType, IEnumerable<Attribute.FieldMapping> mapping, out double runTime)
+        internal static List<object> __DataReaderToObjectList(DbDataReader reader, Type mainType, IEnumerable<Attribute.FieldMapping> mapping, out double runTime)
         {
             //rem mainType 不一定为T
             //var sw = new Stopwatch();

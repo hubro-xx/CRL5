@@ -21,6 +21,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using CRL.DBAccess;
+using System.Reflection;
 
 namespace CRL.MemoryDataCache
 {
@@ -172,12 +173,13 @@ namespace CRL.MemoryDataCache
                 try
                 {
                     var data = QueryData(key, type, query, mapping, helper);
-                    dataItem.Data = ObjectConvert.ConvertToDictionary<TItem>(data);
-                    dataItem.Count = data.Count;
+                    var data2 = ObjectConvert.ConvertToDictionary<TItem>(data);
+                    dataItem.Data = data2;
+                    dataItem.Count = data2.Count;
                     dataItem.QueryCount = 1;
                     dataItem.UpdateTime = DateTime.Now;
                 }
-                catch(Exception ero)
+                catch (Exception ero)
                 {
                     cacheDatas.TryRemove(key, out dataItem);
                     typeCache[typeKey].Remove(key);
@@ -192,7 +194,9 @@ namespace CRL.MemoryDataCache
             //更新缓存数据
             if (dataItem.UpdatedData != null)
             {
-                dataItem.Data = ObjectConvert.ConvertToDictionary<TItem>(dataItem.UpdatedData);
+                var data2 = ObjectConvert.ConvertToDictionary<TItem>(dataItem.UpdatedData);
+                dataItem.Data = data2;
+                dataItem.Count = data2.Count;
                 dataItem.UpdatedData = null;
             }
             dataItem.UseTime = DateTime.Now;
@@ -200,7 +204,7 @@ namespace CRL.MemoryDataCache
         }
 
 
-        static List<object> QueryData(string key, Type type, string query, IEnumerable<Attribute.FieldMapping> mapping, DBHelper helper)
+        static IEnumerable QueryData(string key, Type type, string query, IEnumerable<Attribute.FieldMapping> mapping, DBHelper helper)
         {
             if (cacheDatas.Count > 1000)
             {
@@ -225,25 +229,21 @@ namespace CRL.MemoryDataCache
                 sql = "select * from " + query;
                 reader = helper.ExecDataReader(sql);
             }
-            double runTime;
-            var list = ObjectConvert.DataReaderToObjectList(reader, type, mapping, out runTime);
-            //var queryInfo = new LambdaQuery.Mapping.QueryInfo<object>(false, mapping);
-            //var list = ObjectConvert.DataReaderToIModelList2<object>(reader, queryInfo);
+            //double runTime;
+            //var list = ObjectConvert.DataReaderToObjectList(reader, type, mapping, out runTime);
 
-            string par = "";
-            foreach (KeyValuePair<string, object> item in helper.Params)
-            {
-                par += item.Key + ":" + item.Value;
-            }
-            //list.ForEach(b =>
-            //    {
-            //        var item = b as IModel;
-            //        item.AddCacheListen();
-            //    });
+            var classType = Type.GetType($"CRL.LambdaQuery.Mapping.QueryInfo`1, CRL");
+            var constructedType = classType.MakeGenericType(type);
+            var queryInfo = Activator.CreateInstance(constructedType, new object[] { false, query, mapping, null });
+
+            var typeObjectConvert = typeof(ObjectConvert);
+            var method = typeObjectConvert.GetMethod(nameof(ObjectConvert.DataReaderToSpecifiedList), BindingFlags.NonPublic | BindingFlags.Static);
+            var list = method.MakeGenericMethod(new Type[] { type }).Invoke(null, new object[] { reader, queryInfo });
+
             var ts = DateTime.Now - time;
             //WriteLog("更新查询 " + tableName + " 参数 " + par);
             EventLog.Log("更新查询 " + key + " 用时:" + ts.TotalSeconds + "秒", "DataCache");
-            return list;
+            return list as IEnumerable;
         }
 
         /// <summary>

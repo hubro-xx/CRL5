@@ -47,25 +47,18 @@ namespace CRL.RPC
 
             try
             {
-                var a = serviceHandle.TryGetValue(request.Service, out AbsService service);
+                var a = serviceHandle.TryGetValue(request.Service, out serviceInfo serviceInfo);
                 if (!a)
                 {
                     return ResponseMessage.CreateError("未找到该服务", "404");
                 }
-                var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
-                a = methods.TryGetValue(methodKey, out MethodInfo method);
-                var serviceType = service.GetType();
-                service = System.Activator.CreateInstance(serviceType) as AbsService;
-                if (!a)
-                {
-                    method = serviceType.GetMethod(request.Method);
-                    if (method == null)
-                    {
-                        return ResponseMessage.CreateError("未找到该方法", "404");
-                    }
-                    methods.TryAdd(methodKey, method);
-                }
 
+                var methodInfo = serviceInfo.GetMethod(request.Method);
+                if (methodInfo == null)
+                {
+                    return ResponseMessage.CreateError("未找到该方法" + request.Method, "404");
+                }
+                var method = methodInfo.MethodInfo;
 
                 var paramters = request.Args;
 

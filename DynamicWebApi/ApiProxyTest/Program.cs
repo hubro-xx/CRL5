@@ -15,17 +15,23 @@ namespace ApiProxyTest
         static void Main(string[] args)
         {
             clientConnect = new CRL.Core.ApiProxy.ApiClientConnect("https://api.weixin.qq.com");
-            clientConnect.UseBeforRequest((request, members) =>
+            clientConnect.UseBeforRequest((request, members, url) =>
             {
                 //如果需要设置发送头信息
-                request.SetHead("token","test");
+                request.SetHead("token", "test");
             });
-            //clientConnect.UseXmlContentType();//如果使用XML格式提交解析
             //https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
             var client = clientConnect.GetClient<IToken>();
+            client.Test(new args()
+            {
+                name = "args",
+                name2 = "sss",
+                uArgs = new userInfo() { errcode = "111" }
+            });
+
             //如果参数正确,返回token
             var result = client.token("grant_type", "appid", "secret");
-            //client.test(new Dictionary<string, object>() { { "key", 1 }, { "key2", 12 } });
+            
             Console.WriteLine(result.ToJson());
 
             getInfo();
@@ -45,11 +51,14 @@ namespace ApiProxyTest
     /// <summary>
     /// 微信获取token
     /// </summary>
+    [CRL.Core.ApiProxy.Service(ContentType = CRL.Core.ApiProxy.ContentType.JSON)]
     public interface IToken
     {
         [CRL.Core.ApiProxy.Method(Path = "cgi-bin/token", Method = CRL.Core.ApiProxy.HttpMethod.GET)]
         tokenResponse token(string grant_type, string appid, string secret);
-        string test(Dictionary<string,object> args);
+
+        [CRL.Core.ApiProxy.Method(Path = "cgi-bin/token/test", Method = CRL.Core.ApiProxy.HttpMethod.POST, ContentType = CRL.Core.ApiProxy.ContentType.FORM)]
+        void Test(args args);
     }
     public class tokenResponse
     {
@@ -74,5 +83,19 @@ namespace ApiProxyTest
         public string openid { get; set; }
         public string nickname { get; set; }
         public string headimgurl { get; set; }
+        public args args { get; set; }
+    }
+    public class args
+    {
+        public string name
+        {
+            get;set;
+        }
+        public string name2
+        {
+            get; set;
+        }
+
+        public userInfo uArgs { get; set; }
     }
 }

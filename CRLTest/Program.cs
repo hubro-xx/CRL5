@@ -54,7 +54,7 @@ namespace CRLTest
     {
         static void Main(string[] args)
         {
-            Type classType = Type.GetType("CRLTest.MyGenericClass`1, CRLTest");
+            //MakeGenericTypeTest();
             //var obj = new testClass() { time = DateTime.Now };
             //var json = obj.ToJson();
             //Console.WriteLine(json);
@@ -96,7 +96,9 @@ namespace CRLTest
             //Code.ProductDataManage.Instance.QueryItem(1);
             string str = "111";
         label1:
-            MongoDBTestManage.Instance.GroupTest();
+            var list = ProductDataManage.Instance.QueryFromCache(b => b.Id > 10);
+            Console.WriteLine(list.Count);
+            //MongoDBTestManage.Instance.GroupTest();
             //testFormat();
             //Code.TestAll.TestSelect();
 
@@ -193,6 +195,13 @@ namespace CRLTest
             query.Join<Member>((a, b) => a.Id == b.Id)
                 .Select((a, b) => b).ToList();
             Console.WriteLine(query.ToString());
+        }
+        static void MakeGenericTypeTest()
+        {
+            var type = typeof(ProductData);
+            var classType = Type.GetType($"CRL.LambdaQuery.Mapping.QueryInfo`1, CRL");
+            var constructedType = classType.MakeGenericType(type);
+            var instance = Activator.CreateInstance(constructedType, new object[] {false,"field",null,null });
         }
 
     }
