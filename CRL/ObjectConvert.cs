@@ -341,11 +341,17 @@ namespace CRL
                 }
                 catch(Exception ero)
                 {
+                    var columnType = dataContainer._GetCurrentColumnName();
+                    object dataValue = null;
+                    try
+                    {
+                        dataValue = dataContainer.GetCurrentData();
+                    }
+                    catch { }
                     reader.Close();
                     reader.Dispose();
                     queryInfo = null;
-                    var columnType = dataContainer._GetCurrentColumnName();
-                    throw new CRLException($"反射赋值时发生错误,在:{type }  字段:{columnType.name} 类型:{columnType.typeName },请检查数据库字段类型与对象是否一致 {ero.Message}");
+                    throw new CRLException($"反射赋值时发生错误,在:{type }  字段:{columnType.name} 类型:{columnType.typeName } 值:[{dataValue}],请检查数据库字段类型与对象是否一致 {ero.Message}");
                 }
                 #region 剩下的放索引
                 //按IModel算

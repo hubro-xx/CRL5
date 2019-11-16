@@ -40,6 +40,7 @@ namespace CRL.Core.ApiProxy
 
             var url = Host + requestPath;
             var request = new ImitateWebRequest(ServiceName, apiClientConnect.Encoding);
+            request.ContentType = apiClientConnect.ContentType;
             string result;
             var firstArgs = msg.Args.FirstOrDefault();
             var members = new Dictionary<string, object>();
@@ -83,7 +84,7 @@ namespace CRL.Core.ApiProxy
             {
                 throw new Exception("设置请求头信息时发生错误:" + ero.Message);
             }
-            request.ContentType = apiClientConnect.ContentType;
+    
             if (httpMethod == HttpMethod.POST)
             {
                 string data = "";
@@ -110,14 +111,39 @@ namespace CRL.Core.ApiProxy
                 var str = string.Join("&", list);
                 result = request.Get($"{url}?{str}");
             }
-            if (apiClientConnect.ContentType == "application/json")
+            var generType = returnType;
+            bool isTask = false;
+            if (returnType.Name.StartsWith("Task`1"))
             {
-                return SerializeHelper.DeserializeFromJson(result, returnType);
+                generType = returnType.GenericTypeArguments[0];
+                isTask = true;
             }
-            else
+            object returnObj;
+            try
             {
-                return SerializeHelper.XmlDeserialize(returnType, result, apiClientConnect.Encoding);
+                if (apiClientConnect.ContentType == "application/json")
+                {
+                    returnObj = SerializeHelper.DeserializeFromJson(result, generType);
+                }
+                else
+                {
+                    returnObj = SerializeHelper.XmlDeserialize(generType, result, apiClientConnect.Encoding);
+                }
             }
+            catch (Exception ero)
+            {
+                var eroMsg = $"反序列化为{generType.Name}时出错:" + ero.Message;
+                Core.EventLog.Error(eroMsg + " " + result);
+                throw new Exception(eroMsg);
+            }
+            if(isTask)
+            {
+                //返回Task类型
+                var method = typeof(Task).GetMethod("FromResult", BindingFlags.Public | BindingFlags.Static);
+                var result2 = method.MakeGenericMethod(new Type[] { generType }).Invoke(null, new object[] { returnObj });
+                return result2;
+            }
+            return returnObj;
         }
         public override bool TryInvokeMember(InvokeMemberBinder binder, object[] args, out object result)
         {

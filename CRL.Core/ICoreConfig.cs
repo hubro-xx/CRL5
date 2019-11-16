@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using CRL.Core.Extension;
 namespace CRL.Core
 {
     /// <summary>
@@ -55,8 +55,8 @@ namespace CRL.Core
             {
                 try
                 {
-                    obj = CRL.Core.SerializeHelper.BinaryDeserialize<T>(file);
-                    //CRL.Core.EventLog.Log("读取CoreConfig");
+                    var json = System.IO.File.ReadAllText(file);
+                    obj = json.ToObject<T>();
                 }
                 catch { }
             }
@@ -70,8 +70,7 @@ namespace CRL.Core
         public void Save()
         {
             string file = RequestHelper.GetFilePath(confgiFile);
-            CRL.Core.SerializeHelper.BinarySerialize(this, file);
-            //CRL.Core.EventLog.Log("保存CoreConfig");
+            System.IO.File.WriteAllText(file, this.ToJson());
         }
     }
 }

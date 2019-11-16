@@ -29,6 +29,11 @@ namespace CRL.LambdaQuery.Mapping
         Dictionary<string, ColumnType> columnMapping;
         //Dictionary<int, Type> columnMapping2 = new Dictionary<int, Type>();
         internal int currentDataIndex = 0;
+
+        internal object GetCurrentData()
+        {
+            return reader[currentDataIndex];
+        }
         public DataContainer(DbDataReader _reader, Type _dataType, Dictionary<string, ColumnType> _columnMapping)
         {
             dataType = _dataType;

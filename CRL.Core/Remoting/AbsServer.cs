@@ -9,13 +9,61 @@ using System.Threading.Tasks;
 
 namespace CRL.Core.Remoting
 {
+    #region obj
+    public class serviceInfo
+    {
+        public Type ServiceType;
+        public List<methodInfo> Methods = new List<methodInfo>();
+        public List<Attribute> Attributes = new List<Attribute>();
+        public T GetAttribute<T>() where T : Attribute
+        {
+            foreach (var item in Attributes)
+            {
+                if (item is T)
+                {
+                    return item as T;
+                }
+            }
+            return null;
+        }
+        public methodInfo GetMethod(string name)
+        {
+            return Methods.Find(b => b.MethodInfo.Name == name);
+        }
+    }
+    public class methodInfo
+    {
+        public MethodInfo MethodInfo;
+        public List<Attribute> Attributes = new List<Attribute>();
+        public T GetAttribute<T>() where T : Attribute
+        {
+            foreach (var item in Attributes)
+            {
+                if (item is T)
+                {
+                    return item as T;
+                }
+            }
+            return null;
+        }
+    }
+    #endregion
     public abstract class AbsServer: IDisposable
     {
-        protected static Dictionary<string, AbsService> serviceHandle = new Dictionary<string, AbsService>();
-        protected static ConcurrentDictionary<string, MethodInfo> methods = new ConcurrentDictionary<string, MethodInfo>();
+        protected static Dictionary<string, serviceInfo> serviceHandle = new Dictionary<string, serviceInfo>();
         internal void Register<IService, Service>() where Service : AbsService, IService, new() where IService : class
         {
-            serviceHandle.Add(typeof(IService).Name, new Service());
+            var type = typeof(Service);
+            var info = new serviceInfo() { ServiceType = type, Attributes = type.GetCustomAttributes().ToList() };
+            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            var methodInfoList = new List<methodInfo>();
+            foreach(var m in methods)
+            {
+                var mInfo = new methodInfo() { Attributes = m.GetCustomAttributes().ToList(), MethodInfo = m };
+                methodInfoList.Add(mInfo);
+            }
+            info.Methods = methodInfoList;
+            serviceHandle.Add(typeof(IService).Name, info);
         }
         protected ISessionManage sessionManage
         {
@@ -48,37 +96,32 @@ namespace CRL.Core.Remoting
             result = null;
             token = "";
             outs = new Dictionary<int, object>();
-            var a = serviceHandle.TryGetValue(request.Service, out AbsService service);
+            var a = serviceHandle.TryGetValue(request.Service, out serviceInfo serviceInfo);
             if (!a)
             {
                 return new ErrorInfo("未找到该服务", "404");
             }
-            var serviceType = service.GetType();
-            service = System.Activator.CreateInstance(serviceType) as AbsService;
-            var methodKey = string.Format("{0}.{1}", request.Service, request.Method);
-            a = methods.TryGetValue(methodKey, out MethodInfo method);
-            if (!a)
+            var serviceType = serviceInfo.ServiceType;
+            var service = System.Activator.CreateInstance(serviceType) as AbsService;
+            var methodInfo = serviceInfo.GetMethod(request.Method);
+            if (methodInfo == null)
             {
-                method = serviceType.GetMethod(request.Method);
-                if (method == null)
-                {
-                    return new ErrorInfo("未找到该方法", "404");
-                }
-                methods.TryAdd(methodKey, method);
+                return new ErrorInfo("未找到该方法" + request.Method, "404");
             }
             var checkToken = true;
-            var allowAnonymous = serviceType.GetCustomAttribute<AllowAnonymousAttribute>();
-            var allowAnonymous2 = method.GetCustomAttribute<AllowAnonymousAttribute>();
+            var allowAnonymous = serviceInfo.GetAttribute<AllowAnonymousAttribute>();
+            var allowAnonymous2 = methodInfo.GetAttribute<AllowAnonymousAttribute>();
             if (allowAnonymous != null || allowAnonymous2 != null)
             {
                 checkToken = false;
             }
-            var loginAttr = method.GetCustomAttribute<LoginPointAttribute>();
+            var loginAttr = methodInfo.GetAttribute<LoginPointAttribute>();
             if (loginAttr != null)
             {
                 checkToken = false;
             }
             var paramters = request.Args;
+            var method = methodInfo.MethodInfo;
             var methodParamters = method.GetParameters();
             outs = new Dictionary<int, object>();
             int i = 0;

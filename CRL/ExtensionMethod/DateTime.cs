@@ -86,6 +86,10 @@ namespace CRL
         {
             return origin > begin && origin < end;
         }
+        public static bool Between(this string origin, DateTime begin, DateTime end)
+        {
+            return true; ;
+        }
         #endregion
         /// <summary>
         /// 时间格式化

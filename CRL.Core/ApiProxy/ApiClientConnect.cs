@@ -55,22 +55,6 @@ namespace CRL.Core.ApiProxy
             Encoding = encoding;
             return this;
         }
-        ///// <summary>
-        ///// 设置头
-        ///// </summary>
-        ///// <param name="name"></param>
-        ///// <param name="value"></param>
-        //public void SetHead(string name, string value)
-        //{
-        //    if (!heads.ContainsKey(name))
-        //    {
-        //        heads.Add(name, value);
-        //    }
-        //    else
-        //    {
-        //        heads[name] = value;
-        //    }
-        //}
 
         public override T GetClient<T>()
         {

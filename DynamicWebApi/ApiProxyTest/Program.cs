@@ -11,31 +11,10 @@ namespace ApiProxyTest
 {
     class Program
     {
-
-        public class tokenRequest
-        {
-            public string appId { get; set; }
-            public string timestamp { get; set; } = DateTime.Now.ToString("timestamp");
-            public string nonce { get; set; }
-            public string signMethod { get; set; } = "SHA256";
-            public string signature { get; set; }
-        }
-        public static string sha256(string data)
-        {
-            byte[] bytes = Encoding.UTF8.GetBytes(data);
-            byte[] hash = SHA256.Create().ComputeHash(bytes);
-
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < hash.Length; i++)
-            {
-                builder.Append(hash[i].ToString("X2"));
-            }
-
-            return builder.ToString();
-        }
+        static CRL.Core.ApiProxy.ApiClientConnect clientConnect;
         static void Main(string[] args)
         {
-            var clientConnect = new CRL.Core.ApiProxy.ApiClientConnect("https://api.weixin.qq.com");
+            clientConnect = new CRL.Core.ApiProxy.ApiClientConnect("https://api.weixin.qq.com");
             clientConnect.UseBeforRequest((request, members) =>
             {
                 //如果需要设置发送头信息
@@ -46,17 +25,20 @@ namespace ApiProxyTest
             var client = clientConnect.GetClient<IToken>();
             //如果参数正确,返回token
             var result = client.token("grant_type", "appid", "secret");
-            client.test(new Dictionary<string, object>() { { "key", 1 }, { "key2", 12 } });
+            //client.test(new Dictionary<string, object>() { { "key", 1 }, { "key2", 12 } });
             Console.WriteLine(result.ToJson());
 
-            //https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN
-
-            var client2 = clientConnect.GetClient<IUser>();
-            //如果参数正确,返回用户信息
-            var result2 = client2.info(result.access_token, "openid");
-            Console.WriteLine(result2.ToJson());
+            getInfo();
 
             Console.ReadLine();
+        }
+        static async void getInfo()
+        {
+            //https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN
+            var client2 = clientConnect.GetClient<IUser>();
+            //如果参数正确,返回用户信息
+            var result2 = await client2.info("222", "openid");//异步调用
+            Console.WriteLine(result2.ToJson());
         }
     }
 
@@ -82,7 +64,7 @@ namespace ApiProxyTest
     public interface IUser
     {
         [CRL.Core.ApiProxy.Method(Path = "cgi-bin/user/info", Method = CRL.Core.ApiProxy.HttpMethod.GET)]
-        userInfo info(string access_token, string openid, string lang = "zh_CN");
+        Task<userInfo> info(string access_token, string openid, string lang = "zh_CN");
     }
     public class userInfo
     {

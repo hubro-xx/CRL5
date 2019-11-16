@@ -37,6 +37,7 @@ namespace CRL.Core.QuartzScheduler
             var name = GetType().Name;
             string logName = string.Format("Task_{0}", name);
             EventLog.Log(message, logName);
+            Console.WriteLine(message);
         }
         Task IJob.Execute(IJobExecutionContext context)
         {

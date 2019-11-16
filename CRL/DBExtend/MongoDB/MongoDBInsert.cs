@@ -21,10 +21,14 @@ namespace CRL.DBExtend.MongoDBEx
                 return;
             var table = TypeCache.GetTable(typeof(TModel));
             var collection = GetCollection<TModel>();
-            foreach (var item in details)
+            var isPrimitive = table.PrimaryKey.PropertyType.IsPrimitive;//基元类型
+            if (!keepIdentity)
             {
-                var index = getId(table.TableName);
-                table.PrimaryKey.SetValue(item, index);
+                foreach (var item in details)
+                {
+                    var index = getId(table.TableName);
+                    table.PrimaryKey.SetValue(item, index);
+                }
             }
             collection.InsertMany(details);
         }
