@@ -69,7 +69,8 @@ namespace CRL.LambdaQuery
                 dbContext.parIndex = value;
             }
         }
-        static string[] parameDic = null;
+        //static string[] parameDic = null;
+        static ConcurrentDictionary<DBAccess.DBType, string[]> parameDicList = new ConcurrentDictionary<DBAccess.DBType, string[]>();
         CRLExpression.CRLExpression DealParame(CRLExpression.CRLExpression par1, string typeStr)
         {
             var par = par1.Data + "";
@@ -79,13 +80,15 @@ namespace CRL.LambdaQuery
             {
                 return par1;
             }
-            if (parameDic == null)
+            var a = parameDicList.TryGetValue(__DBAdapter.DBType, out string[] parameDic);
+            if (!a)
             {
                 parameDic = new string[5000];
                 for (int i = 0; i < 5000; i++)
                 {
                     parameDic[i] = __DBAdapter.GetParamName("p", i);
                 }
+                parameDicList.TryAdd(__DBAdapter.DBType, parameDic);
             }
             if (parIndex >= 5000)
             {

@@ -280,10 +280,6 @@ end", spName, script);
                 DataRow dr = tempTable.NewRow();
                 foreach (Attribute.FieldAttribute info in typeArry)
                 {
-                    //if (info.FieldType != Attribute.FieldType.数据库字段)
-                    //{
-                    //    continue;
-                    //}
                     string name = info.MapingName;
                     object value = info.GetValue(item);
                     if (!keepIdentity)
@@ -292,13 +288,6 @@ end", spName, script);
                             continue;
                     }
                     var value2 = ObjectConvert.CheckNullValue(value,info.PropertyType);
-                    //if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
-                    //{
-                    //    if (value2 == null)
-                    //    {
-                    //        continue;
-                    //    }
-                    //}
                     dr[name] = value2;
                 }
                 tempTable.Rows.Add(dr);

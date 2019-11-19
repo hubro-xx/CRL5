@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CounterWatch.cs" />
     <Compile Include="Code\Member.cs" />
     <Compile Include="Code\MemberManage.cs" />
     <Compile Include="Code\MongoModel.cs" />

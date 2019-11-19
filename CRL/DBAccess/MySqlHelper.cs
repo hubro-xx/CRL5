@@ -5,6 +5,7 @@ using System.Text;
 using MySql.Data.MySqlClient;
 using System.Data;
 using System.Data.Common;
+using System.IO;
 
 namespace CRL.DBAccess
 {
@@ -71,15 +72,62 @@ namespace CRL.DBAccess
         }
 
 
-        public override void InsertFromDataTable(DataTable dataTable, string tableName, bool keepIdentity = false)
+        public override void InsertFromDataTable(DataTable table, string tableName, bool keepIdentity = false)
         {
-            throw new NotSupportedException("MySql不支持批量插入");
-            throw new NotImplementedException();
+            if (table.Rows.Count == 0) return ;
+            string tmpPath = Path.GetTempFileName();
+            string csv = DataTableToCsv(table);
+            File.WriteAllText(tmpPath, csv);
+            using (var conn = currentConn??createConn_())
+            {
+                try
+                {
+                    MySqlBulkLoader bulk = new MySqlBulkLoader(conn as MySqlConnection)
+                    {
+                        FieldTerminator = ",",
+                        FieldQuotationCharacter = '"',
+                        EscapeCharacter = '"',
+                        LineTerminator = "\r\n",
+                        FileName = tmpPath,
+                        NumberOfLinesToSkip = 0,
+                        TableName = tableName,
+                    };
+                    //bulk.Columns.AddRange(table.Columns.Cast<DataColumn>().Select(colum => colum.ColumnName).ToArray());
+                    var insertCount = bulk.Load();
+                }
+                catch (MySqlException ex)
+                {
+                    throw ex;
+                }
+            }
+            File.Delete(tmpPath);
         }
 
-        public override DataTable TablesPage(string tableName, string fields, string sortfield, bool singleSortType, int pageSize, int pageIndex, string condition, out int count)
+
+        private static string DataTableToCsv(DataTable table)
         {
-            throw new NotImplementedException();
+            //以半角逗号（即,）作分隔符，列为空也要表达其存在。
+            //列内容如存在半角逗号（即,）则用半角引号（即""）将该字段值包含起来。
+            //列内容如存在半角引号（即"）则应替换成半角双引号（""）转义，并用半角引号（即""）将该字段值包含起来。
+            StringBuilder sb = new StringBuilder();
+            DataColumn colum;
+            foreach (DataRow row in table.Rows)
+            {
+                for (int i = 0; i < table.Columns.Count; i++)
+                {
+                    colum = table.Columns[i];
+                    if (i != 0) sb.Append(",");
+                    if (colum.DataType == typeof(string) && row[colum].ToString().Contains(","))
+                    {
+                        sb.Append("\"" + row[colum].ToString().Replace("\"", "\"\"") + "\"");
+                    }
+                    else sb.Append(row[colum].ToString());
+                }
+                sb.AppendLine();
+            }
+
+
+            return sb.ToString();
         }
     }
 

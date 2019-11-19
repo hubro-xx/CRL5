@@ -200,62 +200,46 @@ namespace CRL.DBAdapter
             return "select  column_name, column_name  from Information_schema.columns  where table_Name = '" + tableName + "';";
         }
         /// <summary>
-        /// 批量插入,mysql不支持批量插入
+        /// 批量插入
         /// </summary>
         /// <param name="details"></param>
         /// <param name="keepIdentity"></param>
         public override void BatchInsert(DbContext dbContext, System.Collections.IList details, bool keepIdentity = false)
         {
-            if (details == null || details.Count == 0)
-            {
+            if (details.Count == 0)
                 return;
-            }
             var type = details[0].GetType();
             var table = TypeCache.GetTable(type);
-            var typeArry = table.Fields;
-            var sql = GetInsertSql(dbContext, table, details[0], false);
-
+            var tableName = KeyWordFormat(table.TableName);
             var helper = dbContext.DBHelper;
+
             var sb = new StringBuilder();
-            //var reflect = ReflectionHelper.GetInfo<T>();
+            GetSelectTop(sb, "*", b =>
+            {
+                b.Append(" from " + tableName + " where 1=0");
+            }, "", 1);
+            var sql = sb.ToString();
+            var tempTable = helper.ExecDataTable(sql);
+
+            var typeArry = table.Fields;
             foreach (var item in details)
             {
-                var line = "(";
+                var dr = tempTable.NewRow();
                 foreach (Attribute.FieldAttribute info in typeArry)
                 {
                     string name = info.MapingName;
-                    if (info.IsPrimaryKey && !info.KeepIdentity)
+                    object value = info.GetValue(item);
+                    if (!keepIdentity)
                     {
-                        continue;
+                        if (info.IsPrimaryKey)
+                            continue;
                     }
-                    var value = info.GetValue(item);
-                    //if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
-                    //{
-                    //    if (value == null)
-                    //    {
-                    //        continue;
-                    //    }
-                    //}
-                    value = ObjectConvert.CheckNullValue(value, info.PropertyType);
-                    if (value != null && value != DBNull.Value)
-                    {
-                        if (info.PropertyType == typeof(string))
-                        {
-                            value = value.ToString().Replace("'", "\'");
-                        }
-                        line += string.Format("'{0}',", value);
-                    }
-                    else
-                    {
-                        line += "null,";
-                    }
+                    var value2 = ObjectConvert.CheckNullValue(value, info.PropertyType);
+                    dr[name] = value2;
                 }
-                line = line.Substring(0, line.Length - 1);
-                line += "),";
-                sb.Append(line);
+                tempTable.Rows.Add(dr);
             }
-            sb.Remove(sb.Length - 1, 1);
-            helper.Execute(sql + sb.ToString());
+            helper.InsertFromDataTable(tempTable, tableName, keepIdentity);
         }
 
         /// <summary>

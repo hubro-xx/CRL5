@@ -43,7 +43,8 @@ namespace CRL.DBAdapter
         }
         public override string GetColumnType(Attribute.FieldAttribute info, out string defaultValue)
         {
-            throw new NotImplementedException();
+            defaultValue = "";
+            return info.PropertyType.Name;
         }
 
         public override Dictionary<Type, string> FieldMaping()

@@ -387,7 +387,6 @@ namespace CRL
         public virtual string CreateTable()
         {
             AbsDBExtend db = DBExtend;
-            T obj1 = new T();
             var str = ModelCheck.CreateTable(typeof(T),db);
             return str;
         }
@@ -396,9 +395,7 @@ namespace CRL
         /// </summary>
         public void CreateTableIndex()
         {
-            AbsDBExtend db = DBExtend;
-            T obj1 = new T();
-            ModelCheck.CheckIndexExists(typeof(T),db);
+            DBExtend.CreateTableIndex<T>();
         }
         #endregion
 

@@ -14,12 +14,17 @@ namespace CRL.Core.BinaryFormat
             var body = new List<byte>();
             var type = param.GetType();
             var innerType = type.GenericTypeArguments[0];
+            var arry = new List<byte[]>();
+            var len = 0;
             foreach (var obj in list)
             {
                 var data = FieldFormat.Pack(innerType,obj);
-                body.AddRange(data);
+                //body.AddRange(data);
+                arry.Add(data);
+                len += data.Length;
             }
-            return body.ToArray();
+            //return body.ToArray();
+            return arry.JoinData(len);
         }
         public static object UnPack(Type type, byte[] datas)
         {

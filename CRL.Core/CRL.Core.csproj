@@ -60,6 +60,7 @@
     <Compile Include="ApiProxy\Attribute.cs" />
     <Compile Include="AsyncInvoke.cs" />
     <Compile Include="BinaryFormat\DicFormat.cs" />
+    <Compile Include="BinaryFormat\Extension.cs" />
     <Compile Include="BinaryFormat\FieldFormat.cs" />
     <Compile Include="BinaryFormat\ClassFormat.cs" />
     <Compile Include="BinaryFormat\ListFormat.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="ImpromptuInterface\Optimization\BareBonesList.cs" />
     <Compile Include="ImpromptuInterface\Optimization\BinderHash.cs" />
     <Compile Include="ImpromptuInterface\Optimization\Util.cs" />
+    <Compile Include="ReflectionHelper.cs" />
     <Compile Include="Remoting\AbsServer.cs" />
     <Compile Include="Remoting\AbsService.cs" />
     <Compile Include="Remoting\Attribute.cs" />

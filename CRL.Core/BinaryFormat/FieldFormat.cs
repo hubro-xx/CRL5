@@ -117,6 +117,9 @@ namespace CRL.Core.BinaryFormat
             }));
             #endregion
         }
+        /// <summary>
+        /// 保存长度的字节长度
+        /// </summary>
         static int lenSaveLength = 3;
         static Type ReturnType(Type type)
         {
@@ -135,7 +138,6 @@ namespace CRL.Core.BinaryFormat
         public static byte[] Pack(Type type, object param)
         {
             type = ReturnType(type);
-            List<byte> datas = new List<byte>();
 
             var len = 0;
 
@@ -183,19 +185,20 @@ namespace CRL.Core.BinaryFormat
                         data = ClassFormat.Pack(type, param);
                     }
                 }
-      
+
                 if (data != null)
                 {
                     len = data.Length;
                 }
             }
-            var lenData = BitConverter.GetBytes(len).Take(lenSaveLength);
-            datas.AddRange(lenData);
+            var lenData = BitConverter.GetBytes(len);
+            var datas = new byte[lenSaveLength + len];
+            Buffer.BlockCopy(lenData, 0, datas, 0, lenSaveLength);
             if (len > 0)
             {
-                datas.AddRange(data);
+                Buffer.BlockCopy(data, 0, datas, lenSaveLength, data.Length);
             }
-            return datas.Count == 0 ? null : datas.ToArray();
+            return datas;
         }
 
         public static object UnPack(Type type, byte[] datas, ref int offset)

@@ -74,9 +74,7 @@ namespace CRL.DBAccess
         /// 是否自动把查询加上WithNolock
         /// </summary>
         public bool AutoFormatWithNolock = true;
-        /// <summary>
-        /// 开启事务的CONN
-        /// </summary>
+
         protected DbConnection currentConn = null;
         protected DbTransaction _trans = null;
         bool autoCloseConn = true;
@@ -279,7 +277,7 @@ namespace CRL.DBAccess
         protected abstract DbConnection createConn_();
 
         public abstract void InsertFromDataTable(DataTable dataTable, string tableName, bool keepIdentity = false);
-        public abstract DataTable TablesPage(string tableName, string fields, string sortfield, bool singleSortType, int pageSize, int pageIndex, string condition, out int count);
+
         #endregion
         public string Name;
         public override string ToString()

@@ -15,6 +15,7 @@ using MongoDB.Driver;
 using System.Linq.Expressions;
 using CRL.LambdaQuery;
 using MongoDB.Driver.Linq;
+using System.Collections.Concurrent;
 
 namespace CRL.DBExtend.MongoDBEx
 {
@@ -43,6 +44,20 @@ namespace CRL.DBExtend.MongoDBEx
                 }
                 return _mongoDatabase; }
             set { _mongoDatabase = value; }
+        }
+
+        public override void CreateTableIndex<TModel>()
+        {
+            var type = typeof(TModel);
+            var columns = ModelCheck.GetColumns(type, this);
+            foreach (Attribute.FieldAttribute item in columns)
+            {
+                if (item.FieldIndexType != Attribute.FieldIndexType.无)
+                {
+                    var indexKeys = Builders<TModel>.IndexKeys.Ascending(item.MemberName);
+                    GetCollection<TModel>().Indexes.CreateOne(indexKeys);
+                }
+            }
         }
         /// <summary>
         /// 返回MongoQueryable

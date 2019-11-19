@@ -135,7 +135,7 @@ namespace CRL
         /// 获取列
         /// </summary>
         /// <returns></returns>
-        static List<Attribute.FieldAttribute> GetColumns(Type type, AbsDBExtend db)
+        internal static List<Attribute.FieldAttribute> GetColumns(Type type, AbsDBExtend db)
         {
             //var dbAdapter = Base.CurrentDBAdapter;
             //Type type = this.GetType();

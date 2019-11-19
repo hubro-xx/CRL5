@@ -954,5 +954,10 @@ namespace CRL
         /// <typeparam name="TModel"></typeparam>
         /// <returns></returns>
         public abstract IMongoQueryable<TModel> GetMongoQueryable<TModel>();
+        public virtual void CreateTableIndex<TModel>()
+        {
+            var type = typeof(TModel);
+            ModelCheck.CheckIndexExists(type, this);
+        }
     }
 }

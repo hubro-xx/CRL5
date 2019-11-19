@@ -54,10 +54,5 @@ namespace CRL.DBAccess
         {
             throw new NotImplementedException();
         }
-
-        public override System.Data.DataTable TablesPage(string tableName, string fields, string sortfield, bool singleSortType, int pageSize, int pageIndex, string condition, out int count)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

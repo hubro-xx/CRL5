@@ -96,8 +96,7 @@ namespace CRLTest
             //Code.ProductDataManage.Instance.QueryItem(1);
             string str = "111";
         label1:
-            var list = ProductDataManage.Instance.QueryFromCache(b => b.Id > 10);
-            Console.WriteLine(list.Count);
+            testFormat();
             //MongoDBTestManage.Instance.GroupTest();
             //testFormat();
             //Code.TestAll.TestSelect();
@@ -115,40 +114,28 @@ namespace CRLTest
             obj.time = DateTime.Now;
             obj.price = 1002;
 
-            var count = 2;
-            long total1 = 0;
-            long total2 = 0;
-            var sw = new System.Diagnostics.Stopwatch(); ;
-            sw.Start();
-            for (int i = 0; i < count; i++)
+            new CounterWatch().Start("json",() =>
             {
-                total1 += testJson(obj);
-            }
-            sw.Stop();
-            var el = sw.ElapsedMilliseconds;
-            Console.WriteLine($"el:{el} t:{total1}");
-            sw = new System.Diagnostics.Stopwatch(); ;
-            sw.Start();
-            for (int i = 0; i < count; i++)
+                testJson(obj);
+            }, 100);
+
+            new CounterWatch().Start("binary",() =>
             {
-                total2 += testBinary(obj);
-            }
-            sw.Stop();
-            var el2 = sw.ElapsedMilliseconds;
-            Console.WriteLine($"el:{el2} t:{total2}");
+                testBinary(obj);
+            }, 100);
         }
         static int testJson(testClass obj)
         {
             var json = SerializeHelper.SerializerToJson(obj);
-            var obj2 = SerializeHelper.DeserializeFromJson<testClass>(json);
-            var buffer = System.Text.Encoding.UTF8.GetBytes(json);
-            return buffer.Length;
+            //var obj2 = SerializeHelper.DeserializeFromJson<testClass>(json);
+            //var buffer = System.Text.Encoding.UTF8.GetBytes(json);
+            return 0;
         }
         static int testBinary(testClass obj)
         {
             var data = CRL.Core.BinaryFormat.ClassFormat.Pack(obj.GetType(), obj);
-            var obj2 = CRL.Core.BinaryFormat.ClassFormat.UnPack(obj.GetType(), data);
-            return data.Length;
+            //var obj2 = CRL.Core.BinaryFormat.ClassFormat.UnPack(obj.GetType(), data);
+            return 0;
         }
         static void testSharding()
         {
@@ -181,20 +168,6 @@ namespace CRLTest
                 }
  
             }
-        }
-
-        public static void Test5(string abc = "123")
-        {
-            var query = ProductDataManage.Instance.GetLambdaQuery();
-            query.Page(2, 1);
-            //query.Where(b => b.Id > 1 && b.CategoryName.StartsWith(b.ProductName));
-            //query.Join<Code.Order>((a, b) => a.Id == b.Id).Select((a, b) => new testC { id = b.Id }).OrderBy(b => b.id).ToList();
-            var list = new List<int>() { 1, 2, 3 };
-            //query.Where(b=>list.Contains(b.Id));
-            query.Where(b => b.Id > 1 && b.CategoryName.StartsWith(abc));
-            query.Join<Member>((a, b) => a.Id == b.Id)
-                .Select((a, b) => b).ToList();
-            Console.WriteLine(query.ToString());
         }
         static void MakeGenericTypeTest()
         {
