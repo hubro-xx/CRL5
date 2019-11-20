@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CRL.Core.Extension
 {
-    public static class Json
+    public static partial class Extension
     {
         public static string ToJson(this object obj)
         {

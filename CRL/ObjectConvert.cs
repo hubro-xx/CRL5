@@ -130,7 +130,7 @@ namespace CRL
             {
                 return convertMethod[type](value);
             }
-            if (type.FullName.StartsWith("System.Nullable"))
+            if (Nullable.GetUnderlyingType(type) != null)
             {
                 //Nullable<T> 可空属性
                 type = type.GenericTypeArguments[0];

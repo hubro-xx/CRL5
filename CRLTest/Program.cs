@@ -12,28 +12,29 @@ using CRL.Core.Extension;
 using CRL.Core.RedisProvider;
 namespace CRLTest
 {
+    #region obj
     class testClass
     {
-        public object name
+        public string name
         {
             get; set;
         }
-        public DateTime? time
+        public DateTime time
         {
             get; set;
         }
-        public b b
-        {
-            get; set;
-        }
+        //public b b
+        //{
+        //    get; set;
+        //}
         public decimal price
         {
             get; set;
         }
-        public Dictionary<string, object> dic
-        {
-            get; set;
-        }
+        //public Dictionary<string, object> dic
+        //{
+        //    get; set;
+        //}
     }
     public class b
     {
@@ -50,6 +51,7 @@ namespace CRLTest
     {
 
     }
+    #endregion
     class Program
     {
         static void Main(string[] args)
@@ -96,8 +98,10 @@ namespace CRLTest
             //Code.ProductDataManage.Instance.QueryItem(1);
             string str = "111";
         label1:
+            MakeGenericTypeTest();
             testFormat();
-            //MongoDBTestManage.Instance.GroupTest();
+            //MongoDBTestManage.Instance.GroupTest(1);
+   
             //testFormat();
             //Code.TestAll.TestSelect();
 
@@ -108,33 +112,35 @@ namespace CRLTest
         static void testFormat()
         {
             var obj = new testClass() { };
-            obj.b = new b() { name = "b22424" };
-            obj.dic = new Dictionary<string, object>() { { "tes111111111112t", 1 }, { "t2222222222122est2", 1 }, { "te22222221s3t", 1 } };
+            //obj.b = new b() { name = "b22424" };
+            //obj.dic = new Dictionary<string, object>() { { "tes111111111112t", 1 }, { "t2222222222122est2", 1 }, { "te22222221s3t", 1 } };
             obj.name = "test2ConvertObject";
             obj.time = DateTime.Now;
             obj.price = 1002;
-
-            new CounterWatch().Start("json",() =>
+            int count = 1000;
+            new CounterWatch().Start("json", () =>
             {
                 testJson(obj);
-            }, 100);
-
+            }, count);
+            //var data = CRL.Core.BinaryFormat.ClassFormat.Pack(obj.GetType(), obj);
             new CounterWatch().Start("binary",() =>
             {
+                //var obj2 = CRL.Core.BinaryFormat.ClassFormat.UnPack(obj.GetType(), data);
                 testBinary(obj);
-            }, 100);
+            }, count);
+
         }
         static int testJson(testClass obj)
         {
             var json = SerializeHelper.SerializerToJson(obj);
-            //var obj2 = SerializeHelper.DeserializeFromJson<testClass>(json);
+            var obj2 = SerializeHelper.DeserializeFromJson<testClass>(json);
             //var buffer = System.Text.Encoding.UTF8.GetBytes(json);
             return 0;
         }
         static int testBinary(testClass obj)
         {
             var data = CRL.Core.BinaryFormat.ClassFormat.Pack(obj.GetType(), obj);
-            //var obj2 = CRL.Core.BinaryFormat.ClassFormat.UnPack(obj.GetType(), data);
+            var obj2 = CRL.Core.BinaryFormat.ClassFormat.UnPack(obj.GetType(), data);
             return 0;
         }
         static void testSharding()
@@ -171,10 +177,7 @@ namespace CRLTest
         }
         static void MakeGenericTypeTest()
         {
-            var type = typeof(ProductData);
-            var classType = Type.GetType($"CRL.LambdaQuery.Mapping.QueryInfo`1, CRL");
-            var constructedType = classType.MakeGenericType(type);
-            var instance = Activator.CreateInstance(constructedType, new object[] {false,"field",null,null });
+            var type = CRL.Core.Extension.Extension.MakeGenericType("CRL.LambdaQuery.Mapping.QueryInfo", "CRL", typeof(ProductData));
         }
 
     }

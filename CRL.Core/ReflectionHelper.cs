@@ -20,7 +20,7 @@ namespace CRL.Core
     public static class ReflectionHelper
     {
         static Dictionary<Type, object> ReflectionInfoCache = new Dictionary<Type, object>(50);
-        public static ReflectionInfo<TObject> GetInfo<TObject>(System.Reflection.ConstructorInfo constructor = null)
+        public static ReflectionInfo<TObject> GetInfo<TObject>(System.Reflection.ConstructorInfo constructor = null) where TObject : class
         {
             var type = typeof(TObject);
             object info;
@@ -36,14 +36,18 @@ namespace CRL.Core
             }
         }
     }
-
-    public class ReflectionInfo<TObject>
+    public interface IReflectionInfo
+    {
+        void SetValue(object obj, string fieldName, object value);
+        object GetValue(object obj, string fieldName);
+    }
+    public class ReflectionInfo<TObject>: IReflectionInfo where TObject : class
     {
         public string TableName { get; set; }
 
         public Func<TObject> CreateObjectInstance;
         internal Dictionary<string, Accessor> accessorDict;
-
+        internal Dictionary<string, PropertyInfo> propertyInfo;
         public ReflectionInfo(Type modelType)
         {
             CreateObjectInstance = Expression.Lambda<Func<TObject>>(Expression.New(modelType)).Compile();
@@ -54,12 +58,13 @@ namespace CRL.Core
         private void InitInfo(Type modelType)
         {
             accessorDict = new Dictionary<string, Accessor>();
+            propertyInfo = new Dictionary<string, PropertyInfo>();
             var Properties = modelType.GetProperties();
             foreach (var prop in Properties)
             {
                 Accessor accessor = null;
                 //var prop = kv.GetPropertyInfo();
-                string propName = prop.Name.ToUpper();
+                string propName = prop.Name;
                 var propType = prop.PropertyType;
 
                 if (propType.IsEnum)
@@ -178,24 +183,44 @@ namespace CRL.Core
 
                 }
                 accessorDict[propName] = accessor;
-
+                propertyInfo[propName] = prop;
             }
         }
 
         public Accessor GetAccessor(string fieldName)
         {
             Accessor accessor;
-            //return accessorDict[fieldName.ToUpper()];
-            if (accessorDict.TryGetValue(fieldName.ToUpper(), out accessor))
+            if (accessorDict.TryGetValue(fieldName, out accessor))
             {
                 return accessor;
             }
             return null;
         }
-        public void SetValue(TObject obj, string fieldName, object value)
+        public void SetValue(object obj, string fieldName, object value)
         {
             var ac = GetAccessor(fieldName);
-            ac?.Set(obj, value);
+            if (ac != null)
+            {
+                ac.Set(obj as TObject, value);
+            }
+            else
+            {
+                var a = propertyInfo.TryGetValue(fieldName,out PropertyInfo p);
+                p?.SetValue(obj,value);
+            }
+        }
+        public object GetValue(object obj, string fieldName)
+        {
+            var ac = GetAccessor(fieldName);
+            if (ac != null)
+            {
+                return ac.Get(obj as TObject);
+            }
+            else
+            {
+                var a = propertyInfo.TryGetValue(fieldName, out PropertyInfo p);
+                return p.GetValue(obj);
+            }
         }
 
 

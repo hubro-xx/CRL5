@@ -75,7 +75,7 @@ namespace CRL.Core.Remoting
             }
             var paramters = request.Args;
             var method = methodInfo.MethodInfo;
-            var methodParamters = method.GetParameters();
+            var methodParamters = methodInfo.Parameters;
             outs = new Dictionary<int, object>();
             int i = 0;
             foreach (var p in methodParamters)

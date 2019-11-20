@@ -17,7 +17,12 @@ namespace CRL.Core.Remoting
             var methodInfoList = new List<methodInfo>();
             foreach (var m in methods)
             {
-                var mInfo = new methodInfo() { Attributes = m.GetCustomAttributes().ToList(), MethodInfo = m };
+                var mInfo = new methodInfo()
+                {
+                    Attributes = m.GetCustomAttributes().ToList(),
+                    MethodInfo = m,
+                    Parameters = m.GetParameters()
+                };
                 methodInfoList.Add(mInfo);
             }
             info.Methods = methodInfoList;
@@ -46,6 +51,7 @@ namespace CRL.Core.Remoting
     {
         public MethodInfo MethodInfo;
         public List<Attribute> Attributes = new List<Attribute>();
+        public ParameterInfo[] Parameters;
         public T GetAttribute<T>() where T : Attribute
         {
             foreach (var item in Attributes)

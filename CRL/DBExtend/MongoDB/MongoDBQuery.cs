@@ -116,7 +116,7 @@ namespace CRL.DBExtend.MongoDBEx
                         ));
                     aggregate = aggregate.Match(having);
                 }
-                var str = aggregate.ToString();
+           
                 if (query.TakeNum > 0)
                 {
                     if (skip > 0)
@@ -126,7 +126,7 @@ namespace CRL.DBExtend.MongoDBEx
                     aggregate = aggregate.Limit(pageSize);
                     //rowNum = collection.Count(query.__MongoDBFilter);//todo 总行数
                 }
-
+                //var str = aggregate.ToString();
                 var result = aggregate.ToList();
                 if (rowNum == 0)
                 {

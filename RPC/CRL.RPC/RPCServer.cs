@@ -62,7 +62,7 @@ namespace CRL.RPC
 
                 var paramters = request.Args;
 
-                var methodParamters = method.GetParameters();
+                var methodParamters = methodInfo.Parameters;
 
                 var args = new object[methodParamters.Length];
 

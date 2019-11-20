@@ -25,6 +25,10 @@ namespace CRLTest.Code
         {
             get; set;
         }
+        public int Status
+        {
+            get;set;
+        }
     }
     public class MongoResult
     {
@@ -60,20 +64,22 @@ namespace CRLTest.Code
             list.Add(new MongoDBModel2() { name = "test3", Numbrer = 3, OrderId = "13" });
             BatchInsert(list);
         }
-        public void GroupTest()
+        public void GroupTest(int page=1)
         {
             //Delete(b=>b.Numbrer>0);
             //GetInitData();
             var query = GetLambdaQuery();
-            query.Where(b => b.Numbrer > 0);
-            var result = query.GroupBy(b => new { b.name, b.OrderId }).Select(b => new
+            query.Page(1, page);
+            var result = query.GroupBy(b => new { b.name,b.OrderId}).Select(b => new
             {
-                count = b.Id.COUNT(),
-                number=b.Numbrer.SUM(),
-                //orderId = b.OrderId.MAX(),
-                name = b.name,
-                orderId = b.OrderId
-            }).HavingCount(b => b.count > 1).ToList();
+                num = b.Numbrer.SUM(),
+                b.OrderId,
+                b.name
+            }).HavingCount(b => b.num > 1).ToList();
+            foreach(var item in result)
+            {
+                Console.WriteLine($"{item.OrderId} {item.num} {item.name}");
+            }
             //var result = query.ToList<MongoResult>();
         }
     }

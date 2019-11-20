@@ -112,7 +112,7 @@ namespace CRL.DBAdapter
                 //继承的枚举
                 type = type.BaseType;
             }
-            if (type.FullName.StartsWith("System.Nullable"))
+            if (Nullable.GetUnderlyingType(type) != null)
             {
                 //Nullable<T> 可空属性
                 type = type.GenericTypeArguments[0];
@@ -225,14 +225,7 @@ namespace CRL.DBAdapter
                     continue;
                 }
                 object value = info.GetValue(obj);
-                //var value = reflect.GetAccessor(info.MemberName).Get(obj);
-                //if (info.PropertyType.FullName.StartsWith("System.Nullable"))//Nullable<T>类型为空值不插入
-                //{
-                //    if (value == null)
-                //    {
-                //        continue;
-                //    }
-                //}
+  
                 value = ObjectConvert.CheckNullValue(value, info.PropertyType);
                 if (!cached)
                 {

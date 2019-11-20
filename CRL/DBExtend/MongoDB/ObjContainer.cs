@@ -25,7 +25,7 @@ namespace CRL.DBExtend.MongoDBEx
             var unType = Nullable.GetUnderlyingType(propType);
             var isNullable = unType != null;
             MethodInfo result;
-            if (propType.IsEnum && !anonymousClass)//按是按lanbda表达式便建对象赋值时,需返回强类型方法
+            if (propType.IsEnum && !anonymousClass)//按是按lanbda表达式创建对象赋值时,需返回强类型方法
             {
                 propType = propType.GetEnumUnderlyingType();
             }

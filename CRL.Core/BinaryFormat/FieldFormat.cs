@@ -20,11 +20,11 @@ namespace CRL.Core.BinaryFormat
             #region methods
             methods.Add(typeof(decimal), new Tuple<toByte, fromByte>((type, param) =>
             {
-                Int32[] bits = Decimal.GetBits((decimal)param);
-                Byte[] bytes = new Byte[bits.Length * 4];
-                for (Int32 i = 0; i < bits.Length; i++)
+                var bits = Decimal.GetBits((decimal)param);
+                var bytes = new Byte[bits.Length * 4];
+                for (var i = 0; i < bits.Length; i++)
                 {
-                    for (Int32 j = 0; j < 4; j++)
+                    for (var j = 0; j < 4; j++)
                     {
                         bytes[i * 4 + j] = (Byte)(bits[i] >> (j * 8));
                     }
@@ -32,10 +32,10 @@ namespace CRL.Core.BinaryFormat
                 return bytes;
             }, (type, data) =>
             {
-                Int32[] bits = new Int32[data.Length / 4];
-                for (Int32 i = 0; i < bits.Length; i++)
+                var bits = new Int32[data.Length / 4];
+                for (var i = 0; i < bits.Length; i++)
                 {
-                    for (Int32 j = 0; j < 4; j++)
+                    for (var j = 0; j < 4; j++)
                     {
                         bits[i] |= data[i * 4 + j] << j * 8;
                     }
@@ -123,21 +123,21 @@ namespace CRL.Core.BinaryFormat
         static int lenSaveLength = 3;
         static Type ReturnType(Type type)
         {
-            if (type.FullName.StartsWith("System.Nullable"))
+            if (Nullable.GetUnderlyingType(type) != null)
             {
                 //Nullable<T> 可空属性
                 return type.GenericTypeArguments[0];
             }
-            if (!type.Name.Contains("&"))
-            {
-                return type;
-            }
-
-            return Type.GetType(type.FullName.Replace("&", ""));
+            //else if (type.IsByRef)
+            //{
+            //    var name = type.FullName.Substring(0, type.FullName.Length - 1);
+            //    return Type.GetType(name);//引用类型
+            //}
+            return type;
         }
         public static byte[] Pack(Type type, object param)
         {
-            type = ReturnType(type);
+            //type = ReturnType(type);
 
             var len = 0;
 
@@ -151,8 +151,16 @@ namespace CRL.Core.BinaryFormat
             {
                 if (type == typeof(object))//object转为string
                 {
+                    throw new Exception("类型不能为object:" + param);
                     type = typeof(string);
-                    param = param + "";
+                    if (param != null)
+                    {
+                        param = param.ToString();
+                    }
+                    else
+                    {
+                        param = "";
+                    }
                 }
                 if (param is Enum)
                 {
@@ -167,11 +175,11 @@ namespace CRL.Core.BinaryFormat
                 {
                     if (type.IsGenericType || type.IsArray)
                     {
-                        if (type.Name.Contains("Dictionary"))
+                        if (typeof(System.Collections.IDictionary).IsAssignableFrom(type))
                         {
                             data = DicFormat.Pack(param);
                         }
-                        else if (type.Name.Contains("List`1") || type.IsArray)
+                        else if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
                         {
                             data = ListFormat.Pack(param);
                         }
@@ -203,13 +211,13 @@ namespace CRL.Core.BinaryFormat
 
         public static object UnPack(Type type, byte[] datas, ref int offset)
         {
-            type = ReturnType(type);
+            //type = ReturnType(type);
             if (type == typeof(object))
             {
+                throw new Exception("类型不能为object:" + type);
                 type = typeof(string);
             }
-            dynamic obj = null;
-            var len = 0;
+            object obj = null;
             var lenData = new byte[4];
             if (datas == null || datas.Length == 0)
             {
@@ -217,7 +225,7 @@ namespace CRL.Core.BinaryFormat
             }
             Buffer.BlockCopy(datas, offset, lenData, 0, lenSaveLength);
 
-            len = BitConverter.ToInt32(lenData, 0);
+            int len = BitConverter.ToInt32(lenData, 0);
             offset += lenSaveLength;
             if (len > 0)
             {
@@ -236,11 +244,11 @@ namespace CRL.Core.BinaryFormat
                 }
                 if (type.IsGenericType || type.IsArray)
                 {
-                    if (type.Name.Contains("Dictionary"))
+                    if (typeof(System.Collections.IDictionary).IsAssignableFrom(type))
                     {
                         return DicFormat.UnPack(type, data);
                     }
-                    else if (type.Name.Contains("List`1") || type.IsArray)
+                    else if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
                     {
                         return ListFormat.UnPack(type, data);
                     }

@@ -18,25 +18,27 @@ namespace CRLTest
         {
             action();
             //GC.Collect();
+
+            var m1 = GC.GetTotalMemory(false);
             count = loopCount;
             name = _name;
             ElapsedMilliseconds = 0;
             UsedMemory = 0;
             var sw = new Stopwatch();
             sw.Start();
-            var m1 = GC.GetTotalMemory(false);
+        
             for (int i = 0; i < loopCount; i++)
             {
                 action();
             }
-
+            sw.Stop();
             var m2 = GC.GetTotalMemory(false);
 
-            sw.Stop();
             ElapsedMilliseconds = sw.ElapsedMilliseconds;
             UsedMemory = Math.Round((m2 - m1) / 1024.0, 4);
-            Console.WriteLine(this.ToString());
             GC.Collect();
+            Console.WriteLine(this.ToString());
+            System.Threading.Thread.Sleep(500);
         }
         public override string ToString()
         {

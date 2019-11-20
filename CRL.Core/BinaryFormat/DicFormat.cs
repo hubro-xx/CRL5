@@ -11,31 +11,33 @@ namespace CRL.Core.BinaryFormat
         public static byte[] Pack(object param)
         {
             var list = (System.Collections.IDictionary)param;
-            var body = new List<byte>();
             var type = param.GetType();
-            var innerType = type.GenericTypeArguments[0];
-            var innerType2 = type.GenericTypeArguments[1];
+            var allArgs = type.GenericTypeArguments;
+            var innerType = allArgs[0];
+            var innerType2 = allArgs[1];
             var arry = new List<byte[]>();
             var len = 0;
-            foreach (var key in list.Keys)
+            var enumerator = list.GetEnumerator();
+            while (enumerator.MoveNext())
             {
-                var obj = list[key];
+                var key = enumerator.Key;
+                var value = enumerator.Value;
+
                 var keyData = FieldFormat.Pack(innerType, key);
-                var valueData = FieldFormat.Pack(innerType2, obj);
-                //body.AddRange(keyData);
-                //body.AddRange(valueData);
+                var valueData = FieldFormat.Pack(innerType2, value);
+
                 arry.Add(keyData);
                 arry.Add(valueData);
                 len += keyData.Length + valueData.Length;
             }
-            //return body.ToArray();
             return arry.JoinData(len);
         }
         public static object UnPack(Type type, byte[] datas)
         {
             var dic = (System.Collections.IDictionary)System.Activator.CreateInstance(type);
-            var innerType = type.GenericTypeArguments[0];
-            var innerType2 = type.GenericTypeArguments[1];
+            var allArgs = type.GenericTypeArguments;
+            var innerType = allArgs[0];
+            var innerType2 = allArgs[1];
             int dataIndex = 0;
             while (dataIndex < datas.Length)
             {
