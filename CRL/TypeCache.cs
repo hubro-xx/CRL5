@@ -58,12 +58,12 @@ namespace CRL
         {
             if (dbContext != null && dbContext.UseSharding)
             {
-                if (dbContext.DBLocation.ShardingLocation == null)
-                {
-                    throw new CRLException("未设置分表定位dbContext.DBLocation.ShardingLocation");
+                if (dbContext.DBLocation.ShardingLocation != null)
+                {//没有设置定位,则找默认库
+
+                    var location = dbContext.DBLocation.ShardingLocation;
+                    tableName = location.TablePartName;
                 }
-                var location = dbContext.DBLocation.ShardingLocation;
-                tableName = location.TablePartName;
             }
             return tableName;
         }

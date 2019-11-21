@@ -32,19 +32,22 @@ namespace CRL.DBExtend.MongoDBEx
             }
             collection.InsertMany(details);
         }
-        int getId(string tableName)
+        long getId(string tableName)
         {
             var newIndex = _MongoDB.RunCommand<MongoDB.Bson.BsonDocument>(@"{findAndModify:'ids',query:{_id:'" + tableName + @"'}, update:{
 $inc:{ 'currentIdValue':1}
         }, new:true,upsert:true}");
-            var index = newIndex["value"]["currentIdValue"].AsInt32;
+            var index = newIndex["value"]["currentIdValue"].AsInt64;
             return index;
         }
         public override void InsertFromObj<TModel>(TModel obj)
         {
             var table = TypeCache.GetTable(typeof(TModel));
-            var index = getId(table.TableName);
-            table.PrimaryKey.SetValue(obj, index);
+            if (!table.PrimaryKey.KeepIdentity)
+            {
+                var index = getId(table.TableName);
+                table.PrimaryKey.SetValue(obj, index);
+            }
             var collection = GetCollection<TModel>();
             collection.InsertOne(obj);
         }

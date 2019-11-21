@@ -99,6 +99,9 @@ namespace CRL.LambdaQuery
                         break;
                     case "DateDiff":
                         throw new NotSupportedException(methodInfo.MethodName);
+                    case "IsNullOrEmpty":
+                        filter = builder.Eq(field, "") | builder.Eq(field, BsonNull.Value);
+                        break;
                     case "In":
                         var list = args.FirstOrDefault() as IEnumerable;
                         var list2 = new List<object>();
@@ -125,7 +128,7 @@ namespace CRL.LambdaQuery
                     default:
                         throw new NotSupportedException(methodInfo.MethodName);//不支持
                 }
-                if (expressionType == System.Linq.Expressions.ExpressionType.Not)
+                if (expressionType == System.Linq.Expressions.ExpressionType.Not)//创建反向操作
                 {
                     filter = builder.Not(filter);
                 }

@@ -88,17 +88,6 @@ namespace CRL.DBExtend.MongoDBEx
             }
             return _MongoDB.GetCollection<TModel>(tableName);
         }
-        /// <summary>
-        /// 创建索引
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <param name="name"></param>
-        public void CreateIndex<TModel>(string name)
-        {
-            var collection = GetCollection<TModel>();
-            var indexKeys = Builders<TModel>.IndexKeys.Ascending(name);
-            collection.Indexes.CreateOne(indexKeys);
-        }
         internal override TType GetFunction<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> selectField, FunctionType functionType, bool compileSp = false)
         {
             var query = new MongoDBLambdaQuery<TModel>(dbContext);

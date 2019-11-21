@@ -24,13 +24,14 @@ namespace CRL.Sharding
         /// </summary>
         public BaseProvider<TModel> SetLocation(TModel args)
         {
-            var func = LocationManage.Get<TModel>();
-            if (func == null)
-            {
-                throw new CRLException($"指定类型{typeof(TModel).Name} 未注册定位方法");
-            }
-
             var table = TypeCache.GetTable(typeof(TModel));
+            var func = LocationManage.Get<TModel>();
+            if (func == null || args == null)
+            {
+                //throw new CRLException($"指定类型{typeof(TModel).Name} 未注册定位方法");
+                //没有设置则按默认库
+                return this;
+            }
             var location = func(table, args);
             location.CheckNull("location");
             dbLocation.ShardingLocation = location;

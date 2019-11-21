@@ -69,6 +69,10 @@ namespace CRLTest.Code
             //Delete(b=>b.Numbrer>0);
             //GetInitData();
             var query = GetLambdaQuery();
+            query.Where(b => string.IsNullOrEmpty(b.name));
+            var result2 = query.ToList();
+            Console.WriteLine(result2.Count);
+            return;
             query.Page(1, page);
             var result = query.GroupBy(b => new { b.name,b.OrderId}).Select(b => new
             {

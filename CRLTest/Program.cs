@@ -98,10 +98,11 @@ namespace CRLTest
             //Code.ProductDataManage.Instance.QueryItem(1);
             string str = "111";
         label1:
-            MakeGenericTypeTest();
+            
+            //MakeGenericTypeTest();
             testFormat();
             //MongoDBTestManage.Instance.GroupTest(1);
-   
+
             //testFormat();
             //Code.TestAll.TestSelect();
 
@@ -111,6 +112,7 @@ namespace CRLTest
         }
         static void testFormat()
         {
+
             var obj = new testClass() { };
             //obj.b = new b() { name = "b22424" };
             //obj.dic = new Dictionary<string, object>() { { "tes111111111112t", 1 }, { "t2222222222122est2", 1 }, { "te22222221s3t", 1 } };

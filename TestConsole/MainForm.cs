@@ -40,7 +40,7 @@ namespace TestConsole
             methods.Add("EFLinqQueryTest", MappingSpeedTest.EFLinqQueryTest);
             methods.Add("EFSqlQueryTest(SQL)", MappingSpeedTest.EFSqlQueryTest);
             methods.Add("LinqToDBQueryTest", MappingSpeedTest.LinqToDBQueryTest);
-
+            methods.Add("FreeSqlTest", MappingSpeedTest.FreeSqlTest);
 
         }
 
@@ -56,12 +56,17 @@ namespace TestConsole
             await Task.Run(() =>
             {
                 TestConsole.CRLManage.Instance.QueryItem(b => b.Id > 0);
-                labTip.Visible = false;
-                button1.Enabled = true;
-                button2.Enabled = true;
+          
+                this.BeginInvoke(new Action(()=>
+                {
+                    labTip.Visible = false;
+                    button1.Enabled = true;
+                    button2.Enabled = true;
+                }));
+        
             });
         }
-        private  void button1_Click(object sender, EventArgs e)
+        private async void button1_Click(object sender, EventArgs e)
         {
             button1.Enabled = false;
             button2.Enabled = false;
@@ -70,25 +75,30 @@ namespace TestConsole
             txtResult.Clear();
             txtResult.AppendText(txt);
             long useTime;
-            foreach (var kv in methods)
+            await Task.Run(()=>
             {
-                System.Threading.Thread.Sleep(300);
-                var method = kv.Value;
-                method(1);
-                useTime = TestConsole.SW.Do(() =>
+                foreach (var kv in methods)
                 {
-                    method(n);
-                });
-                GC.Collect();
-                txt = string.Format("{0}用时:{1}ms\r\n", kv.Key, useTime);
-                txtResult.AppendText(txt);
-            }
-            button1.Enabled = true;
-            button2.Enabled = true;
-            //await Task.Run(() =>
-            //{
-
-            //});
+                    System.Threading.Thread.Sleep(300);
+                    var method = kv.Value;
+                    var counter = new CounterWatch();
+                    counter.Start(kv.Key, () =>
+                    {
+                        method(n);
+                    }, 1);
+                    txt = counter.ToString() + "\r\n";
+                    this.BeginInvoke(new Action(() =>
+                    {
+                        txtResult.AppendText(txt);
+                    }));
+                }
+                this.BeginInvoke(new Action(() =>
+                {
+                    button1.Enabled = true;
+                    button2.Enabled = true;
+                }));
+            });
+            
         }
 
         private async void button2_Click(object sender, EventArgs e)
@@ -106,21 +116,24 @@ namespace TestConsole
                 foreach (var kv in methods)
                 {
                     var item = kv.Value;
-                    item(1);
-                    useTime = TestConsole.SW.Do(() =>
+                    var counter = new CounterWatch();
+                    counter.Start(kv.Key, () =>
                     {
-                        for (int i = 0; i < n; i++)
-                        {
-                            item(1);
-                        }
-                    });
-                    GC.Collect();
-                    txt = string.Format("{0}用时:{1}ms\r\n", kv.Key, useTime);
-                    txtResult.AppendText(txt);
-                    //System.Threading.Thread.Sleep(500);
+                        item(1);
+                    }, n);
+                    txt = counter.ToString() + "\r\n";
+
+                    this.BeginInvoke(new Action(() =>
+                    {
+                        txtResult.AppendText(txt);
+                    }));
                 }
-                button1.Enabled = true;
-                button2.Enabled = true;
+        
+                this.BeginInvoke(new Action(() =>
+                {
+                    button1.Enabled = true;
+                    button2.Enabled = true;
+                }));
             });
         }
     }

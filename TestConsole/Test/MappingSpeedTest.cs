@@ -39,6 +39,11 @@ namespace TestConsole
     }
     class MappingSpeedTest
     {
+        static MappingSpeedTest(){
+             fsql = new FreeSql.FreeSqlBuilder()
+       .UseConnectionString(FreeSql.DataType.SqlServer, DbHelper.ConnectionString).Build(); //请务必定义成 Singleton 单例模式
+
+        }
         //public static void LoognQueryTest(int takeCount)
         //{
         //    using (var db = new SqlConnection(DbHelper.ConnectionString))
@@ -152,6 +157,21 @@ namespace TestConsole
                 }
             }
         }
-        
+        static IFreeSql fsql;
+        public static void FreeSqlTest(int takeCount)
+        {
+
+            if (takeCount == 1)
+            {
+                var first = fsql.Select<TestEntity>().Where(b => b.Id < id2 && b.Id > id).OrderBy(b => b.Id).Take(takeCount).ToList();
+
+            }
+            else
+            {
+                var first = fsql.Queryable<TestEntity>().OrderBy(b => b.Id).Take(takeCount).ToList();
+            }
+        }
+
+
     }
 }

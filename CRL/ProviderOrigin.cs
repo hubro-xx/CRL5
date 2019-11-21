@@ -864,6 +864,10 @@ namespace CRL
             var db = DBExtend;
             return db.Update(query, updateValue);
         }
+        public int Update(Expression<Func<T, bool>> expression, Dictionary<string,object> dic)
+        {
+            return Update(expression, new ParameCollection(dic));
+        }
         /// <summary>
         /// 关联更新
         /// </summary>

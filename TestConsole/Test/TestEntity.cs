@@ -17,6 +17,7 @@ namespace TestConsole
 {
     public class TestEntity 
     {
+        [FreeSql.DataAnnotations.Column(IsIdentity = true)]
         [Column(IsPrimaryKey = true)]
         [AutoIncrement]
         public int Id { get; set; }

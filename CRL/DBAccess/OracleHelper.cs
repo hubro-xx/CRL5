@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data.Common;
-using System.Data.OracleClient;
+using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types; 
 using System.Data;
 namespace CRL.DBAccess
 {
@@ -36,11 +37,11 @@ namespace CRL.DBAccess
                         DbParameter p;
                         if (kv.Key.ToLower().EndsWith("cursor"))// cursor
                         {
-                            p = new OracleParameter(kv.Key, OracleType.Cursor);
+                            p = new OracleParameter(kv.Key,  OracleDbType.Char);
                         }
                         else
                         {
-                            p = new OracleParameter(kv.Key, OracleType.VarChar, 500);
+                            p = new OracleParameter(kv.Key, OracleDbType.NChar, 500);
                         }
                         p.Direction = ParameterDirection.Output;
                         cmd.Parameters.Add(p);

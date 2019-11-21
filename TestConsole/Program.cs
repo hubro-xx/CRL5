@@ -29,6 +29,7 @@ namespace TestConsole
             //var obj2 = fuc(dataContainer);
 
             CRL.SettingConfig.AutoTrackingModel = false;
+            CRL.SettingConfig.CheckModelTableMaping = false;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             CRL.SettingConfig.GetDbAccess = (dbLocation) =>
