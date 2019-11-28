@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Net;
 using System.Collections;
 using System.Collections.Specialized;
@@ -17,6 +17,16 @@ namespace CRL.Core
     /// </summary>
 	public class EventLog
     {
+        static ThreadWork thread;
+        static EventLog()
+        {
+            thread = new ThreadWork();
+            thread.Start("eventLog",() =>
+            {
+                WriteLogFromCache();
+                return true;
+            }, 0.5);
+        }
         /// <summary>
         /// 是否使用上下文信息写日志
         /// </summary>
@@ -25,6 +35,8 @@ namespace CRL.Core
         [Serializable]
         public class LogItem
         {
+            internal string Path;
+            internal string Id;
             public DateTime Time
             {
                 get;
@@ -240,16 +252,8 @@ namespace CRL.Core
 
 		static bool Writing = false;
 		static DateTime lastWriteTime = DateTime.Now;
-		static Dictionary<string, LogItemArry> logCaches = new Dictionary<string, LogItemArry>();
-		static System.Timers.Timer timer;
-		private static void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-		{
-			if (!Writing)
-			{
-				WriteLogFromCache();
-			}
-            //CRL.Core.Reflection.DynamicVisitor.SaveMethodCache();
-		}
+		static Dictionary<string, LogItem> logCaches = new Dictionary<string, LogItem>();
+
         /// <summary>
         /// 指定路径,文件名,写入日志
         /// </summary>
@@ -258,62 +262,59 @@ namespace CRL.Core
         /// <param name="fileName"></param>
         /// <returns></returns>
         public static bool WriteLog(string path, LogItem logItem, string fileName)//建立日志
-		{
+        {
             try
             {
-                if (timer == null)
-                {
-                    timer = new System.Timers.Timer();
-                    timer.Interval = 1000;
-                    timer.Elapsed += new System.Timers.ElapsedEventHandler(timer_Elapsed);
-                    timer.Start();
-                }
                 if (!System.IO.Directory.Exists(path))
                     CreateFolder(path);
                 string filePath = "";
-
+                var id = System.Guid.NewGuid().ToString();
                 filePath = path + fileName + ".txt";
-
-                if (!logCaches.ContainsKey(filePath))
-                    logCaches.Add(filePath, new LogItemArry() { savePath = filePath });
-                
-                logCaches[filePath].Add(logItem);
+                logItem.Path = filePath;
+                logItem.Id = id;
+                logCaches.Add(id, logItem);
                 return true;
             }
-            catch
+            catch (Exception ero)
             {
+                Console.WriteLine("写入文件时发生错误:" + ero.Message);
                 return false;
             }
         }
 		public static string LastError;
-		public static void WriteLogFromCache()
-		{
-			lock (lockObj)
-			{
-				Writing = true;
-				//累加上次记录的日志
-				if (logCaches.Count > 0)
-				{
-					Dictionary<string, LogItemArry> list = new Dictionary<string, LogItemArry>(logCaches);
-					foreach (KeyValuePair<string, LogItemArry> entry in list)
-					{
-						LogItemArry logitemArry = entry.Value;
-						LastError = null;
-						try
-						{
-							WriteLine(logitemArry.ToString(), entry.Key);
-						}
-						catch(Exception ero)
-						{
-							LastError = ero.ToString();
-						}
-						logCaches.Remove(entry.Key);
-					}
-				}
-				//System.Threading.Thread.Sleep(6000);
-				Writing = false;
-			}
-		}
+        public static void WriteLogFromCache()
+        {
+            lock (lockObj)
+            {
+                Writing = true;
+                //累加上次记录的日志
+                if (logCaches.Count > 0)
+                {
+                    var list = new Dictionary<string, LogItem>(logCaches);
+                    var group = list.Values.GroupBy(b => b.Path);
+                    var removeKeys = new List<string>();
+                    foreach (var g in group)
+                    {
+                        var logs = new LogItemArry() { logs = g.ToList() };
+                        try
+                        {
+                            WriteLine(logs.ToString(), g.Key);
+                            removeKeys.AddRange(g.Select(b => b.Id));
+                        }
+                        catch (Exception ero)
+                        {
+                            LastError = ero.ToString();
+                        }
+                    }
+                    foreach (var key in removeKeys)
+                    {
+                        logCaches.Remove(key);
+                    }
+                }
+                //System.Threading.Thread.Sleep(6000);
+                Writing = false;
+            }
+        }
 
         static string thisDomain = "";
 
@@ -333,16 +334,6 @@ namespace CRL.Core
 			}
 			//Console.WriteLine(message);
 		}
-		static string secondFolder=null;
-		/// <summary>
-		/// 获取日志二级目录
-		/// </summary>
-		/// <returns></returns>
-		public static string GetSecondFolder()
-		{
-            return "";
-
-		}
         static string rootPath = null;
 		/// <summary>
 		/// 获取日志绝对目录
@@ -357,7 +348,7 @@ namespace CRL.Core
                 {
                     rootPath = AppDomain.CurrentDomain.BaseDirectory + @"\log\";
                 }
-                rootPath += GetSecondFolder() + @"\";
+                rootPath += @"\";
                 //如果节点有设置,则按节点设置读取
                 NameValueCollection appSettings = ConfigurationManager.AppSettings;
                 string settingPath = appSettings["EventLogFolder"];
@@ -370,19 +361,19 @@ namespace CRL.Core
 		}
         public static void Stop()
         {
-            if (timer != null)
+            if (thread != null)
             {
-                timer.Stop();
-                timer = null;
+                thread.Stop();
+                //thread = null;
             }
         }
         /// <summary>
         /// 项集合
         /// </summary>
-		public class LogItemArry 
+		class LogItemArry 
 		{
 			public string savePath;
-            List<LogItem> logs = new List<LogItem>();
+            internal List<LogItem> logs = new List<LogItem>();
             public void Add(LogItem log)
 			{
 				logs.Add(log);

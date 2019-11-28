@@ -58,6 +58,8 @@
     <Compile Include="Code\ProductDataManage.cs" />
     <Compile Include="Code\Sharding\MemberManage.cs" />
     <Compile Include="Code\Sharding\OrderManage.cs" />
+    <Compile Include="LocationReporter.cs" />
+    <Compile Include="LocationTracker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Code\TestAll.cs" />

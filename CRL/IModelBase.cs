@@ -31,24 +31,13 @@ namespace CRL
             get;
             set;
         }
-        [System.Xml.Serialization.XmlIgnore]
-        [NonSerialized]
-        private DateTime addTime = DateTime.Now;
-
         /// <summary>
         /// 添加时间
         /// </summary>
         public DateTime AddTime
         {
-            get
-            {
-                return addTime;
-            }
-            set
-            {
-                addTime = value;
-            }
-        }
+            get; set;
+        } = DateTime.Now;
 
     }
     /// <summary>
@@ -197,7 +186,7 @@ namespace CRL
             Changes = new ParameCollection();
         }
 
-
+        internal string ManageName;
         #region 索引
 
         [System.Xml.Serialization.XmlIgnore]

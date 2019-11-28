@@ -9,7 +9,8 @@ namespace CRL.Core
     public class ThreadWork
     {
         Thread thread;
-        public void Start(string name, Func<bool> action, int second)
+        static List<Thread> threads = new List<Thread>();
+        public void Start(string name, Func<bool> action, double second)
         {
             if (thread == null)
             {
@@ -26,9 +27,10 @@ namespace CRL.Core
                             CRL.Core.EventLog.Log("ThreadWork时发生错误" + ero, "ThreadWork_" + name);
                         }
 
-                        Thread.Sleep(1000 * second);
+                        Thread.Sleep((int)(1000 * second));
                     }
                 });
+                threads.Add(thread);
                 thread.Start();
                 CRL.Core.EventLog.Log(name + "启动", "ThreadWork");
             }
@@ -38,6 +40,17 @@ namespace CRL.Core
             if (thread != null)
             {
                 thread.Abort();
+            }
+        }
+        public static void StopAll()
+        {
+            foreach(var item in threads)
+            {
+                try
+                {
+                    item.Abort();
+                }
+                catch { }
             }
         }
     }

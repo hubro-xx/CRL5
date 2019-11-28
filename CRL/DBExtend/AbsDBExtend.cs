@@ -753,7 +753,12 @@ namespace CRL
         public List<TModel> QueryList<TModel>(LambdaQuery.LambdaQuery<TModel> query) where TModel : CRL.IModel, new()
         {
             string key;
-            return QueryOrFromCache<TModel>(query, out key);
+            var list = QueryOrFromCache<TModel>(query, out key);
+            list.ForEach(b =>
+            {
+                b.ManageName = dbContext.DBLocation.ManageName;
+            });
+            return list;
         }
         /// <summary>
         /// 返回多项结果

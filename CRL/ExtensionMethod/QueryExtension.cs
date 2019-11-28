@@ -41,9 +41,9 @@ namespace CRL
             var db = DBExtendFactory.CreateDBExtend(query.__DbContext);
             return db.Update(query, updateValue);
         }
-        static DbContext getDbContext<T>()
+        static DbContext getDbContext<T>(string manageName)
         {
-            var dbLocation = new CRL.DBLocation() { DataAccessType = DataAccessType.Default, ManageType = typeof(T) };
+            var dbLocation = new CRL.DBLocation() { DataAccessType = DataAccessType.Default, ManageType = typeof(T), ManageName = manageName };
             var helper = SettingConfig.GetDbAccess(dbLocation).GetDBHelper();
             var dbContext = new DbContext(helper, dbLocation);
             return dbContext;
@@ -57,7 +57,7 @@ namespace CRL
         public static int Save<T>(this T obj) where T : IModel, new()
         {
             obj.CheckNull("obj");
-            var dbContext = getDbContext<T>();
+            var dbContext = getDbContext<T>(obj.ManageName);
             var db = DBExtendFactory.CreateDBExtend(dbContext);
             return db.Update(obj);
         }
@@ -70,7 +70,7 @@ namespace CRL
         public static int Delete<T>(this T obj) where T : IModel, new()
         {
             obj.CheckNull("obj");
-            var dbContext = getDbContext<T>();
+            var dbContext = getDbContext<T>(obj.ManageName);
             var db = DBExtendFactory.CreateDBExtend(dbContext);
             return db.Delete<T>(obj.GetpPrimaryKeyValue());
         }

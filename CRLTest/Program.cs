@@ -19,7 +19,7 @@ namespace CRLTest
         {
             get; set;
         }
-        public DateTime time
+        public DateTime? time
         {
             get; set;
         }
@@ -56,11 +56,8 @@ namespace CRLTest
     {
         static void Main(string[] args)
         {
-            //MakeGenericTypeTest();
-            //var obj = new testClass() { time = DateTime.Now };
-            //var json = obj.ToJson();
-            //Console.WriteLine(json);
-            //Console.ReadLine();
+            
+ 
             var configBuilder = new CRL.Core.ConfigBuilder();
             configBuilder.UseRedis("passs@127.0.0.0:27017")
                 .UseRedisSession();
@@ -98,7 +95,7 @@ namespace CRLTest
             //Code.ProductDataManage.Instance.QueryItem(1);
             string str = "111";
         label1:
-            
+            //CRL.Core.EventLog.Log("ssss");
             //MakeGenericTypeTest();
             testFormat();
             //MongoDBTestManage.Instance.GroupTest(1);
@@ -182,5 +179,20 @@ namespace CRLTest
             var type = CRL.Core.Extension.Extension.MakeGenericType("CRL.LambdaQuery.Mapping.QueryInfo", "CRL", typeof(ProductData));
         }
 
+        static void testIObserver()
+        {
+            LocationTracker provider = new LocationTracker();
+            LocationReporter reporter1 = new LocationReporter("FixedGPS");
+            reporter1.Subscribe(provider);
+            LocationReporter reporter2 = new LocationReporter("MobileGPS");
+            reporter2.Subscribe(provider);
+
+            provider.TrackLocation(new Location(47.6456, -122.1312));
+            reporter1.Unsubscribe();
+            provider.TrackLocation(new Location(47.6677, -122.1199));
+            provider.TrackLocation(null);
+            provider.EndTransmission();
+            Console.ReadLine();
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace CRL.Core.Extension
 {
     public static partial class Extension
     {
-        static Dictionary<Type, TypeInfo> TypeInfoCache = new Dictionary<Type, TypeInfo>();
+        static System.Collections.Concurrent.ConcurrentDictionary<Type, TypeInfo> TypeInfoCache = new System.Collections.Concurrent.ConcurrentDictionary<Type, TypeInfo>();
         public static TypeInfo GetReflectionInfo(this Type type)
         {
             var a = TypeInfoCache.TryGetValue(type, out TypeInfo typeInfo);
@@ -20,7 +20,7 @@ namespace CRL.Core.Extension
                 var refInfo = method.MakeGenericMethod(new Type[] { type }).Invoke(null, new object[] { null }) as IReflectionInfo;
                 var pro = type.GetProperties().Where(b => b.GetSetMethod() != null);
                 typeInfo = new TypeInfo() { Properties = pro, ReflectionInfo = refInfo };
-                TypeInfoCache.Add(type, typeInfo);
+                TypeInfoCache.TryAdd(type, typeInfo);
             }
             return typeInfo;
         }

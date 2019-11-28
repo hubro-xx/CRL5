@@ -12,6 +12,11 @@ namespace CRL.Core.QuartzScheduler
     /// </summary>
     public abstract class QuartzJob : IJob
     {
+        /// <summary>
+        /// 任务数据项
+        /// </summary>
+        public object TagData;
+
         //string JobName { get; }
         //string JobGroup { get; }
         /// <summary>
@@ -49,6 +54,8 @@ namespace CRL.Core.QuartzScheduler
             QuartzWorker.workCache[name] = true;
             try
             {
+                var data = context.JobDetail.JobDataMap["TagData"];
+                this.TagData = data;
                 DoWork();
             }
             catch (Exception ero)

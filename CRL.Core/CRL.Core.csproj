@@ -118,7 +118,6 @@
     <Compile Include="Request\HttpRequest.cs" />
     <Compile Include="LocalCookie.cs" />
     <Compile Include="Log\EventLog.cs" />
-    <Compile Include="Log\LogItem.cs" />
     <Compile Include="PageNavigation.cs" />
     <Compile Include="Reflection\DynamicMethodExecutor.cs" />
     <Compile Include="Reflection\MethodCache.cs" />
