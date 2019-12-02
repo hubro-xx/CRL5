@@ -374,6 +374,7 @@ namespace CRLTest.Code
                 throw new Exception("事务未回滚");
             }
             #endregion
+            Console.WriteLine("TestUpdate finish");
         }
 
         public class testC

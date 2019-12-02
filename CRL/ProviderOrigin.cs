@@ -15,6 +15,7 @@ using CRL.LambdaQuery;
 using System.Messaging;
 using CRL.Core;
 using MongoDB.Driver.Linq;
+using System.Collections;
 
 namespace CRL
 {
@@ -244,7 +245,7 @@ namespace CRL
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public T GetFromCache(string id)
+        public T GetFromRedisCache(string id)
         {
             var timeOutSecond = 60 * 60 * 24;
             return RedisClient.GetCustomCache(id, timeOutSecond, () =>
@@ -777,22 +778,7 @@ namespace CRL
             int n = Update(query, model.GetUpdateField());
             return n;
         }
-        /// <summary>
-        /// 指定条件和参数进行更新[基本方法]
-        /// </summary>
-        /// <param name="expression">条件</param>
-        /// <param name="setValue">值</param>
-        /// <returns></returns>
-        public int Update(Expression<Func<T, bool>> expression, ParameCollection setValue)
-        {
-            var query = GetLambdaQuery();
-            query.Where(expression);
-            int n = Update(query, setValue);
-            return n;
-            //var db = DBExtend;
-            //int n = db.Update(expression, setValue);
-            //return n;
-        }
+
         /// <summary>
         /// 按匿名对象更新
         /// </summary>
@@ -802,6 +788,10 @@ namespace CRL
         /// <returns></returns>
         public int Update<TOjbect>(Expression<Func<T, bool>> expression, TOjbect updateValue) where TOjbect : class
         {
+            if(updateValue is IDictionary)
+            {
+                return Update(expression, updateValue as IDictionary);
+            }
             var properties = updateValue.GetType().GetProperties();
             var c = new ParameCollection();
             foreach (var p in properties)
@@ -813,6 +803,7 @@ namespace CRL
             int n = Update(query, c);
             return n;
         }
+
         /// <summary>
         /// 按匿名表达式更新
         /// </summary>
@@ -853,20 +844,39 @@ namespace CRL
             int n = Update(query, c);
             return n;
         }
+
+        /// <summary>
+        /// 指定条件和参数进行更新[基本方法]
+        /// </summary>
+        /// <param name="expression">条件</param>
+        /// <param name="setValue">值</param>
+        /// <returns></returns>
+        public int Update(Expression<Func<T, bool>> expression, IDictionary setValue)
+        {
+            var query = GetLambdaQuery();
+            query.Where(expression);
+            int n = Update(query, setValue);
+            return n;
+            //var db = DBExtend;
+            //int n = db.Update(expression, setValue);
+            //return n;
+        }
         /// <summary>
         /// 按完整查询条件更新
         /// </summary>
         /// <param name="query"></param>
         /// <param name="updateValue">要按字段值更新,需加前辍$ 如 c["UserId"] = "$UserId"</param>
         /// <returns></returns>
-        public int Update(LambdaQuery<T> query, ParameCollection updateValue)
+        public int Update(LambdaQuery<T> query, IDictionary updateValue)
         {
             var db = DBExtend;
-            return db.Update(query, updateValue);
-        }
-        public int Update(Expression<Func<T, bool>> expression, Dictionary<string,object> dic)
-        {
-            return Update(expression, new ParameCollection(dic));
+            var iDic = updateValue as Dictionary<string, object>;
+            if (iDic == null)
+            {
+                throw new CRLException("无法转换为Dictionary<string, object>");
+            }
+            var dic = new ParameCollection(iDic);
+            return db.Update(query, dic);
         }
         /// <summary>
         /// 关联更新
@@ -875,7 +885,7 @@ namespace CRL
         /// <param name="expression"></param>
         /// <param name="updateValue">要按字段值更新,需加前辍$ 如 c["UserId"] = "$UserId"</param>
         /// <returns></returns>
-        public int Update<TJoin>(Expression<Func<T, TJoin, bool>> expression, ParameCollection updateValue)
+        public int Update<TJoin>(Expression<Func<T, TJoin, bool>> expression, IDictionary updateValue)
             where TJoin : IModel, new()
         {
             //return DBExtend.Update(expression, updateValue);

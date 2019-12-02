@@ -97,12 +97,12 @@ namespace CRLTest
         label1:
             //CRL.Core.EventLog.Log("ssss");
             //MakeGenericTypeTest();
-            testFormat();
+            //testFormat();
             //MongoDBTestManage.Instance.GroupTest(1);
 
-            //testFormat();
+            testFormat();
             //Code.TestAll.TestSelect();
-
+            //Code.TestAll.TestUpdate();
             Console.ReadLine();
             goto label1;
             Console.ReadLine();

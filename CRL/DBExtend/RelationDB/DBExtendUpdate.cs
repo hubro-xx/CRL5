@@ -212,8 +212,8 @@ namespace CRL.DBExtend.RelationDB
                 }
                 index += 1;
                 var keyValue = primaryKey.GetValue(obj);
-                var keyParme = _DBAdapter.GetParamName(primaryKey.MemberName, index);
-                var where = $" where {_DBAdapter.KeyWordFormat(primaryKey.MemberName)}={keyParme}";
+                var keyParme = _DBAdapter.GetParamName(primaryKey.MapingName, index);
+                var where = $" where {_DBAdapter.KeyWordFormat(primaryKey.MapingName)}={keyParme}";
                 db.AddParam(keyParme, keyValue);
                 var setString = string.Join(",", c.Select(b => string.Format("{0}='{1}'", _DBAdapter.KeyWordFormat(b.Key), b.Value)));
                 string sql = _DBAdapter.GetUpdateSql(table.TableName, setString, where);

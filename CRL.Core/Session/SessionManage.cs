@@ -9,14 +9,13 @@ namespace CRL.Core.Session
 {
     public class SessionManage
     {
-        public static Func<HttpContextBase,AbsSession> __SessionCreater;
         public static AbsSession GetSessionClient(HttpContextBase context)
         {
-            if (__SessionCreater == null)
+            if (ConfigBuilder.current?.__SessionCreater == null)
             {
                 return new WebSession(context);
             }
-            return __SessionCreater(context);
+            return ConfigBuilder.current?.__SessionCreater(context);
         }
     }
 }

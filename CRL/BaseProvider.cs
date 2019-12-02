@@ -380,19 +380,5 @@ namespace CRL
             return list;
         }
         #endregion
-
-        #region 存储过程
-        /// <summary>
-        /// 执行存储过程返回结果集
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sp"></param>
-        /// <returns></returns>
-        protected List<T> RunList<T>(string sp) where T : class, new()
-        {
-            AbsDBExtend db = DBExtend;
-            return db.RunList<T>(sp);
-        }
-        #endregion
     }
 }

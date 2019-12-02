@@ -14,7 +14,11 @@ namespace CRL.Core
         {
             current = this;
         }
+        static ConfigBuilder()
+        {
+            current = new ConfigBuilder();
+        }
         internal static ConfigBuilder current;
-        public  Func<HttpContextBase, AbsSession> __SessionCreater;
+        public Func<HttpContextBase, AbsSession> __SessionCreater;
     }
 }
