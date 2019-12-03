@@ -8,9 +8,40 @@ using System.Threading.Tasks;
 
 namespace CRL.Core.Remoting
 {
+    public class HostAddress
+    {
+        public string address;
+        public int port;
+        public override string ToString()
+        {
+            var str = address;
+            if (port > 0)
+            {
+                str += $":{port}";
+            }
+            return str;
+        }
+    }
     public abstract class AbsClient: DynamicObject, IDisposable
     {
-        public string Host;
+        HostAddress hostAddress;
+        public HostAddress HostAddress
+        {
+            get
+            {
+                //获取consol服务发现
+                if (clientConnect.__GetConsulAgent != null)
+                {
+                    return clientConnect.__GetConsulAgent();
+                }
+                return hostAddress;
+            }
+            set
+            {
+                hostAddress = value;
+            }
+        }
+    
         public string ServiceName
         {
             get

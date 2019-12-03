@@ -16,7 +16,7 @@ namespace CRL.RPC
 {
     class RPCClient : AbsClient
     {
-        public int Port;
+        //public int Port;
         static Bootstrap bootstrap;
         IChannel channel = null;
 
@@ -45,7 +45,7 @@ namespace CRL.RPC
             {
                 if (channel == null || !channel.Open)
                 {
-                    channel = Core.AsyncInvoke.RunSync(() => bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(Host), Port)));
+                    channel = Core.AsyncInvoke.RunSync(() => bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(HostAddress.address), HostAddress.port)));
                 }
             }
             catch(Exception ero)

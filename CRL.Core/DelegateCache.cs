@@ -34,7 +34,7 @@ namespace CRL.Core
                 {
                     return default(T);
                 }
-                cache.Insert(key, cacheObj, null, DateTime.Now.AddMinutes(minute), System.Web.Caching.Cache.NoSlidingExpiration);
+                cache.Insert(key, cacheObj, null, DateTime.Now.AddSeconds(minute * 60), System.Web.Caching.Cache.NoSlidingExpiration);
             }
             return (T)cacheObj;
         }

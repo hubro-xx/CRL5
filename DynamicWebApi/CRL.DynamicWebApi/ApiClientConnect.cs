@@ -28,7 +28,7 @@ namespace CRL.DynamicWebApi
             var info = serviceInfo.GetServiceInfo(type);
             var client = new ApiClient(this)
             {
-                Host = host,
+                HostAddress = new HostAddress() { address = host },
                 serviceInfo = info,
             };
             //创建代理

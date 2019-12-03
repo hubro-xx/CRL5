@@ -15,6 +15,7 @@ namespace ApiProxyTest
         static void Main(string[] args)
         {
             clientConnect = new CRL.Core.ApiProxy.ApiClientConnect("https://api.weixin.qq.com");
+            //clientConnect.UseConsulAgent("http://118.12.31.22:8500", "service1");// use consul
             clientConnect.UseBeforRequest((request, members, url) =>
             {
                 //如果需要设置发送头信息

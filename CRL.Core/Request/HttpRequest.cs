@@ -53,12 +53,23 @@ namespace CRL.Core.Request
         /// <returns></returns>
         public static string HttpGet(string url, string proxyHost, Encoding enc)
         {
-            Stream myStream = HttpGet(url, proxyHost);
-            StreamReader sr = new StreamReader(myStream, enc);
-            var strResult = sr.ReadToEnd();
-            sr.Close();
-            myStream.Close();
-            return strResult;
+            Stream myStream = null;
+            HttpWebRequest request = null;
+            try
+            {
+                myStream = HttpGet(url, proxyHost, out request);
+                StreamReader sr = new StreamReader(myStream, enc);
+                var strResult = sr.ReadToEnd();
+                sr.Close();
+                myStream.Close();
+                return strResult;
+            }
+            catch (Exception ero)
+            {
+                myStream?.Close();
+                request?.Abort();
+                throw ero;
+            }
         }
         /// <summary>
         /// 返回流
@@ -66,11 +77,11 @@ namespace CRL.Core.Request
         /// <param name="url"></param>
         /// <param name="proxyHost">代理地址</param>
         /// <returns></returns>
-        public static Stream HttpGet(string url, string proxyHost)
-		{
-            var request = new ImitateWebRequest(new Uri(url).Host, Encoding.UTF8);
-            request.ProxyHost = proxyHost;
-            return request.GetStream(url);
+        public static Stream HttpGet(string url, string proxyHost, out HttpWebRequest request)
+        {
+            var requestInstance = new ImitateWebRequest(new Uri(url).Host, Encoding.UTF8);
+            requestInstance.ProxyHost = proxyHost;
+            return requestInstance.GetStream(url, out request);
         }
 	}
 }

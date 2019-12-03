@@ -30,8 +30,8 @@ namespace CRL.RPC
             var info = serviceInfo.GetServiceInfo(type);
             var client = new RPCClient(this)
             {
-                Host = host,
-                Port = port,
+                HostAddress = new HostAddress() { address = host, port = port },
+                //Port = port,
                 serviceInfo = info,
             };
             //创建代理

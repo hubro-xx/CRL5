@@ -66,6 +66,12 @@
     <Compile Include="BinaryFormat\ListFormat.cs" />
     <Compile Include="CallContext.cs" />
     <Compile Include="ConfigBuilder.cs" />
+    <Compile Include="ConsulClient\Check.cs" />
+    <Compile Include="ConsulClient\CheckRegistrationInfo.cs" />
+    <Compile Include="ConsulClient\Consul.cs" />
+    <Compile Include="ConsulClient\ServiceInfo.cs" />
+    <Compile Include="ConsulClient\ServiceCheckStatus.cs" />
+    <Compile Include="ConsulClient\ServiceRegistrationInfo.cs" />
     <Compile Include="CoreConfig.cs" />
     <Compile Include="CustomSetting.cs" />
     <Compile Include="Encrypt\CBC.cs" />

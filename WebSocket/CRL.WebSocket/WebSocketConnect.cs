@@ -42,7 +42,7 @@ namespace CRL.WebSocket
             }
             var client = new WebSocketClient(this)
             {
-                Host = host,
+                HostAddress = host,
                 ServiceType = typeof(T),
                 ServiceName = serviceName,
             };

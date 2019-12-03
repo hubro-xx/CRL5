@@ -69,7 +69,7 @@ namespace CRL.Core.ApiProxy
                 }
             }
 
-            var url = Host + requestPath;
+            var url = HostAddress + requestPath;
             var request = new ImitateWebRequest(ServiceName, apiClientConnect.Encoding);
             request.ContentType = ContentTypeDic[contentType];
             string result;

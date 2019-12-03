@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using CRL.Core.Extension;
+
 namespace CRL.Core.Request
 {
     /// <summary>
@@ -13,6 +13,10 @@ namespace CRL.Core.Request
     /// </summary>
     public class ImitateWebRequest
     {
+        static ImitateWebRequest()
+        {
+            ServicePointManager.DefaultConnectionLimit = Int32.MaxValue;
+        }
         /// <summary>
         /// 创建附带COOKIE的请求
         /// </summary>
@@ -196,13 +200,23 @@ namespace CRL.Core.Request
         /// <returns></returns>
         public string GetSource(string url)
         {
-            var dataStream = GetStream(url);
-            //Stream dataStream = ((HttpWebResponse)CreateWebRequest(url, null).GetResponse()).GetResponseStream();
-            StreamReader reader = new StreamReader(dataStream, ResponseEncoding);
-            string responseFromServer = reader.ReadToEnd();
-            reader.Close();
-            dataStream.Close();
-
+            var dataStream = GetStream(url,out HttpWebRequest request);
+            string responseFromServer;
+            try
+            {
+                using (var reader = new StreamReader(dataStream, ResponseEncoding))
+                {
+                    responseFromServer = reader.ReadToEnd();
+                }
+                dataStream.Close();
+            }
+            catch (Exception ero)
+            {
+                dataStream.Close();
+                request?.Abort();
+                throw ero;
+            }
+            request?.Abort();
             return responseFromServer;
         }
         /// <summary>
@@ -223,7 +237,12 @@ namespace CRL.Core.Request
         public string Post(string url, string data)
         {
             string out_str;
-            return Post(url, data, out out_str);
+            return SendData(url,"POST", data, out out_str);
+        }
+        public string Put(string url, string data)
+        {
+            string out_str;
+            return SendData(url, "PUT", data, out out_str);
         }
         /// <summary>
         /// POST内容,并返回跳转后的URL
@@ -232,38 +251,57 @@ namespace CRL.Core.Request
         /// <param name="data"></param>
         /// <param name="now_url"></param>
         /// <returns></returns>
-        public string Post(string url, string data, out string now_url)
+        string SendData(string url,string method, string data, out string now_url)
         {
             string str = "";
             HttpWebResponse response;
-            //var response = CreateWebRequest(url, data).GetResponse() as HttpWebResponse;
+            HttpWebRequest request = null;
             try
             {
-                response = CreateWebRequest(url, data).GetResponse() as HttpWebResponse;
+                request = CreateWebRequest(url, method, data);
+                response = request.GetResponse() as HttpWebResponse;
             }
             catch (WebException ex)
             {
                 response = (HttpWebResponse)ex.Response;
+                using (StreamReader requestReader = new StreamReader(response.GetResponseStream(), ResponseEncoding))
+                {
+                    str = requestReader.ReadToEnd();
+                }
+                response.Close();
+                request?.Abort();
+                throw new RequestException(url, data, str);
             }
-            var errorCodes = new int[] { 404, 500 };
-            if (errorCodes.Contains((int)response.StatusCode))
-            {
-                throw new Exception("服务器返回内部错误"+ response.StatusCode);
-            }
+            //var errorCodes = new int[] { 404, 500 };
+            //if (errorCodes.Contains((int)response.StatusCode))
+            //{
+            //    throw new Exception("服务器返回内部错误"+ response.StatusCode);
+            //}
             SaveCookies(response.Cookies);
             now_url = response.ResponseUri.ToString();
-            if (response.StatusCode == HttpStatusCode.Found)
+
+            try
             {
-                string url1 = response.Headers["Location"];
-                now_url = url1;
-                CurrentUrl = url1;
-                return GetSource(url1);
+                if (response.StatusCode == HttpStatusCode.Found)
+                {
+                    string url1 = response.Headers["Location"];
+                    now_url = url1;
+                    CurrentUrl = url1;
+                    return GetSource(url1);
+                }
+                using (StreamReader requestReader = new StreamReader(response.GetResponseStream(), ResponseEncoding))
+                {
+                    str = requestReader.ReadToEnd();
+                }
             }
-            using (StreamReader requestReader = new StreamReader(response.GetResponseStream(), ResponseEncoding))
+            catch(Exception ero)
             {
-                str = requestReader.ReadToEnd();
+                response?.Close();
+                request?.Abort();
+                throw new RequestException(url, data, ero.Message);
             }
-            response.Close();
+            response?.Close();
+            request?.Abort();
             return str;
         }
         private static bool CheckValidationResult(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate, System.Security.Cryptography.X509Certificates.X509Chain chain, System.Net.Security.SslPolicyErrors errors)
@@ -287,7 +325,7 @@ namespace CRL.Core.Request
         /// <param name="url"></param>
         /// <param name="postData"></param>
         /// <returns></returns>
-        public HttpWebRequest CreateWebRequest(string url, string postData)
+        public HttpWebRequest CreateWebRequest(string url, string method, string postData)
         {
             Uri URI = new Uri(url);
             HttpWebRequest request;
@@ -347,10 +385,11 @@ namespace CRL.Core.Request
                 }
             }
             //RequestWidthCookie = true;
-            if ((postData != null) && (postData.Length > 0))
+            if ((method!="GET") && (postData.Length > 0))
             {
                 request.ContentType = ContentType;
-                request.Method = "POST";
+                request.Method = method;
+                request.ServicePoint.Expect100Continue = false;
                 //EventLog.Log(request.ToJson(), "post");
                 byte[] b = ContentEncoding.GetBytes(postData);
                 request.ContentLength = b.Length;
@@ -377,28 +416,53 @@ namespace CRL.Core.Request
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public Stream GetStream(string url)
+        public Stream GetStream(string url, out HttpWebRequest request)
         {
             MemoryStream dataStream;
-            HttpWebRequest request = CreateWebRequest(url, null);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            SaveCookies(response.Cookies);
-            if (response.StatusCode == HttpStatusCode.Found)
-            {
-                string url1 = response.Headers["Location"];
-                CurrentUrl = url1;
-                return GetStream(url1);
-            }
+            request = null;
             try
             {
+                request = CreateWebRequest(url, "GET",null);
+            }
+            catch (Exception ero)
+            {
+                request?.Abort();
+                throw new RequestException(url, "", ero.Message);
+            }
+            HttpWebResponse response = null;
+            try
+            {
+                response = (HttpWebResponse)request.GetResponse();
+                SaveCookies(response.Cookies);
+                if (response.StatusCode == HttpStatusCode.Found)
+                {
+                    string url1 = response.Headers["Location"];
+                    CurrentUrl = url1;
+                    return GetStream(url1, out request);
+                }
                 dataStream = CopyStream(response.GetResponseStream());
             }
-            finally
+            catch (Exception ero)
             {
-                request.Abort();
-                response.Close();
+                request?.Abort();
+                response?.Close();
+                throw new RequestException(url, "", ero.Message);
             }
             return dataStream;
+        }
+    }
+    public class RequestException : Exception
+    {
+        public string Url;
+        public string Args;
+        public RequestException(string url,string args,string ero):base(ero)
+        {
+            Url = url;
+            Args = args;
+        }
+        public override string ToString()
+        {
+            return $"发送请求时失败,在URL:{Url} {Message}";
         }
     }
 }
