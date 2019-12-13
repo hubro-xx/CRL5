@@ -35,9 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Consul, Version=0.7.2.6, Culture=neutral, PublicKeyToken=20a6ad9a81df1d95, processorArchitecture=MSIL">
-      <HintPath>..\packages\Consul.0.7.2.6\lib\net45\Consul.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -73,12 +70,15 @@
     <None Include="Config\CustomSetting.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CRL.Core.QuartzScheduler\CRL.Core.QuartzScheduler.csproj">
       <Project>{89a602b5-446e-4f7b-aa96-2e3b90358ef2}</Project>
       <Name>CRL.Core.QuartzScheduler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CRL.Core.RabbitMQ\CRL.Core.RabbitMQ.csproj">
+      <Project>{c13f7a54-0cf8-4888-ad93-44312e211e6b}</Project>
+      <Name>CRL.Core.RabbitMQ</Name>
     </ProjectReference>
     <ProjectReference Include="..\CRL.Core.RedisProvider\CRL.Core.RedisProvider.csproj">
       <Project>{62ac0217-6a60-4c29-99ca-18dd9c0bf8bf}</Project>
@@ -91,6 +91,10 @@
     <ProjectReference Include="..\CRL\CRL.csproj">
       <Project>{221a152b-1136-46a0-bf49-37d8e8ef19a0}</Project>
       <Name>CRL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DynamicWebApi\CRL.DynamicWebApi\CRL.DynamicWebApi.csproj">
+      <Project>{d38d1696-a995-4764-9a04-52d55db2b947}</Project>
+      <Name>CRL.DynamicWebApi</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

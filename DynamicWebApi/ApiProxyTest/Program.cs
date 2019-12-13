@@ -15,14 +15,18 @@ namespace ApiProxyTest
         static void Main(string[] args)
         {
             clientConnect = new CRL.Core.ApiProxy.ApiClientConnect("https://api.weixin.qq.com");
-            //clientConnect.UseConsulAgent("http://118.12.31.22:8500", "service1");// use consul
+
+            clientConnect.UseConsulDiscover("http://127.0.0.1:8500", "serviceName");//使用consul发现服务
+            //clientConnect.UseConsulApiGateway("http://127.0.0.1:3400");//直接使用ocelot网关
+            //clientConnect.UseConsulApiGatewayDiscover("http://127.0.0.1:3400", "serviceName");//使用ocelot网关发现服务
+
             clientConnect.UseBeforRequest((request, members, url) =>
             {
                 //如果需要设置发送头信息
                 request.SetHead("token", "test");
             });
             //https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
-            var client = clientConnect.GetClient<IToken>();
+            var client = clientConnect.GetClient<IToken>("clientservice");
             client.Test(new args()
             {
                 name = "args",
@@ -39,6 +43,7 @@ namespace ApiProxyTest
 
             Console.ReadLine();
         }
+
         static async void getInfo()
         {
             //https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN
@@ -56,18 +61,12 @@ namespace ApiProxyTest
     public interface IToken
     {
         [CRL.Core.ApiProxy.Method(Path = "cgi-bin/token", Method = CRL.Core.ApiProxy.HttpMethod.GET)]
-        tokenResponse token(string grant_type, string appid, string secret);
+        Dictionary<string,string> token(string grant_type, string appid, string secret);
 
         [CRL.Core.ApiProxy.Method(Path = "cgi-bin/token/test", Method = CRL.Core.ApiProxy.HttpMethod.POST, ContentType = CRL.Core.ApiProxy.ContentType.FORM)]
         void Test(args args);
     }
-    public class tokenResponse
-    {
-        public string errcode { get; set; }
-        public string errmsg { get; set; }
-        public string access_token { get; set; }
-        public int expires_in { get; set; }
-    }
+
     /// <summary>
     /// 微信获取用户信息
     /// </summary>
@@ -76,6 +75,7 @@ namespace ApiProxyTest
         [CRL.Core.ApiProxy.Method(Path = "cgi-bin/user/info", Method = CRL.Core.ApiProxy.HttpMethod.GET)]
         Task<userInfo> info(string access_token, string openid, string lang = "zh_CN");
     }
+    #region obj
     public class userInfo
     {
         public string errcode { get; set; }
@@ -99,4 +99,5 @@ namespace ApiProxyTest
 
         public userInfo uArgs { get; set; }
     }
+    #endregion
 }

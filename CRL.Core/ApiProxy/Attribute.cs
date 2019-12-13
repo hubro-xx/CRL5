@@ -26,6 +26,13 @@ namespace CRL.Core.ApiProxy
         {
             get; set;
         }
+        /// <summary>
+        /// 网关服务前辍
+        /// </summary>
+        public string GatewayPrefix
+        {
+            get; set;
+        }
     }
 
     /// <summary>
@@ -65,7 +72,7 @@ namespace CRL.Core.ApiProxy
     }
     public enum HttpMethod
     {
-        POST,GET
+        POST,GET,PUT
     }
     public enum ContentType
     {

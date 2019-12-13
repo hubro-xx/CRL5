@@ -192,60 +192,32 @@ namespace CRLTest
 
         static void consulTest()
         {
-            var client = new CRL.Core.ConsulClient.Consul("http://118.190.157.156:8500");
+            var client = new CRL.Core.ConsulClient.Consul("http://localhost:8500");
             var info = new CRL.Core.ConsulClient.ServiceRegistrationInfo
             {
-                Address = "http://47.105.88.113",
+                Address = "http://192.168.0.1",
                 Name = "payService",
                 ID = "payService1",
                 Port = 802,
                 Tags = new[] { "v1" },
                 Check = new CRL.Core.ConsulClient.CheckRegistrationInfo()
                 {
-                    HTTP = "http://pay.gsp2013.com/",
+                    HTTP = "http://192.168.0.1",
                     Interval = "10s",
                     DeregisterCriticalServiceAfter = "90m"
                 }
             };
-            var info2 = new CRL.Core.ConsulClient.ServiceRegistrationInfo
-            {
-                Address = "http://47.105.88.113",
-                Name = "payService",
-                ID = "payService2",
-                Port = 802,
-                Tags = new[] { "v1" },
-                Check = new CRL.Core.ConsulClient.CheckRegistrationInfo()
-                {
-                    HTTP = "http://pay.gsp2013.com/",
-                    Interval = "10s",
-                    DeregisterCriticalServiceAfter = "90m"
-                }
-            };
+            
             var a=client.RegisterService(info);
-            //a = client.RegisterService(info2);
+    
             Console.WriteLine($"注册{info.Name} {a}");
             Console.ReadLine();
 
             var services = client.GetServiceInfo(info.Name);
             a = client.DeregisterService(info.ID);
-            //a = client.DeregisterService(info2.ID);
+
             Console.WriteLine($"卸载{info.Name} {a}");
             //Console.ReadLine();
-        }
-        static void test23()
-        {
-            using (var consul = new Consul.ConsulClient(c =>
-            {
-                c.Address = new Uri("http://127.0.0.1:8500");
-            }))
-            {
-                //取在Consul注册的全部服务
-                var services = consul.Agent.Services().Result.Response;
-                foreach (var s in services.Values)
-                {
-                    Console.WriteLine($"ID={s.ID},Service={s.Service},Addr={s.Address},Port={s.Port}");
-                }
-            }
         }
     }
 }

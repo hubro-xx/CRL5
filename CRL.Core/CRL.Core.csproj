@@ -69,6 +69,7 @@
     <Compile Include="ConsulClient\Check.cs" />
     <Compile Include="ConsulClient\CheckRegistrationInfo.cs" />
     <Compile Include="ConsulClient\Consul.cs" />
+    <Compile Include="ConsulClient\ConsulGateway.cs" />
     <Compile Include="ConsulClient\ServiceInfo.cs" />
     <Compile Include="ConsulClient\ServiceCheckStatus.cs" />
     <Compile Include="ConsulClient\ServiceRegistrationInfo.cs" />

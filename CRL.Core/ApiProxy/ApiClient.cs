@@ -35,12 +35,17 @@ namespace CRL.Core.ApiProxy
             var returnType = method.MethodInfo.ReturnType;
             var contentType = ContentType.JSON;
             var serviceName = serviceInfo.ServiceType.Name;
+            var hostAddress = HostAddress;
             if (serviceAttribute != null && serviceAttribute.ContentType != ContentType.NONE)
             {
                 contentType = serviceAttribute.ContentType;
                 if(!string.IsNullOrEmpty(serviceAttribute.Name))
                 {
                     serviceName = serviceAttribute.Name;
+                }
+                if (!string.IsNullOrEmpty(serviceAttribute.GatewayPrefix))
+                {
+                    hostAddress.serviceNamePrefix = serviceAttribute.GatewayPrefix;
                 }
             }
             var apiClientConnect = clientConnect as ApiClientConnect;
@@ -69,7 +74,7 @@ namespace CRL.Core.ApiProxy
                 }
             }
 
-            var url = HostAddress + requestPath;
+            var url = hostAddress.GetHttpAddress() + requestPath;
             var request = new ImitateWebRequest(ServiceName, apiClientConnect.Encoding);
             request.ContentType = ContentTypeDic[contentType];
             string result;
@@ -115,7 +120,7 @@ namespace CRL.Core.ApiProxy
                 throw new Exception("设置请求头信息时发生错误:" + ero.Message);
             }
 
-            if (httpMethod == HttpMethod.POST)
+            if (httpMethod == HttpMethod.POST || httpMethod == HttpMethod.PUT)
             {
                 string data = "";
                 if (firstArgs != null)
@@ -137,7 +142,7 @@ namespace CRL.Core.ApiProxy
                         data = firstArgs.ToString();
                     }
                 }
-                result = request.Post(url, data);
+                result = request.SendData(url, httpMethod.ToString(), data, out string nowUrl);
             }
             else
             {
@@ -208,7 +213,12 @@ namespace CRL.Core.ApiProxy
             }
             catch (Exception ero)
             {
-                ThrowError(ero.Message, "500");
+                var msg = ero.Message;
+                if(ero is RequestException)
+                {
+                    msg = (ero as RequestException).ToString();
+                }
+                ThrowError(msg, "500");
             }
             if (returnType == typeof(void))
             {

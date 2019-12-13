@@ -1,31 +1,27 @@
-﻿using Newtonsoft.Json;
+﻿using CRL.Core.Extension;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using CRL.Core.Extension;
+
 namespace CRL.Core.ConsulClient
 {
-    public class Consul
+    public class ConsulGateway
     {
         private static Random rng = new Random();
         public string ConsulHost { get; } = "127.0.0.1";
         //public int ConsulHttpPort { get; } = 8500;
-        protected readonly Request.ImitateWebRequest request = new Request.ImitateWebRequest("ConsulClient");
+        protected readonly Request.ImitateWebRequest request = new Request.ImitateWebRequest("ConsulGateway");
         protected static readonly JsonSerializer Serializer = JsonSerializer.CreateDefault();
         protected static readonly MediaTypeHeaderValue MediaJson = new MediaTypeHeaderValue("application/json");
 
-        public Consul(string host)
+        public ConsulGateway(string host)
         {
             ConsulHost = host;
             request.ContentType = "application/json";
-            //Client.BaseAddress = new Uri($"http://{ConsulHost}:{ConsulHttpPort}");
-            //Client.DefaultRequestHeaders.Accept.Clear();
-            //Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         private bool PutJson(string path, object obj)
@@ -41,12 +37,12 @@ namespace CRL.Core.ConsulClient
             {
                 service.Address = service.Address.Replace("http://", "");
             }
-            return PutJson("/v1/agent/service/register", service);
+            return PutJson("/consul/RegisterService", service);
         }
 
         public bool DeregisterService(string serviceId)
         {
-            var url = $"/v1/agent/service/deregister/{serviceId}";
+            var url = $"/consul/DeregisterService/{serviceId}";
             return PutJson(url, null);
         }
         /// <summary>
@@ -55,14 +51,14 @@ namespace CRL.Core.ConsulClient
         /// <returns></returns>
         public Dictionary<string, ServiceInfo> GetAllServices()
         {
-            var url = $"{ConsulHost}/v1/agent/services";
+            var url = $"{ConsulHost}/consul/GetAllServices";
             try
             {
                 var result = request.Get(url);
                 var services = result.ToObject<Dictionary<string, ServiceInfo>>();
                 return services;
             }
-            catch(Exception ero)
+            catch (Exception ero)
             {
                 throw new Exception($"无法获取consul服务注册,{ero}");
             }
@@ -79,9 +75,9 @@ namespace CRL.Core.ConsulClient
             if (minute > 0)
             {
                 all = DelegateCache.Init("consulServiceCache", minute, () =>
-                 {
-                     return GetAllServices();
-                 });
+                {
+                    return GetAllServices();
+                });
             }
             else
             {

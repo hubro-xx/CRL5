@@ -12,12 +12,31 @@ namespace CRL.Core.Remoting
     {
         public string address;
         public int port;
-        public override string ToString()
+        public string serviceNamePrefix;
+        /// <summary>
+        /// 返回带HTTP的格式
+        /// </summary>
+        /// <returns></returns>
+        public string GetHttpAddress()
         {
-            var str = address;
+            var str = address + "/";
+            if (str.EndsWith("/"))
+            {
+                str = str.TrimEnd('/');
+            }
+            if (!str.StartsWith("http"))
+            {
+                str = $"http://{str}";
+            }
             if (port > 0)
             {
                 str += $":{port}";
+            }
+            if (!string.IsNullOrEmpty(serviceNamePrefix))
+            {
+                serviceNamePrefix = serviceNamePrefix.TrimStart('/');
+                serviceNamePrefix = serviceNamePrefix.TrimEnd('/');
+                str += $"/{serviceNamePrefix}";
             }
             return str;
         }
@@ -32,7 +51,12 @@ namespace CRL.Core.Remoting
                 //获取consol服务发现
                 if (clientConnect.__GetConsulAgent != null)
                 {
-                    return clientConnect.__GetConsulAgent();
+                    var address = clientConnect.__GetConsulAgent();
+                    if (!string.IsNullOrEmpty(hostAddress.serviceNamePrefix))
+                    {
+                        address.serviceNamePrefix = hostAddress.serviceNamePrefix;
+                    }
+                    return address;
                 }
                 return hostAddress;
             }

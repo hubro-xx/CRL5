@@ -33,6 +33,7 @@ namespace CRL.WebSocket
         }
         public override T GetClient<T>()
         {
+            var type = typeof(T);
             var serviceName = typeof(T).Name;
             var key = string.Format("{0}_{1}", host, serviceName);
             var a = _services.TryGetValue(key, out object instance);
@@ -40,11 +41,11 @@ namespace CRL.WebSocket
             {
                 return instance as T;
             }
+            var info = serviceInfo.GetServiceInfo(type);
             var client = new WebSocketClient(this)
             {
-                HostAddress = host,
-                ServiceType = typeof(T),
-                ServiceName = serviceName,
+                HostAddress = new HostAddress() { address=host},
+                serviceInfo = info,
             };
             //创建代理
             instance = client.ActLike<T>();

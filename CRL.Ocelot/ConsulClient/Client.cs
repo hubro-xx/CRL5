@@ -1,53 +1,64 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using CRL.Core.Extension;
+
 namespace CRL.Core.ConsulClient
 {
-    public class Consul
+    public class Client:IDisposable
     {
         private static Random rng = new Random();
         public string ConsulHost { get; } = "127.0.0.1";
-        //public int ConsulHttpPort { get; } = 8500;
-        protected readonly Request.ImitateWebRequest request = new Request.ImitateWebRequest("ConsulClient");
-        protected static readonly JsonSerializer Serializer = JsonSerializer.CreateDefault();
+        public IConfiguration Configuration { get; }
         protected static readonly MediaTypeHeaderValue MediaJson = new MediaTypeHeaderValue("application/json");
-
-        public Consul(string host)
+        protected readonly HttpClient httpClient = new HttpClient();
+        public Client(IConfiguration configuration)
         {
+            Configuration = configuration;
+            var host = $"http://{configuration.GetSection("GlobalConfiguration:ServiceDiscoveryProvider:Host")?.Value}:{configuration.GetSection("GlobalConfiguration:ServiceDiscoveryProvider:Port")?.Value}";
             ConsulHost = host;
-            request.ContentType = "application/json";
-            //Client.BaseAddress = new Uri($"http://{ConsulHost}:{ConsulHttpPort}");
-            //Client.DefaultRequestHeaders.Accept.Clear();
-            //Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.BaseAddress = new Uri(host);
+            httpClient.DefaultRequestHeaders.Accept.Clear();
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+        private async Task<bool> HandleResponse(Task<HttpResponseMessage> responseTask)
+        {
+            var response = await responseTask;
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return true;
+            }
+
+            var responseText = await response.Content.ReadAsStringAsync();
+            //Log.Warn($"{response.RequestMessage.RequestUri} => {response.RequestMessage.Method} failed : ({(int)response.StatusCode}) {responseText}");
+            return false;
         }
 
-        private bool PutJson(string path, object obj)
+        private async Task<bool> PutJson(string path, object obj)
         {
-            var url = $"{ConsulHost}{path}";
-            var json = obj.ToJson();
-            var result = request.Put(url, json);
-            return true;
+            var content = new StringContent(JsonSerializer.Serialize(obj));
+            content.Headers.ContentType = MediaJson;
+            return await HandleResponse(httpClient.PutAsync(path, content));
+
         }
-        public bool RegisterService(ServiceRegistrationInfo service)
+        public async Task<bool> RegisterService(ServiceRegistrationInfo service)
         {
             if (service.Address.Contains("http"))
             {
                 service.Address = service.Address.Replace("http://", "");
             }
-            return PutJson("/v1/agent/service/register", service);
+            return await PutJson("/v1/agent/service/register", service);
         }
 
-        public bool DeregisterService(string serviceId)
+        public async Task<bool> DeregisterService(string serviceId)
         {
             var url = $"/v1/agent/service/deregister/{serviceId}";
-            return PutJson(url, null);
+            return await PutJson(url, null);
         }
         /// <summary>
         /// 获取所有服务
@@ -58,11 +69,11 @@ namespace CRL.Core.ConsulClient
             var url = $"{ConsulHost}/v1/agent/services";
             try
             {
-                var result = request.Get(url);
-                var services = result.ToObject<Dictionary<string, ServiceInfo>>();
+                var result = httpClient.GetStringAsync(url).Result;
+                var services =JsonSerializer.Deserialize<Dictionary<string, ServiceInfo>>(result);
                 return services;
             }
-            catch(Exception ero)
+            catch (Exception ero)
             {
                 throw new Exception($"无法获取consul服务注册,{ero}");
             }
@@ -79,9 +90,9 @@ namespace CRL.Core.ConsulClient
             if (minute > 0)
             {
                 all = DelegateCache.Init("consulServiceCache", minute, () =>
-                 {
-                     return GetAllServices();
-                 });
+                {
+                    return GetAllServices();
+                });
             }
             else
             {
@@ -106,6 +117,11 @@ namespace CRL.Core.ConsulClient
                 list[k] = list[n];
                 list[n] = value;
             }
+        }
+
+        public void Dispose()
+        {
+            httpClient.Dispose();
         }
     }
 }

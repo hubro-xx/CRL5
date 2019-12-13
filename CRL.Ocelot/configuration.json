@@ -1,0 +1,24 @@
+{
+  "ReRoutes": [
+    // API01:CAS.ClientService
+    {
+      "UseServiceDiscovery": true, // use Consul service discovery
+      "DownstreamPathTemplate": "/home/{url}",
+      "DownstreamScheme": "http",
+      "ServiceName": "DataTransfer.Supplier.Receive.Api",
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+      "UpstreamPathTemplate": "/clientservice/{url}",
+      "UpstreamHttpMethod": [ "Get", "Post" ],
+      "ReRoutesCaseSensitive": false // non case sensitive
+    }
+  ],
+  "GlobalConfiguration": {
+    //"BaseUrl": "https://api.mybusiness.com"
+    "ServiceDiscoveryProvider": {
+      "Host": "118.190.157.156", // Consul Service IP
+      "Port": 8500 // Consul Service Port
+    }
+  }
+}

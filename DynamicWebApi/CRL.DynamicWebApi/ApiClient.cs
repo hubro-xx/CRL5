@@ -19,7 +19,9 @@ namespace CRL.DynamicWebApi
         }
         ResponseJsonMessage SendRequest(ParameterInfo[] argsName, RequestJsonMessage msg)
         {
-            var url = HostAddress + $"/DynamicApi/{msg.Service}/{msg.Method}";
+            var hostAddress = HostAddress;
+            //hostAddress.serviceNamePrefix = "";//todo
+            var url = hostAddress.GetHttpAddress() + $"/DynamicApi/{msg.Service}/{msg.Method}";
             var request = new ImitateWebRequest(HostAddress.address, Encoding.UTF8);
             request.ContentType = "application/json";
             var token = clientConnect.Token;

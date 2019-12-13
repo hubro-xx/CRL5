@@ -33,50 +33,50 @@ namespace CRL.Core
             System.Runtime.Remoting.Messaging.CallContext.SetData(contextName, data);
         }
     }
-    /// <summary>
-    /// 自定义CallContext
-    /// </summary>
-    public class CallContext2
-    {
-        static System.Collections.Concurrent.ConcurrentDictionary<string, callContextData> caches = new System.Collections.Concurrent.ConcurrentDictionary<string, callContextData>();
-        static ThreadWork work = null;
-        public static T GetData<T>(string contextName)
-        {
-            var threadId = System.Threading.Thread.CurrentThread.ExecutionContext.GetHashCode();
-            var key = $"{contextName}_{threadId}";
-            var a = caches.TryGetValue(key, out callContextData v);
-            if (a)
-            {
-                return (T)v.data;
-            }
-            return default(T);
-        }
-        public static void SetData(string contextName, object data)
-        {
-            var threadId = System.Threading.Thread.CurrentThread.ExecutionContext.GetHashCode();
-            var key = $"{contextName}_{threadId}";
-            caches.TryRemove(key, out callContextData v);
-            caches.TryAdd(key, new callContextData() { key = key, time = DateTime.Now, data = data });
-            if (work == null)
-            {
-                work = new ThreadWork();
-                work.Start("removeCallContext", () =>
-                 {
-                     var time = DateTime.Now.AddSeconds(-10);
-                     var find = caches.Values.ToList().FindAll(b => b.time < time);
-                     foreach (var item in find)
-                     {
-                         caches.TryRemove(item.key, out callContextData d);
-                     }
-                     return true;
-                 }, 4);
-            }
-        }
-        class callContextData
-        {
-            public string key;
-            public object data;
-            public DateTime time;
-        }
-    }
+    ///// <summary>
+    ///// 自定义CallContext
+    ///// </summary>
+    //public class CallContext2
+    //{
+    //    static System.Collections.Concurrent.ConcurrentDictionary<string, callContextData> caches = new System.Collections.Concurrent.ConcurrentDictionary<string, callContextData>();
+    //    static ThreadWork work = null;
+    //    public static T GetData<T>(string contextName)
+    //    {
+    //        var threadId = System.Threading.Thread.CurrentThread.ExecutionContext.GetHashCode();
+    //        var key = $"{contextName}_{threadId}";
+    //        var a = caches.TryGetValue(key, out callContextData v);
+    //        if (a)
+    //        {
+    //            return (T)v.data;
+    //        }
+    //        return default(T);
+    //    }
+    //    public static void SetData(string contextName, object data)
+    //    {
+    //        var threadId = System.Threading.Thread.CurrentThread.ExecutionContext.GetHashCode();
+    //        var key = $"{contextName}_{threadId}";
+    //        caches.TryRemove(key, out callContextData v);
+    //        caches.TryAdd(key, new callContextData() { key = key, time = DateTime.Now, data = data });
+    //        if (work == null)
+    //        {
+    //            work = new ThreadWork();
+    //            work.Start("removeCallContext", () =>
+    //             {
+    //                 var time = DateTime.Now.AddSeconds(-10);
+    //                 var find = caches.Values.ToList().FindAll(b => b.time < time);
+    //                 foreach (var item in find)
+    //                 {
+    //                     caches.TryRemove(item.key, out callContextData d);
+    //                 }
+    //                 return true;
+    //             }, 4);
+    //        }
+    //    }
+    //    class callContextData
+    //    {
+    //        public string key;
+    //        public object data;
+    //        public DateTime time;
+    //    }
+    //}
 }

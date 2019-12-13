@@ -251,7 +251,7 @@ namespace CRL.Core.Request
         /// <param name="data"></param>
         /// <param name="now_url"></param>
         /// <returns></returns>
-        string SendData(string url,string method, string data, out string now_url)
+        public string SendData(string url,string method, string data, out string now_url)
         {
             string str = "";
             HttpWebResponse response;
@@ -264,11 +264,18 @@ namespace CRL.Core.Request
             catch (WebException ex)
             {
                 response = (HttpWebResponse)ex.Response;
-                using (StreamReader requestReader = new StreamReader(response.GetResponseStream(), ResponseEncoding))
+                if (ContentType == "application/json")
                 {
-                    str = requestReader.ReadToEnd();
+                    using (StreamReader requestReader = new StreamReader(response.GetResponseStream(), ResponseEncoding))
+                    {
+                        str = requestReader.ReadToEnd();
+                    }
                 }
-                response.Close();
+                else
+                {
+                    str = ex.Message;
+                }
+                response?.Close();
                 request?.Abort();
                 throw new RequestException(url, data, str);
             }
@@ -462,7 +469,7 @@ namespace CRL.Core.Request
         }
         public override string ToString()
         {
-            return $"发送请求时失败,在URL:{Url} {Message}";
+            return $"发送请求时失败,{Message} 在URL:{Url}";
         }
     }
 }
