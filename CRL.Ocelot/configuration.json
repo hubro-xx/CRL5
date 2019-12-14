@@ -5,7 +5,7 @@
       "UseServiceDiscovery": true, // use Consul service discovery
       "DownstreamPathTemplate": "/home/{url}",
       "DownstreamScheme": "http",
-      "ServiceName": "DataTransfer.Supplier.Receive.Api",
+      "ServiceName": "service1",
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
       },
@@ -17,7 +17,7 @@
   "GlobalConfiguration": {
     //"BaseUrl": "https://api.mybusiness.com"
     "ServiceDiscoveryProvider": {
-      "Host": "118.190.157.156", // Consul Service IP
+      "Host": "127.0.0.1", // Consul Service IP
       "Port": 8500 // Consul Service Port
     }
   }

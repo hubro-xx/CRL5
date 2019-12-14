@@ -16,8 +16,8 @@ namespace ApiProxyTest
         {
             clientConnect = new CRL.Core.ApiProxy.ApiClientConnect("https://api.weixin.qq.com");
 
-            clientConnect.UseConsulDiscover("http://127.0.0.1:8500", "serviceName");//使用consul发现服务
-            //clientConnect.UseConsulApiGateway("http://127.0.0.1:3400");//直接使用ocelot网关
+            //clientConnect.UseConsulDiscover("http://127.0.0.1:8500", "serviceName");//使用consul发现服务
+            clientConnect.UseConsulApiGateway("http://127.0.0.1:3400");//直接使用ocelot网关
             //clientConnect.UseConsulApiGatewayDiscover("http://127.0.0.1:3400", "serviceName");//使用ocelot网关发现服务
 
             clientConnect.UseBeforRequest((request, members, url) =>
@@ -26,7 +26,7 @@ namespace ApiProxyTest
                 request.SetHead("token", "test");
             });
             //https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
-            var client = clientConnect.GetClient<IToken>("clientservice");
+            var client = clientConnect.GetClient<IToken>();
             client.Test(new args()
             {
                 name = "args",
@@ -57,7 +57,7 @@ namespace ApiProxyTest
     /// <summary>
     /// 微信获取token
     /// </summary>
-    [CRL.Core.ApiProxy.Service(ContentType = CRL.Core.ApiProxy.ContentType.JSON)]
+    [CRL.Core.ApiProxy.Service(ContentType = CRL.Core.ApiProxy.ContentType.JSON, GatewayPrefix = "clientservice")]
     public interface IToken
     {
         [CRL.Core.ApiProxy.Method(Path = "cgi-bin/token", Method = CRL.Core.ApiProxy.HttpMethod.GET)]
