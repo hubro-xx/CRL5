@@ -20,8 +20,16 @@ namespace CRL.DynamicWebApi
         ResponseJsonMessage SendRequest(ParameterInfo[] argsName, RequestJsonMessage msg)
         {
             var hostAddress = HostAddress;
-            //hostAddress.serviceNamePrefix = "";//todo
-            var url = hostAddress.GetHttpAddress() + $"/DynamicApi/{msg.Service}/{msg.Method}";
+            string url;
+            if(!string.IsNullOrEmpty(hostAddress.serviceNamePrefix))
+            {
+                url = hostAddress.GetHttpAddress() + $"/{msg.Service}/{msg.Method}";
+            }
+            else
+            {
+                url = hostAddress.GetHttpAddress() + $"/DynamicApi/{msg.Service}/{msg.Method}";
+            }
+ 
             var request = new ImitateWebRequest(HostAddress.address, Encoding.UTF8);
             request.ContentType = "application/json";
             var token = clientConnect.Token;

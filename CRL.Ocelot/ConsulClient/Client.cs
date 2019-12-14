@@ -78,46 +78,6 @@ namespace CRL.Core.ConsulClient
                 throw new Exception($"无法获取consul服务注册,{ero}");
             }
         }
-        /// <summary>
-        /// 按服务名称,随机返回一个服务地址
-        /// </summary>
-        /// <param name="serviceName"></param>
-        /// <param name="minute"></param>
-        /// <returns></returns>
-        public ServiceInfo GetServiceInfo(string serviceName, double minute = 0)
-        {
-            Dictionary<string, ServiceInfo> all;
-            if (minute > 0)
-            {
-                all = DelegateCache.Init("consulServiceCache", minute, () =>
-                {
-                    return GetAllServices();
-                });
-            }
-            else
-            {
-                all = GetAllServices();
-            }
-            var services = all.Values.Where(b => b.Service == serviceName).ToList();
-            if (services.Count == 0)
-            {
-                throw new Exception($"找不到可用的服务:{serviceName}");
-            }
-            int k = rng.Next(services.Count);
-            return services[k];
-        }
-        public static void Shuffle<T>(IList<T> list)
-        {
-            int n = list.Count;
-            while (n > 1)
-            {
-                n--;
-                int k = rng.Next(n + 1);
-                T value = list[k];
-                list[k] = list[n];
-                list[n] = value;
-            }
-        }
 
         public void Dispose()
         {

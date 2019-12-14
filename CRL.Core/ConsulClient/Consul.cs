@@ -18,11 +18,12 @@ namespace CRL.Core.ConsulClient
         protected readonly Request.ImitateWebRequest request = new Request.ImitateWebRequest("ConsulClient");
         protected static readonly JsonSerializer Serializer = JsonSerializer.CreateDefault();
         protected static readonly MediaTypeHeaderValue MediaJson = new MediaTypeHeaderValue("application/json");
-
-        public Consul(string host)
+        bool _ocelotGateway;
+        public Consul(string host, bool ocelotGateway = false)
         {
             ConsulHost = host;
             request.ContentType = "application/json";
+            _ocelotGateway = ocelotGateway;
             //Client.BaseAddress = new Uri($"http://{ConsulHost}:{ConsulHttpPort}");
             //Client.DefaultRequestHeaders.Accept.Clear();
             //Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -41,13 +42,15 @@ namespace CRL.Core.ConsulClient
             {
                 service.Address = service.Address.Replace("http://", "");
             }
-            return PutJson("/v1/agent/service/register", service);
+            var path = _ocelotGateway ? "/consul/RegisterService" : "/v1/agent/service/register";
+            return PutJson(path, service);
         }
 
         public bool DeregisterService(string serviceId)
         {
+            var path = _ocelotGateway ? $"/consul/DeregisterService?serviceId={serviceId}" : $"/v1/agent/service/deregister/{serviceId}";
             var url = $"/v1/agent/service/deregister/{serviceId}";
-            return PutJson(url, null);
+            return PutJson(path, null);
         }
         /// <summary>
         /// 获取所有服务
@@ -55,7 +58,9 @@ namespace CRL.Core.ConsulClient
         /// <returns></returns>
         public Dictionary<string, ServiceInfo> GetAllServices()
         {
-            var url = $"{ConsulHost}/v1/agent/services";
+            var url = _ocelotGateway ? $"{ConsulHost}/consul/GetAllServices" : $"{ConsulHost}/v1/agent/services";
+
+            //var url = $"{ConsulHost}/v1/agent/services";
             try
             {
                 var result = request.Get(url);
