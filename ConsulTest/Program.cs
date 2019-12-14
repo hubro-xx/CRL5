@@ -12,13 +12,15 @@ namespace ConsulTest
     {
         static void Main(string[] args)
         {
+            //1.启动consol
+            //2.启动CRL.Ocelot,配置见configuration.json
             var server = new ServerCreater().CreatetApi();
             server.Register<ITestService, TestService>();
             var listener = new ServerListener();
             listener.Start("http://localhost:809/");//启用apiService1
             //注册服务
-            //var consulClient = new CRL.Core.ConsulClient.Consul("http://localhost:8500");
-            var consulClient = new CRL.Core.ConsulClient.Consul("http://localhost:3400", true);
+            var consulClient = new CRL.Core.ConsulClient.Consul("http://localhost:8500");
+            consulClient.UseOcelotGatewayDiscover("http://localhost:3400"); //使用网关服务发现
             var info = new CRL.Core.ConsulClient.ServiceRegistrationInfo
             {
                 Address = "localhost",
@@ -29,21 +31,21 @@ namespace ConsulTest
             };
             consulClient.DeregisterService(info.ID);
             var a = consulClient.RegisterService(info);//注册apiService1
-            var clientConnect = new CRL.DynamicWebApi.ApiClientConnect("");
+            var clientConnect = new ApiClientConnect("");
             clientConnect.UseConsulApiGatewayDiscover("http://localhost:3400", "apiService1");//服务发现
 
-            var clientConnect2 = new CRL.DynamicWebApi.ApiClientConnect("");
+            var clientConnect2 = new ApiClientConnect("");
             clientConnect2.UseConsulApiGateway("http://localhost:3400");//直接使用网关
 
         label1:
 
             var service1 = clientConnect.GetClient<ITestService>();
-            service1.Login();
-            Console.WriteLine("服务发现调用成功");
+            var msg = service1.Login();
+            Console.WriteLine("服务发现调用成功:" + msg);
 
             var service2 = clientConnect2.GetClient<ITestService>("serviceTest");
-            service2.Login();
-            Console.WriteLine("服务网关调用成功");
+            msg = service2.Login();
+            Console.WriteLine("服务网关调用成功:" + msg);
 
             Console.ReadLine();
 

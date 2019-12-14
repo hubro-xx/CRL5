@@ -13,20 +13,25 @@ namespace CRL.Core.ConsulClient
     public class Consul
     {
         private static Random rng = new Random();
-        public string ConsulHost { get; } = "127.0.0.1";
+        public string ConsulHost = "127.0.0.1";
         //public int ConsulHttpPort { get; } = 8500;
         protected readonly Request.ImitateWebRequest request = new Request.ImitateWebRequest("ConsulClient");
         protected static readonly JsonSerializer Serializer = JsonSerializer.CreateDefault();
         protected static readonly MediaTypeHeaderValue MediaJson = new MediaTypeHeaderValue("application/json");
         bool _ocelotGateway;
-        public Consul(string host, bool ocelotGateway = false)
+        public Consul(string host)
         {
             ConsulHost = host;
             request.ContentType = "application/json";
-            _ocelotGateway = ocelotGateway;
-            //Client.BaseAddress = new Uri($"http://{ConsulHost}:{ConsulHttpPort}");
-            //Client.DefaultRequestHeaders.Accept.Clear();
-            //Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+        /// <summary>
+        /// 使用ocelot服务发现
+        /// </summary>
+        /// <param name="gatewayHost"></param>
+        public void UseOcelotGatewayDiscover(string gatewayHost)
+        {
+            ConsulHost = gatewayHost;
+            _ocelotGateway = true;
         }
 
         private bool PutJson(string path, object obj)

@@ -13,16 +13,17 @@ namespace CRL.Core.Remoting
     }
     public interface ITestService
     {
-        void Login();
+        string Login();
         bool Test1(int a,int? b,out string error);
         TestObj Test2(TestObj obj);
     }
     public class TestService : AbsService, ITestService
     {
         [LoginPoint]
-        public void Login()
+        public string Login()
         {
             SaveSession("hubro", "7777777777", "test");
+            return "登录成功";
         }
 
         public bool Test1(int a, int? b, out string error)
