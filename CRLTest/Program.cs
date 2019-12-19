@@ -59,7 +59,7 @@ namespace CRLTest
             
  
             var configBuilder = new CRL.Core.ConfigBuilder();
-            configBuilder.UseRedis("passs@127.0.0.0:27017")
+            configBuilder.UseRedis("Server_204@127.0.0.1:6389")
                 .UseRedisSession();
             //自定义定位
             CRL.Sharding.LocationManage.Register<Code.Sharding.MemberSharding>((t, a) =>
@@ -73,30 +73,37 @@ namespace CRLTest
                 //返回定位库和表名
                 return new CRL.Sharding.Location("testdb", tableName);
             });
-            CRL.SettingConfig.GetDbAccess = (dbLocation) =>
+            CRL.SettingConfig.RegisterDBAccessBuild(dbLocation=>
             {
-                if(dbLocation.ManageName=="mongo")
+                if (dbLocation.ManageName == "mongo")
                 {
                     var conn = CRL.Core.CustomSetting.GetConfigKey("mongodb");
                     return new CRL.DBAccessBuild(DBType.MongoDB, conn);
 
                 }
+                return null;
+            });
+            CRL.SettingConfig.RegisterDBAccessBuild(dbLocation =>
+            {
                 //定位库
                 if (dbLocation.ShardingLocation != null)
                 {
                     return new CRL.DBAccessBuild(DBType.MSSQL, "Data Source=.;Initial Catalog=" + dbLocation.ShardingLocation.DataBaseName + ";User ID=sa;Password=123");
                 }
                 return new CRL.DBAccessBuild(DBType.MSSQL, "server=.;database=testDb; uid=sa;pwd=123;");
-            };
+            });
 
 
             //Code.MemberManage.Instance.QueryItem(1);
             //Code.OrderManage.Instance.QueryItem(1);
             //Code.ProductDataManage.Instance.QueryItem(1);
             string str = "111";
+            var client = new CRL.Core.RedisProvider.RedisClient(4);
 
         label1:
-            consulTest();
+            var token = "12312222";
+            client.KSet("keyTest", token, TimeSpan.FromMinutes(1000));
+            var value = client.KGet("keyTest");
             Console.ReadLine();
             goto label1;
             Console.ReadLine();
@@ -188,36 +195,6 @@ namespace CRLTest
                 }
                 return true;
             }, 0.3);
-        }
-
-        static void consulTest()
-        {
-            var client = new CRL.Core.ConsulClient.Consul("http://localhost:8500");
-            var info = new CRL.Core.ConsulClient.ServiceRegistrationInfo
-            {
-                Address = "http://192.168.0.1",
-                Name = "payService",
-                ID = "payService1",
-                Port = 802,
-                Tags = new[] { "v1" },
-                Check = new CRL.Core.ConsulClient.CheckRegistrationInfo()
-                {
-                    HTTP = "http://192.168.0.1",
-                    Interval = "10s",
-                    DeregisterCriticalServiceAfter = "90m"
-                }
-            };
-            
-            var a=client.RegisterService(info);
-    
-            Console.WriteLine($"注册{info.Name} {a}");
-            Console.ReadLine();
-
-            var services = client.GetServiceInfo(info.Name);
-            a = client.DeregisterService(info.ID);
-
-            Console.WriteLine($"卸载{info.Name} {a}");
-            //Console.ReadLine();
         }
     }
 }

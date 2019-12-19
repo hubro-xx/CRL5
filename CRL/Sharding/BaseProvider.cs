@@ -40,12 +40,12 @@ namespace CRL.Sharding
         }
         internal override DbContext GetDbContext()
         {
-            if (SettingConfig.GetDbAccess == null)
+            if (SettingConfig.DbAccessCreaterCache.Count == 0)
             {
                 throw new CRLException("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
             }
             dbLocation.ManageName = ManageName;
-            var helper = SettingConfig.GetDbAccess(dbLocation).GetDBHelper();
+            var helper = SettingConfig.GetDBAccessBuild(dbLocation).GetDBHelper();
             var dbContext = new DbContext(helper, dbLocation);
 
             dbContext.UseSharding = true;

@@ -43,7 +43,7 @@ namespace ConsulTest
             var msg = service1.Login();
             Console.WriteLine("服务发现调用成功:" + msg);
 
-            var service2 = clientConnect2.GetClient<ITestService>("serviceTest");
+            var service2 = clientConnect2.GetClient<ITestService>("serviceTest");//传入网关调用前辍
             msg = service2.Login();
             Console.WriteLine("服务网关调用成功:" + msg);
 

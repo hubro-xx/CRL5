@@ -39,6 +39,11 @@ namespace CRL.Core.Remoting
         /// 是否使用网关
         /// </summary>
         internal bool __UseGateway;
+        [Obsolete("使用UseConsulDiscover")]
+        public void UseConsulAgent(string consulUrl, string serviceName, double cacheMinute = 0.5)
+        {
+            UseConsulDiscover(consulUrl, serviceName, cacheMinute);
+        }
         /// <summary>
         /// 使用consul服务发现
         /// </summary>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Consul;
 using CRL.Core.ConsulClient;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,6 +15,7 @@ namespace CRL.Ocelot.Controllers
 {
     [Produces("application/json")]
     [Route("[controller]/[action]")]
+    //[Authorize()]
     public class ConsulController : ControllerBase
     {
         private readonly Client _client;

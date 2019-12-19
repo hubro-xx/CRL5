@@ -44,7 +44,7 @@ namespace CRL
         static DbContext getDbContext<T>(string manageName)
         {
             var dbLocation = new CRL.DBLocation() { DataAccessType = DataAccessType.Default, ManageType = typeof(T), ManageName = manageName };
-            var helper = SettingConfig.GetDbAccess(dbLocation).GetDBHelper();
+            var helper = SettingConfig.GetDBAccessBuild(dbLocation).GetDBHelper();
             var dbContext = new DbContext(helper, dbLocation);
             return dbContext;
         }

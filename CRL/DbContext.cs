@@ -55,7 +55,7 @@ namespace CRL
         internal DBHelper GetDBHelper(DataAccessType accessType = DataAccessType.Default)
         {
             DBLocation.DataAccessType = accessType;
-            var helper = SettingConfig.GetDbAccess(DBLocation).GetDBHelper();
+            var helper = SettingConfig.GetDBAccessBuild(DBLocation).GetDBHelper();
             return helper;
         }
     }

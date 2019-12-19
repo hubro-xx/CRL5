@@ -37,7 +37,7 @@ namespace CRL.Core.RedisProvider
         }
         public T KGet<T>(string key, out bool find)
         {
-            var str = KGet(key, out find);
+            var str = KGetString(key, out find);
             if (find)
             {
                 return SerializeHelper.DeserializeFromJson<T>(str);
@@ -47,7 +47,7 @@ namespace CRL.Core.RedisProvider
         public string KGet(string key)
         {
             bool find;
-            return KGet(key, out find);
+            return KGet<string>(key, out find);
         }
         /// <summary>
         /// 读取Key/Value值
@@ -55,7 +55,7 @@ namespace CRL.Core.RedisProvider
         /// <typeparam name="T"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
-        public string KGet(string key, out bool find)
+        string KGetString(string key, out bool find)
         {
             find = false;
             var str = new StackExchangeRedisHelper(_id).Get(key);

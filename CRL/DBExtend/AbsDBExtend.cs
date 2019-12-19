@@ -108,7 +108,7 @@ namespace CRL
         }
         internal AbsDBExtend copyDBExtend()
         {
-            var helper = SettingConfig.GetDbAccess(dbContext.DBLocation).GetDBHelper();
+            var helper = SettingConfig.GetDBAccessBuild(dbContext.DBLocation).GetDBHelper();
             var dbContext2 = new DbContext(helper, dbContext.DBLocation);
             //dbContext2.ShardingMainDataIndex = dbContext.ShardingMainDataIndex;
             dbContext2.UseSharding = dbContext.UseSharding;

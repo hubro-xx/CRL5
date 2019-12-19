@@ -77,7 +77,35 @@ namespace CRL
         /// <summary>
         /// 获取数据连接
         /// </summary>
-        public static Func<DBLocation, DBAccessBuild> GetDbAccess;
+        public static Func<DBLocation, DBAccessBuild> GetDbAccess
+        {
+            set
+            {
+                DbAccessCreaterCache.Add(value);
+            }
+        }
+        /// <summary>
+        /// 注册数据访问实现
+        /// 按优先顺序添加,不成立则返回null
+        /// </summary>
+        /// <param name="func"></param>
+        public static void RegisterDBAccessBuild(Func<DBLocation, DBAccessBuild> func)
+        {
+            DbAccessCreaterCache.Add(func);
+        }
+        internal static List<Func<DBLocation, DBAccessBuild>> DbAccessCreaterCache = new List<Func<DBLocation, DBAccessBuild>>();
+        internal static DBAccessBuild GetDBAccessBuild(DBLocation location)
+        {
+            foreach (var m in DbAccessCreaterCache)
+            {
+                var act = m(location);
+                if (act != null)
+                {
+                    return act;
+                }
+            }
+            throw new CRLException("未找到对应的数据访问实现");
+        }
 
         #endregion
 

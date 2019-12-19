@@ -44,7 +44,7 @@ namespace CRL.Set
         DbContext getDbContext()
         {
             var dbLocation = new CRL.DBLocation() { DataAccessType = DataAccessType.Read, ManageType = typeof(T) };
-            var helper = SettingConfig.GetDbAccess(dbLocation).GetDBHelper();
+            var helper = SettingConfig.GetDBAccessBuild(dbLocation).GetDBHelper();
             var dbContext = new DbContext(helper, dbLocation);
             return dbContext;
         }

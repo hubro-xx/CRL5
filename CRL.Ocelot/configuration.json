@@ -7,7 +7,7 @@
       "DownstreamScheme": "http",
       "ServiceName": "apiService1",
       "LoadBalancerOptions": {
-        "Type": "RoundRobin"
+        "Type": "RoundRobin" //LeastConnection : 将请求发往最空闲的那个服务器 RoundRobin ：轮流发送  NoLoadBalance ：不启用负载均衡，总是发往第一个请求或者服务发现的那个服务器
       },
       "UpstreamPathTemplate": "/serviceTest/{url}",
       "UpstreamHttpMethod": [ "Get", "Post" ],

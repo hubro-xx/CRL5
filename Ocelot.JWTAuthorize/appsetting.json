@@ -1,16 +1,7 @@
-{
-  "Logging": {
-    "IncludeScopes": false,
-    "LogLevel": {
-      "Default": "Debug",
-      "System": "Information",
-      "Microsoft": "Information"
-    }
-  },
-  //JWT≈‰÷√
+Ôªø{
   "JwtAuthorize": {
     "Secret": "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
-    "Issuer": "gsw",
+    "Issuer": "ocelot",
     "Audience": "everyone",
     "PolicyName": "permission",
     "DefaultScheme": "Bearer",
