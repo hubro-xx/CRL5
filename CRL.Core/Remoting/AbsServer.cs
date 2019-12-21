@@ -126,7 +126,7 @@ namespace CRL.Core.Remoting
                     return new ErrorInfo("token不合法 user@token", "401");
                     //throw new Exception("token不合法 user@token");
                 }
-                var a2 = sessionManage.CheckSession(tokenArry[0], tokenArry[1], methodParamters, paramters, out string error);
+                var a2 = CheckSession(tokenArry[0], tokenArry[1], methodParamters, paramters, out string error);
                 if (!a2)
                 {
                     return new ErrorInfo(error, "401");
@@ -148,5 +148,28 @@ namespace CRL.Core.Remoting
             }
             return null;
         }
+        bool CheckSession(string user, string token, ParameterInfo[] argsName, List<object> args, out string error)
+        {
+            error = "";
+            //var exists = sessions.TryGetValue(user, out Tuple<string, object> v);
+            var v = sessionManage.GetSession(user);
+            if (v == null)
+            {
+                error = "未找到API登录状态,请重新登录";
+                return false;
+            }
+            var serverToken = v.Item1;
+            if (ServerCreater.__CheckSign)//使用简单签名
+            {
+                serverToken = SignCheck.CreateSign(serverToken, argsName, args);
+            }
+            if (token != serverToken)
+            {
+                error = "token验证失败";
+                return false;
+            }
+            return true;
+        }
+
     }
 }

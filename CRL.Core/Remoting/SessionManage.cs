@@ -12,7 +12,7 @@ namespace CRL.Core.Remoting
     public interface ISessionManage
     {
         void SaveSession(string user, string token, object tag = null);
-        bool CheckSession(string user, string token, ParameterInfo[] argsName, List<object> args, out string error);
+        //bool CheckSession(string user, string token, ParameterInfo[] argsName, List<object> args, out string error);
         Tuple<string, object> GetSession(string user);
     }
     public class SignCheck
@@ -94,28 +94,7 @@ namespace CRL.Core.Remoting
             }
         }
 
-        public bool CheckSession(string user, string token, ParameterInfo[] argsName, List<object> args, out string error)
-        {
-            error = "";
-            var exists = sessions.TryGetValue(user, out Tuple<string, object> v);
-            if (!exists)
-            {
-                error = "API未登录";
-                return false;
-            }
-            var serverToken = v.Item1;
-            if (ServerCreater.__CheckSign)//使用简单签名
-            {
-                serverToken = SignCheck.CreateSign(serverToken, argsName, args);
-            }
-            if (token != serverToken)
-            {
-                error = "token验证失败";
-                return false;
-            }
-            return true;
-        }
-
+     
         public Tuple<string, object> GetSession(string user)
         {
             sessions.TryGetValue(user, out Tuple<string, object> v);

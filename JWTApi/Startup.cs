@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +13,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Ocelot.JwtAuthorize;
+using Microsoft.IdentityModel.Tokens;
 
 namespace JWTApiTest
 {
@@ -25,10 +29,51 @@ namespace JWTApiTest
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApiJwtAuthorize(Configuration, (routeEndpoint, claims) =>
-             {
-                 return ValidatePermission(routeEndpoint, claims);
-             });
+            #region jwt
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            var config = Configuration.GetSection("JwtAuthorize");
+
+            var keyByteArray = Encoding.ASCII.GetBytes(config["Secret"]);
+            var signingKey = new SymmetricSecurityKey(keyByteArray);
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = signingKey,
+                ValidateIssuer = true,
+                ValidIssuer = config["Issuer"],
+                ValidateAudience = true,
+                ValidAudience = config["Audience"],
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+                RequireExpirationTime = bool.Parse(config["RequireExpirationTime"])
+            };
+            var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+
+            var permissionRequirement = new JwtAuthorizationRequirement(
+                config["Issuer"],
+                config["Audience"],
+                signingCredentials
+                );
+
+            permissionRequirement.ValidatePermission = ValidatePermission;
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(o =>
+            {
+                o.RequireHttpsMetadata = bool.Parse(config["IsHttps"]);
+                o.TokenValidationParameters = tokenValidationParameters;
+            });
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(config["PolicyName"], policy => policy.Requirements.Add(permissionRequirement));
+
+            });
+            services.AddSingleton<IAuthorizationHandler, PermissionHandler>();
+            services.AddSingleton(permissionRequirement);
+            #endregion
             services.AddControllers();
         }
 

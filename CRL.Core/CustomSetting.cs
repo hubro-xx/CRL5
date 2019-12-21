@@ -55,7 +55,7 @@ namespace CRL.Core
                     };
                     watch.EnableRaisingEvents = true;
                 }
-                var arry = System.IO.File.ReadLines(file, Encoding.GetEncoding("gb2312"));
+                var arry = System.IO.File.ReadLines(file);
                 foreach (string str in arry)
                 {
                     if (str.StartsWith("//"))
@@ -93,7 +93,11 @@ namespace CRL.Core
             var keyCaches = GetSettings();
             return keyCaches.ContainsKey(key);
         }
-
+        public static T GetConfigKey<T>(string key)
+        {
+            string value = GetConfigKey(key);
+            return (T)Convert.ChangeType(value, typeof(T));
+        }
         /// <summary>
         /// 获取自定义配置值
         /// 如果值用[]包括，则按加密过处理
