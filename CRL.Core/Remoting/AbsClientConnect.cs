@@ -52,6 +52,10 @@ namespace CRL.Core.Remoting
         /// <param name="cacheMinute"></param>
         public void UseConsulDiscover(string consulUrl, string serviceName, double cacheMinute = 0.5)
         {
+            if (string.IsNullOrEmpty(consulUrl))
+            {
+                throw new ArgumentNullException("consulUrl");
+            }
             var consulClient = new ConsulClient.Consul(consulUrl);
             //发现consul服务注册,返回服务地址
             __GetConsulAgent = () =>
@@ -61,14 +65,18 @@ namespace CRL.Core.Remoting
             };
         }
         /// <summary>
-        /// 使用consulAPI网关
+        /// 直接使用OcelotAPI网关
         /// </summary>
         /// <param name="gatewayUrl"></param>
         /// <param name="serviceNamePrefix"></param>
         /// <param name="useGateway"></param>
         /// <param name="cacheMinute"></param>
-        public void UseConsulApiGateway(string gatewayUrl)
+        public void UseOcelotApiGateway(string gatewayUrl)
         {
+            if (string.IsNullOrEmpty(gatewayUrl))
+            {
+                throw new ArgumentNullException("gatewayUrl");
+            }
             __GatewayUrl = gatewayUrl;
             __UseGateway = true;
             __GetConsulAgent = () =>
@@ -77,13 +85,17 @@ namespace CRL.Core.Remoting
             };
         }
         /// <summary>
-        /// 使用consulAPI网关服务发现
+        /// 使用OcelotAPI网关服务发现
         /// </summary>
         /// <param name="gatewayUrl"></param>
         /// <param name="serviceName"></param>
         /// <param name="cacheMinute"></param>
-        public void UseConsulApiGatewayDiscover(string gatewayUrl, string serviceName, double cacheMinute = 0.5)
+        public void UseOcelotApiGatewayDiscover(string gatewayUrl, string serviceName, double cacheMinute = 0.5)
         {
+            if (string.IsNullOrEmpty(gatewayUrl))
+            {
+                throw new ArgumentNullException("gatewayUrl");
+            }
             __GatewayUrl = gatewayUrl;
             var gatewayClient = new ConsulClient.ConsulGateway(gatewayUrl);
             __GetConsulAgent = () =>

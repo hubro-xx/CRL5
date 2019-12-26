@@ -91,6 +91,10 @@ namespace JWTApiTest
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync(GetType().Namespace);
+                });
             });
         }
         public class Permission

@@ -18,7 +18,7 @@ namespace ConsulTest
             server.Register<ITestService, TestService>();
             var listener = new ServerListener();
             listener.Start("http://localhost:809/");//启用apiService1
-            //注册服务
+            #region 注册服务
             var consulClient = new CRL.Core.ConsulClient.Consul("http://localhost:8500");
             consulClient.UseOcelotGatewayDiscover("http://localhost:3400"); //使用网关服务发现
             var info = new CRL.Core.ConsulClient.ServiceRegistrationInfo
@@ -31,12 +31,15 @@ namespace ConsulTest
             };
             consulClient.DeregisterService(info.ID);
             var a = consulClient.RegisterService(info);//注册apiService1
+            #endregion
+
+            #region 发现调用服务
             var clientConnect = new ApiClientConnect("");
-            clientConnect.UseConsulApiGatewayDiscover("http://localhost:3400", "apiService1");//服务发现
+            clientConnect.UseOcelotApiGatewayDiscover("http://localhost:3400", "apiService1");//服务发现
 
             var clientConnect2 = new ApiClientConnect("");
-            clientConnect2.UseConsulApiGateway("http://localhost:3400");//直接使用网关
-
+            clientConnect2.UseOcelotApiGateway("http://localhost:3400");//直接使用网关
+            #endregion
         label1:
 
             var service1 = clientConnect.GetClient<ITestService>();

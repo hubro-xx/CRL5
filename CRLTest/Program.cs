@@ -101,9 +101,7 @@ namespace CRLTest
             var client = new CRL.Core.RedisProvider.RedisClient(4);
 
         label1:
-            var token = "12312222";
-            client.KSet("keyTest", token, TimeSpan.FromMinutes(1000));
-            var value = client.KGet("keyTest");
+            testFormat();
             Console.ReadLine();
             goto label1;
             Console.ReadLine();

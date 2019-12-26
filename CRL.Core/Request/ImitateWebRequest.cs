@@ -264,7 +264,7 @@ namespace CRL.Core.Request
             catch (WebException ex)
             {
                 response = (HttpWebResponse)ex.Response;
-                if (ContentType == "application/json")
+                if (response != null && ContentType == "application/json")
                 {
                     using (StreamReader requestReader = new StreamReader(response.GetResponseStream(), ResponseEncoding))
                     {

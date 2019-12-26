@@ -75,13 +75,14 @@ namespace CRL.Ocelot
             //使用JWT认证调用权限
             app.UseAuthorization();
             app.UseMiddleware<JwtAuthorizeMiddleware>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                //endpoints.MapGet("/", async context =>
-                //{
-                //    await context.Response.WriteAsync("Hello World!");
-                //});
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync(GetType().Namespace);
+                });
             });
             //app.UseConsulProxy();
             app.UseOcelot().Wait();
