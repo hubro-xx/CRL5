@@ -14,7 +14,7 @@ using System.Transactions;
 using CRL.LambdaQuery;
 using System.Messaging;
 using CRL.Core;
-using MongoDB.Driver.Linq;
+//using MongoDB.Driver.Linq;
 using System.Collections;
 
 namespace CRL
@@ -286,26 +286,27 @@ namespace CRL
         /// 创建当前类型查询表达式实列
         /// </summary>
         /// <returns></returns>
-        public virtual LambdaQuery<T> GetLambdaQuery()
+        public virtual ILambdaQuery<T> GetLambdaQuery()
         {
+            var db = DBExtend as AbsDBExtend;
             //var dbContext2 = GetDbContext(true);//避开事务控制,使用新的连接
-            var query = LambdaQueryFactory.CreateLambdaQuery<T>(DBExtend.dbContext);
+            var query = LambdaQueryFactory.CreateLambdaQuery<T>(db.dbContext);
             return query;
         }
-        /// <summary>
-        /// 获取Mongo查询
-        /// </summary>
-        /// <returns></returns>
-        public IMongoQueryable<T> GetMongoQueryable()
-        {
-            return DBExtend.GetMongoQueryable<T>();
-        }
+        ///// <summary>
+        ///// 获取Mongo查询
+        ///// </summary>
+        ///// <returns></returns>
+        //public IMongoQueryable<T> GetMongoQueryable()
+        //{
+        //    return DBExtend.GetMongoQueryable<T>();
+        //}
         /// <summary>
         /// 指定查询条件创建表达式实例
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public LambdaQuery<T> GetLambdaQuery(Expression<Func<T, bool>> expression)
+        public ILambdaQuery<T> GetLambdaQuery(Expression<Func<T, bool>> expression)
         {
             var query = GetLambdaQuery();
             query.Where(expression);
@@ -313,12 +314,12 @@ namespace CRL
         }
 
         #region 数据访问对象
-        AbsDBExtend _dBExtend;
+        IAbsDBExtend _dBExtend;
         /// <summary>
         /// 数据访部对象
         /// 当前实例内只会创建一个,查询除外
         /// </summary>
-        protected AbsDBExtend DBExtend
+        protected IAbsDBExtend DBExtend
         {
             get
             {
@@ -387,8 +388,8 @@ namespace CRL
         /// <returns></returns>
         public virtual string CreateTable()
         {
-            AbsDBExtend db = DBExtend;
-            var str = ModelCheck.CreateTable(typeof(T),db);
+            var db = DBExtend;
+            var str = ModelCheck.CreateTable(typeof(T),db as AbsDBExtend);
             return str;
         }
         /// <summary>
@@ -517,7 +518,7 @@ namespace CRL
         /// <param name="asyn">异步插入</param>
         public virtual void Add(T p, bool asyn = false)
         {
-            AbsDBExtend db = DBExtend;
+            var db = DBExtend as AbsDBExtend;
             #region MQ初始
             if (asyn)
             {
@@ -559,7 +560,7 @@ namespace CRL
         /// <param name="keepIdentity">是否保持自增主键</param>
         public virtual void BatchInsert<T2>(List<T2> list, bool keepIdentity = false) where T2 : IModel, new()
         {
-            AbsDBExtend db = DBExtend;
+            var db = DBExtend;
             if (list == null || list.Count == 0)
             {
                 return;
@@ -595,7 +596,7 @@ namespace CRL
             query.Top(1);
             query.Where(expression).OrderBy(sortExpression, desc);
             var db = DBExtend;
-            return db.QueryList(query).FirstOrDefault();
+            return db.QueryList(query as LambdaQuery<T>).FirstOrDefault();
         }
         /// <summary>
         /// 按主键查询一项[基本方法]
@@ -623,7 +624,7 @@ namespace CRL
             query.CompileToSp(compileSp);
             query.Where(expression).OrderByPrimaryKey(idDest);
             var db = DBExtend;
-            return db.QueryList(query).FirstOrDefault();
+            return db.QueryList(query as LambdaQuery<T>).FirstOrDefault();
         }
         #endregion
 
@@ -638,7 +639,7 @@ namespace CRL
             //return db.QueryList<TModel>();
             var query = GetLambdaQuery();
             var db = DBExtend;
-            return db.QueryList(query);
+            return db.QueryList(query as LambdaQuery<T>);
         }
         /// <summary>
         /// 指定条件查询[基本方法]
@@ -654,7 +655,7 @@ namespace CRL
             query.CompileToSp(compileSp);
             query.Where(expression);
             var db = DBExtend;
-            return db.QueryList(query);
+            return db.QueryList(query as LambdaQuery<T>);
         }
 
         #endregion
@@ -705,10 +706,10 @@ namespace CRL
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        public int Delete(LambdaQuery<T> query)
+        public int Delete(ILambdaQuery<T> query)
         {
             var db = DBExtend;
-            int n = db.Delete(query);
+            int n = db.Delete(query as LambdaQuery<T>);
             return n;
         }
         /// <summary>
@@ -775,7 +776,7 @@ namespace CRL
         {
             var query = GetLambdaQuery();
             query.Where(expression);
-            int n = Update(query, model.GetUpdateField());
+            int n = Update(query as LambdaQuery<T>, model.GetUpdateField());
             return n;
         }
 
@@ -800,7 +801,7 @@ namespace CRL
             }
             var query = GetLambdaQuery();
             query.Where(expression);
-            int n = Update(query, c);
+            int n = Update(query as LambdaQuery<T>, c);
             return n;
         }
 
@@ -841,7 +842,7 @@ namespace CRL
   
             var query = GetLambdaQuery();
             query.Where(expression);
-            int n = Update(query, c);
+            int n = Update(query as LambdaQuery<T>, c);
             return n;
         }
 
@@ -855,7 +856,7 @@ namespace CRL
         {
             var query = GetLambdaQuery();
             query.Where(expression);
-            int n = Update(query, setValue);
+            int n = Update(query as LambdaQuery<T>, setValue);
             return n;
             //var db = DBExtend;
             //int n = db.Update(expression, setValue);
@@ -867,7 +868,7 @@ namespace CRL
         /// <param name="query"></param>
         /// <param name="updateValue">要按字段值更新,需加前辍$ 如 c["UserId"] = "$UserId"</param>
         /// <returns></returns>
-        public int Update(LambdaQuery<T> query, IDictionary updateValue)
+        public int Update(ILambdaQuery<T> query, IDictionary updateValue)
         {
             var db = DBExtend;
             var iDic = updateValue as Dictionary<string, object>;
@@ -876,7 +877,7 @@ namespace CRL
                 throw new CRLException("无法转换为Dictionary<string, object>");
             }
             var dic = new ParameCollection(iDic);
-            return db.Update(query, dic);
+            return db.Update(query as LambdaQuery<T>, dic);
         }
         /// <summary>
         /// 关联更新
@@ -891,7 +892,7 @@ namespace CRL
             //return DBExtend.Update(expression, updateValue);
             var query = GetLambdaQuery();
             query.Join(expression);
-            return Update(query, updateValue);
+            return Update(query as LambdaQuery<T>, updateValue);
         }
         #endregion
 
@@ -907,7 +908,7 @@ namespace CRL
         /// <returns></returns>
         protected List<T> ExecListWithFormat<T>(string sql, ParameCollection parame, params Type[] types) where T : class, new()
         {
-            AbsDBExtend db = DBExtend;
+            var db = DBExtend;
             foreach (var p in parame)
             {
                 db.AddParam(p.Key, p.Value);
@@ -923,7 +924,7 @@ namespace CRL
         /// <returns></returns>
         protected int ExecuteWithFormat(string sql, ParameCollection parame, params Type[] types)
         {
-            AbsDBExtend db = DBExtend;
+            var db = DBExtend;
             foreach (var p in parame)
             {
                 db.AddParam(p.Key, p.Value);
@@ -939,7 +940,7 @@ namespace CRL
         /// <returns></returns>
         protected T ExecScalarWithFormat<T>(string sql, ParameCollection parame, params Type[] types)
         {
-            AbsDBExtend db = DBExtend;
+            var db = DBExtend;
             foreach (var p in parame)
             {
                 db.AddParam(p.Key, p.Value);

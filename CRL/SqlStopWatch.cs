@@ -21,7 +21,7 @@ namespace CRL
     /// </summary>
     public class SqlStopWatch
     {
-        internal static int Execute(DBHelper __DbHelper, string sql)
+        public static int Execute(DBHelper __DbHelper, string sql)
         {
             int n = 0;
             var el = Run(() =>
@@ -31,7 +31,7 @@ namespace CRL
             Base.SaveSQLRunningtme(sql, el);
             return n;
         }
-        internal static object ExecScalar(DBHelper __DbHelper, string sql)
+        public static object ExecScalar(DBHelper __DbHelper, string sql)
         {
             object obj = null;
             var el = Run(() =>

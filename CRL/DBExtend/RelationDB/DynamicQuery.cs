@@ -82,7 +82,7 @@ namespace CRL.DBExtend.RelationDB
                     int count;
                     var list2 = r.GetDataDynamic(out count);
                     query.MapingTime += r.runTime;
-                    query.RowCount = count;
+                    query.__RowCount = count;
                     return list2;
                 });
                 return list;
@@ -104,7 +104,7 @@ namespace CRL.DBExtend.RelationDB
                     double runTime;
                     var list2 = Dynamic.DynamicObjConvert.DataReaderToDynamic(r.reader, out runTime);
                     query.MapingTime += runTime;
-                    query.RowCount = list2.Count;
+                    query.__RowCount = list2.Count;
                     return list2;
                 });
                 return list;
@@ -135,7 +135,7 @@ namespace CRL.DBExtend.RelationDB
                 {
                     int count;
                     var list2 = r.GetDataTResult<TResult>(queryInfo, out count);
-                    query.RowCount = count;
+                    query.__RowCount = count;
                     return list2;
                 });
                 return list;
@@ -154,7 +154,7 @@ namespace CRL.DBExtend.RelationDB
                 }, (r) =>
                 {
                     var list2 = ObjectConvert.DataReaderToSpecifiedList<TResult>(r.reader, queryInfo);
-                    query.RowCount = list2.Count;
+                    query.__RowCount = list2.Count;
                     return list2;
                 });
                 return list;
@@ -185,7 +185,7 @@ namespace CRL.DBExtend.RelationDB
                 {
                     int count;
                     var list2 = r.GetDataTResult<TResult>(queryInfo, out count);
-                    query.RowCount = count;
+                    query.__RowCount = count;
                     return list2;
                 });
             }

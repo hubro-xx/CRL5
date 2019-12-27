@@ -422,7 +422,7 @@ namespace CRL.LambdaQuery
                     var exp2 = exp.Equal(Expression.Constant(true));
                     return RouteExpressionHandler(exp2);
                 }
-                CRL.Attribute.FieldAttribute field;
+                CRL.Attribute.FieldInnerAttribute field;
                 var a = TypeCache.GetProperties(type, true).TryGetValue(memberName, out field);
                 if (!a)
                 {

@@ -79,7 +79,7 @@ namespace CRL.ExistsTableCache
                     allFileds2.Add(f.Key.ToLower(), 0);
                 }
                 var fields = table.Fields;
-                var needCreates = new List<Attribute.FieldAttribute>();
+                var needCreates = new List<Attribute.FieldInnerAttribute>();
                 foreach (var field in fields)
                 {
                     //if (field.FieldType != Attribute.FieldType.数据库字段)

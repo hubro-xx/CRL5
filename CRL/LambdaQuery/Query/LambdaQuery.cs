@@ -24,14 +24,14 @@ namespace CRL.LambdaQuery
     /// Lamada表达式查询
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract partial class LambdaQuery<T> : LambdaQueryBase where T : IModel, new()
+    public abstract partial class LambdaQuery<T> : LambdaQueryBase, ILambdaQuery<T> where T : IModel, new()
     {
         /// <summary>
         /// lambda查询
         /// </summary>
         /// <param name="_dbContext"></param>
         /// <param name="_useTableAliasesName">查询是否生成表别名,在更新和删除时用</param>
-        public LambdaQuery(DbContext _dbContext, bool _useTableAliasesName = true):base()
+        public LambdaQuery(DbContext _dbContext, bool _useTableAliasesName = true) : base()
         {
             __DbContext = _dbContext;
             __MainType = typeof(T);
@@ -43,7 +43,7 @@ namespace CRL.LambdaQuery
             QueryTableName = TypeCache.GetTableName(__MainType, __DbContext);
             startTime = DateTime.Now;
         }
-        
+
         /// <summary>
         /// 返回查询语句
         /// </summary>
@@ -57,7 +57,7 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 查询的表名
         /// </summary>
-        internal string QueryTableName = "";
+        public string QueryTableName = "";
 
         ///// <summary>
         ///// 前几条
@@ -72,7 +72,7 @@ namespace CRL.LambdaQuery
 
 
         protected DateTime startTime;
-       
+
         #region 对外方法
         /// <summary>
         /// 设置查询TOP
@@ -197,7 +197,7 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="resultSelectorBody"></param>
         /// <returns></returns>
-        internal LambdaQuery<T> Select(Expression resultSelectorBody)
+        public LambdaQuery<T> Select(Expression resultSelectorBody)
         {
             if (resultSelectorBody is ParameterExpression)
             {
@@ -207,7 +207,7 @@ namespace CRL.LambdaQuery
             }
             var info = GetSelectField(true, resultSelectorBody, false, typeof(T));
             //_CurrentSelectFieldCache = info;
-            SetSelectFiled(info,true);
+            SetSelectFiled(info, true);
             //__QueryFields = fields;
             return this;
         }
@@ -298,7 +298,7 @@ namespace CRL.LambdaQuery
         /// <param name="desc">是否倒序</param>
         /// <returns></returns>
         public abstract LambdaQuery<T> OrderBy<TResult>(Expression<Func<T, TResult>> expression, bool desc = true);
-       
+
         /// <summary>
         /// 传入字符串排序
         /// </summary>
@@ -330,16 +330,16 @@ namespace CRL.LambdaQuery
         public abstract LambdaQuery<T> Or(Expression<Func<T, bool>> expression);
         #endregion
 
-        
+
         #endregion
 
         #region 获取解析值
-        
+
         /// <summary>
         /// 获取排序 带 order by
         /// </summary>
         /// <returns></returns>
-        internal abstract string GetOrderBy();
+        public abstract string GetOrderBy();
 
         /// <summary>
         /// 输出当前查询语句
@@ -365,6 +365,35 @@ namespace CRL.LambdaQuery
             return sql;
         }
         #endregion
-
+        #region inner
+        public double AnalyticalTime
+        {
+            get
+            {
+                return base.__AnalyticalTime;
+            }
+        }
+        public double ExecuteTime
+        {
+            get
+            {
+                return base.ExecuteTime;
+            }
+        }
+        public double MapingTime
+        {
+            get
+            {
+                return base.MapingTime;
+            }
+        }
+        public int RowCount
+        {
+            get
+            {
+                return base.__RowCount;
+            }
+        }
+        #endregion
     }
 }

@@ -12,11 +12,11 @@ using System.Linq.Expressions;
 using System.Text;
 using CRL.Core;
 using CRL.DBAccess;
-using MongoDB.Driver.Linq;
+//using MongoDB.Driver.Linq;
 
 namespace CRL
 {
-    public abstract class AbsDBExtend
+    public abstract class AbsDBExtend : IAbsDBExtend
     {
         /// <summary>
         /// 构造DBExtend
@@ -159,7 +159,7 @@ namespace CRL
         /// lockObj
         /// </summary>
         static protected object lockObj = new object();
-        internal DbContext dbContext;
+        public DbContext dbContext;
         #endregion
         /// <summary>
         /// 检测数据
@@ -173,7 +173,7 @@ namespace CRL
             string msg;
             var sb = new StringBuilder();
             //检测数据约束
-            foreach (Attribute.FieldAttribute p in types)
+            foreach (Attribute.FieldInnerAttribute p in types)
             {
                 string value = p.GetValue(obj) + "";
                 if (!string.IsNullOrEmpty(value) && p.MemberName != "AddTime" && checkRepeated)
@@ -311,9 +311,9 @@ namespace CRL
         Dictionary<string, object> _OutParame;
         internal void FillParame(DBHelper db)
         {
-            foreach(var kv in _Parame)
+            foreach (var kv in _Parame)
             {
-                db.AddParam(kv.Key,kv.Value);
+                db.AddParam(kv.Key, kv.Value);
             }
             if (_OutParame != null)
             {
@@ -346,9 +346,9 @@ namespace CRL
         {
             value = ObjectConvert.CheckNullValue(value);
             //__DbHelper.AddParam(name, value);
-            _Parame.Add(name,value);
+            _Parame.Add(name, value);
         }
-        public void SetParam(string name,object value)
+        public void SetParam(string name, object value)
         {
             value = ObjectConvert.CheckNullValue(value);
             _Parame[name] = value;
@@ -399,7 +399,7 @@ namespace CRL
         /// <summary>
         /// 开始事务
         /// </summary>
-        public abstract void BeginTran(System.Data.IsolationLevel isolationLevel= System.Data.IsolationLevel.ReadCommitted);
+        public abstract void BeginTran(System.Data.IsolationLevel isolationLevel = System.Data.IsolationLevel.ReadCommitted);
         /// <summary>
         /// 回滚事务
         /// </summary>
@@ -413,7 +413,7 @@ namespace CRL
         /// 检查表是否创建了
         /// </summary>
         /// <param name="type"></param>
-        internal abstract void CheckTableCreated(Type type);
+        public abstract void CheckTableCreated(Type type);
         #region Insert
         /// <summary>
         /// 插入
@@ -498,7 +498,7 @@ namespace CRL
         /// <typeparam name="TValue"></typeparam>
         /// <param name="query"></param>
         /// <returns></returns>
-        public abstract Dictionary<TKey, TValue> ToDictionary<TModel,TKey, TValue>(LambdaQuery.LambdaQuery<TModel> query)where TModel : CRL.IModel, new();
+        public abstract Dictionary<TKey, TValue> ToDictionary<TModel, TKey, TValue>(LambdaQuery.LambdaQuery<TModel> query) where TModel : CRL.IModel, new();
 
         /// <summary>
         /// 返回首行首列
@@ -622,8 +622,8 @@ namespace CRL
         //    return GetFunction<TType, TModel>(expression, field, FunctionType.SUM, compileSp);
         //}
         #endregion
- 
-        internal abstract TType GetFunction<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> selectField, FunctionType functionType, bool compileSp = false) where TModel : IModel, new();  
+
+        public abstract TType GetFunction<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> selectField, FunctionType functionType, bool compileSp = false) where TModel : IModel, new();
         #endregion
 
         #region Page
@@ -676,7 +676,7 @@ namespace CRL
         /// <param name="query"></param>
         /// <returns></returns>
         public abstract List<TResult> QueryResult<TResult>(CRL.LambdaQuery.LambdaQueryBase query);
-        
+
         /// <summary>
         /// 按筛选返回匿名对象
         /// </summary>
@@ -715,7 +715,7 @@ namespace CRL
         /// <param name="idDest">是否按主键倒序</param>
         /// <param name="compileSp">是否编译成存储过程</param>
         /// <returns></returns>
-        public TModel QueryItem<TModel>(Expression<Func<TModel, bool>> expression, bool idDest = true, bool compileSp = false)where TModel : CRL.IModel, new()
+        public TModel QueryItem<TModel>(Expression<Func<TModel, bool>> expression, bool idDest = true, bool compileSp = false) where TModel : CRL.IModel, new()
         {
             var query = CreateLambdaQuery<TModel>();
             query.Top(1);
@@ -842,7 +842,7 @@ namespace CRL
         {
             var query = CreateLambdaQuery<TModel>();
             query.Where(expression);
-            var n= Update(query, setValue);
+            var n = Update(query, setValue);
             System.Threading.Tasks.Task.Run(() =>
             {
                 UpdateCacheItem<TModel>(expression, setValue);
@@ -930,7 +930,7 @@ namespace CRL
         /// </summary>
         /// <typeparam name="TModel"></typeparam>
         /// <param name="list"></param>
-        internal void SetOriginClone<TModel>(List<TModel> list) where TModel : IModel, new()
+        public void SetOriginClone<TModel>(List<TModel> list) where TModel : IModel, new()
         {
             if (SettingConfig.UsePropertyChange)
             {
@@ -945,7 +945,7 @@ namespace CRL
         internal ParameCollection GetUpdateField<TModel>(TModel obj) where TModel : IModel, new()
         {
             var c = obj.GetUpdateField(_DBAdapter);
-            
+
             if (c.Count() > 0 && obj.GetOriginClone() != null)//只有克隆过的才进行检查
             {
                 CheckData(obj, false);
@@ -953,12 +953,12 @@ namespace CRL
             return c;
 
         }
-        /// <summary>
-        /// 获取Mongo查询
-        /// </summary>
-        /// <typeparam name="TModel"></typeparam>
-        /// <returns></returns>
-        public abstract IMongoQueryable<TModel> GetMongoQueryable<TModel>();
+        ///// <summary>
+        ///// 获取Mongo查询
+        ///// </summary>
+        ///// <typeparam name="TModel"></typeparam>
+        ///// <returns></returns>
+        //public abstract IMongoQueryable<TModel> GetMongoQueryable<TModel>();
         public virtual void CreateTableIndex<TModel>()
         {
             var type = typeof(TModel);

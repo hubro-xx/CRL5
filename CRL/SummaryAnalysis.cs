@@ -151,14 +151,14 @@ namespace CRL
             return objItems;
         }
 
-        static Dictionary<Type, CRL.Attribute.TableAttribute> Merge(List<Type> types,Dictionary<string, ObjItem> objItems)
+        static Dictionary<Type, CRL.Attribute.TableInnerAttribute> Merge(List<Type> types,Dictionary<string, ObjItem> objItems)
         {
-            var result = new Dictionary<Type, CRL.Attribute.TableAttribute>();
+            var result = new Dictionary<Type, CRL.Attribute.TableInnerAttribute>();
             foreach(var type in types)
             {
                 string typeName = type.FullName;
                 var list2 = CRL.TypeCache.GetProperties(type, true);
-                var table = new CRL.Attribute.TableAttribute();
+                var table = new CRL.Attribute.TableInnerAttribute();
                 if (objItems.ContainsKey(typeName))
                 {
                     var objItem = objItems[typeName];

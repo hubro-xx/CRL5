@@ -71,7 +71,7 @@ namespace CRL.ExistsTableCache
         /// <param name="dbName"></param>
         /// <param name="table"></param>
         /// <param name="tableName"></param>
-        public void SaveTable(string dbName, Attribute.TableAttribute table,string tableName)
+        public void SaveTable(string dbName, Attribute.TableInnerAttribute table,string tableName)
         {
             tableName = tableName.ToLower();
             var fields = table.Fields;
@@ -96,11 +96,11 @@ namespace CRL.ExistsTableCache
         /// <param name="table"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public List<Attribute.FieldAttribute> CheckFieldExists(string dbName, Attribute.TableAttribute table, string tableName)
+        public List<Attribute.FieldInnerAttribute> CheckFieldExists(string dbName, Attribute.TableInnerAttribute table, string tableName)
         {
             tableName = tableName.ToLower();
             var tb = GetTable(dbName, tableName);
-            var returns = new List<Attribute.FieldAttribute>();
+            var returns = new List<Attribute.FieldInnerAttribute>();
            
             if (tb.ColumnChecked)
             {

@@ -112,12 +112,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public List<dynamic> ToDynamic()
         { 
-            //todo MongoDB未实现
             var db = DBExtendFactory.CreateDBExtend(BaseQuery.__DbContext);
-            if (db is DBExtend.MongoDBEx.MongoDBExt)
-            {
-                throw new NotSupportedException("MongoDB暂未实现");
-            }
             return db.QueryDynamic(BaseQuery);
         }
         /// <summary>

@@ -18,7 +18,7 @@ using System.Text;
 
 namespace CRL
 {
-    internal class ObjectConvert
+    public class ObjectConvert
     {
         static ConcurrentDictionaryEx<Type, Func<object, object>> nullCheckMethod = new ConcurrentDictionaryEx<Type, Func<object, object>>();
         /// <summary>
@@ -27,7 +27,7 @@ namespace CRL
         /// <param name="value"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        internal static object CheckNullValue(object value, Type type = null)
+        public static object CheckNullValue(object value, Type type = null)
         {
             if (type == null && value == null)
             {
@@ -144,7 +144,7 @@ namespace CRL
         /// <typeparam name="T"></typeparam>
         /// <param name="obj"></param>
         /// <returns></returns>
-        internal static T ConvertObject<T>(object obj)
+        public static T ConvertObject<T>(object obj)
         {
             if (obj == null)
                 return default(T);
@@ -159,7 +159,7 @@ namespace CRL
             public Action<object, object> Set2;
             public string Name;
             public int ValueIndex;
-            public Attribute.FieldAttribute FieldAttribute;
+            public Attribute.FieldInnerAttribute FieldAttribute;
             public void SetValue(T item, object[] values)
             {
                 Set(item, values[ValueIndex]);
@@ -202,7 +202,7 @@ namespace CRL
             foreach (var mp in mapping)
             {
                 var fieldName = mp.ResultName.ToLower();
-                Attribute.FieldAttribute info;
+                Attribute.FieldInnerAttribute info;
                 var a = typeArry.TryGetValue(mp.ResultName, out info);
                 if (!a)
                 {

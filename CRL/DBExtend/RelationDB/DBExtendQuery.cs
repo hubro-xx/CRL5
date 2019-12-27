@@ -81,7 +81,7 @@ namespace CRL.DBExtend.RelationDB
                 list = MemoryDataCache.CacheService.GetCacheList<TModel>(sql, query.GetFieldMapping(), cacheTime, db, out cacheKey).Values.ToList();
             }
             ClearParame();
-            query.RowCount = list.Count;
+            query.__RowCount = list.Count;
             if (SettingConfig.AutoTrackingModel && query.__TrackingModel)
             {
                 SetOriginClone(list);
@@ -95,7 +95,7 @@ namespace CRL.DBExtend.RelationDB
 
 
 
-        internal override TType GetFunction<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> selectField, FunctionType functionType, bool compileSp = false)
+        public override TType GetFunction<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> selectField, FunctionType functionType, bool compileSp = false)
         {
             LambdaQuery<TModel> query = new RelationLambdaQuery<TModel>(dbContext, true);
             query.Select(selectField.Body);

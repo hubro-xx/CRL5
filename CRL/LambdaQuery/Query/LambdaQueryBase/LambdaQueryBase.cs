@@ -12,8 +12,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using CRL.Core;
-using MongoDB.Driver;
-using MongoDB.Bson;
+
 using System.Text.RegularExpressions;
 namespace CRL.LambdaQuery
 {
@@ -22,7 +21,7 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 当前类型
         /// </summary>
-        internal Type __MainType;
+        public Type __MainType;
         internal ExpressionVisitor __Visitor;
         internal bool __FromDbContext = false;
         /// <summary>
@@ -36,11 +35,11 @@ namespace CRL.LambdaQuery
             }
         }
 
-        internal CRLExpression.CRLExpression mongoHavingCount;
+        public CRLExpression.CRLExpression mongoHavingCount;
         /// <summary>
         /// 条件
         /// </summary>
-        internal StringBuilder Condition = new StringBuilder();
+        public StringBuilder Condition = new StringBuilder();
         /// <summary>
         /// 查询字段是否需要加上前辍,如t1.Id
         /// </summary>
@@ -52,12 +51,12 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 获取记录条数
         /// </summary>
-        internal int TakeNum = 0;
+        public int TakeNum = 0;
 
         /// <summary>
         /// 分页索引,要分页,设为大于0
         /// </summary>
-        internal int SkipPage = 0;
+        public int SkipPage = 0;
 
 
         /// <summary>
@@ -67,11 +66,11 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// group字段 QueryField
         /// </summary>
-        internal List<Attribute.FieldMapping> __GroupFields;
-        internal Dictionary<TypeQuery, JoinInfo> __Relations;
+        public List<Attribute.FieldMapping> __GroupFields;
+        public Dictionary<TypeQuery, JoinInfo> __Relations;
         internal DbContext __DbContext;
         internal DBAdapter.DBAdapterBase __DBAdapter;
-        internal bool __DistinctFields = false;
+        public bool __DistinctFields = false;
         /// <summary>
         /// 对象转换时间
         /// </summary>
@@ -79,7 +78,7 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 查询返回的总行数
         /// </summary>
-        public int RowCount = 0;
+        public int __RowCount = 0;
         /// <summary>
         /// 缓存查询过期时间
         /// </summary>
@@ -88,7 +87,7 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 语法解析时间
         /// </summary>
-        public double AnalyticalTime = 0;
+        public double __AnalyticalTime = 0;
         /// <summary>
         /// 语句执行时间
         /// </summary>
@@ -203,7 +202,7 @@ namespace CRL.LambdaQuery
         /// </summary>
         /// <param name="expressionBody"></param>
         /// <returns></returns>
-        internal CRLExpression.CRLExpression FormatExpression(Expression expressionBody)
+        public CRLExpression.CRLExpression FormatExpression(Expression expressionBody)
         {
             //string condition;
             if (expressionBody == null)
@@ -305,12 +304,12 @@ namespace CRL.LambdaQuery
         /// 获取查询字段字符串,按条件排除
         /// </summary>
         /// <returns></returns>
-        internal abstract string GetQueryFieldString();
+        public abstract string GetQueryFieldString();
         /// <summary>
         /// 获取查询条件串,带表名
         /// </summary>
         /// <returns></returns>
-        internal virtual void GetQueryConditions(StringBuilder sb, bool withTableName = true)
+        public virtual void GetQueryConditions(StringBuilder sb, bool withTableName = true)
         {
             //return "";
         }
@@ -318,7 +317,7 @@ namespace CRL.LambdaQuery
         /// 获取完整查询
         /// </summary>
         /// <returns></returns>
-        internal abstract string GetQuery();
+        public abstract string GetQuery();
         internal SelectFieldInfo GetSelectFieldInfo()
         {
             if (_CurrentSelectFieldCache == null)
@@ -327,7 +326,7 @@ namespace CRL.LambdaQuery
             }
             return _CurrentSelectFieldCache;
         }
-        internal IEnumerable<Attribute.FieldMapping> GetFieldMapping()
+        public IEnumerable<Attribute.FieldMapping> GetFieldMapping()
         {
             var cache = GetSelectFieldInfo();
             return cache.mapping;
@@ -355,7 +354,7 @@ namespace CRL.LambdaQuery
     }
 
 
-    internal class JoinInfo
+    public class JoinInfo
     {
         public JoinType joinType;
         public string tableName;

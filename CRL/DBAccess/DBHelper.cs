@@ -3,16 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Data.Common;
-using System.Xml;
-using System.Web;
+
 using System.Data;
-using System.Web.UI.WebControls;
-using System.Web.UI;
-using System.Reflection;
-using System.Collections;
-using System.Web.UI.HtmlControls;
-using System.Web.Caching;
-using System.Text.RegularExpressions;
+
 using CRL.Core;
 
 namespace CRL.DBAccess

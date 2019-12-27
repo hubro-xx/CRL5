@@ -378,10 +378,6 @@
       <Project>{1255276c-756e-48aa-a09b-22e92d16d995}</Project>
       <Name>CRL.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CRLTest\CRLTest.csproj">
-      <Project>{251d0528-06ae-4ff5-82ba-344c273ef148}</Project>
-      <Name>CRLTest</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CRL\CRL.csproj">
       <Project>{221a152b-1136-46a0-bf49-37d8e8ef19a0}</Project>
       <Name>CRL</Name>

@@ -50,13 +50,13 @@ namespace CRL
         /// </summary>
         /// <param name="baseType"></param>
         /// <returns></returns>
-        public static Dictionary<Attribute.TableAttribute,AbsDBExtend> GetAllModel(Type baseType)
+        public static Dictionary<Attribute.TableInnerAttribute,AbsDBExtend> GetAllModel(Type baseType)
         {
             //var assemblies = System.Web.Compilation.BuildManager.GetReferencedAssemblies().Cast<Assembly>().ToArray();
             //var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             var assembyle = System.Reflection.Assembly.GetAssembly(baseType);
             Type[] types = assembyle.GetTypes();
-            var findTypes = new Dictionary<Attribute.TableAttribute,AbsDBExtend>();
+            var findTypes = new Dictionary<Attribute.TableInnerAttribute,AbsDBExtend>();
             var typeCRL = typeof(CRL.IProvider);
             foreach (var type in types)
             {

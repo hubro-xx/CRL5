@@ -95,17 +95,18 @@ namespace CRL
         {
             Type type = typeof(T);
             var key = "";
-            if (TypeCache.GetModelKeyCache(type, DBExtend.DatabaseName, out key))
+            var db = DBExtend as AbsDBExtend;
+            if (TypeCache.GetModelKeyCache(type, db.DatabaseName, out key))
             {
                 CRL.MemoryDataCache.CacheService.RemoveCache(key);
-                TypeCache.RemoveModelKeyCache(type, DBExtend.DatabaseName);
+                TypeCache.RemoveModelKeyCache(type, db.DatabaseName);
             }
         }
         /// <summary>
         /// 缓存默认查询
         /// </summary>
         /// <returns></returns>
-        protected virtual LambdaQuery<T> CacheQuery()
+        protected virtual ILambdaQuery<T> CacheQuery()
         {
             return GetLambdaQuery();
         }
@@ -129,7 +130,7 @@ namespace CRL
             get
             {
                 var query = CacheQuery();
-                var all = GetCache(query);
+                var all = GetCache(query as LambdaQuery<T>);
                 if (all == null)
                 {
                     return new List<T>();
@@ -176,7 +177,8 @@ namespace CRL
             {
                 //更新缓存
                 var item = (T)SerializeHelper.DeserializeFromJson<T>(command.Data);
-                var updateModel = MemoryDataCache.CacheService.GetCacheTypeKey(typeof(T), DBExtend.__DbHelper.DatabaseName);
+                var db = DBExtend as AbsDBExtend;
+                var updateModel = MemoryDataCache.CacheService.GetCacheTypeKey(typeof(T), db.__DbHelper.DatabaseName);
                 foreach (var key in updateModel)
                 {
                     MemoryDataCache.CacheService.UpdateCacheItem(key, item, null);
@@ -226,7 +228,7 @@ namespace CRL
             }
             else
             {
-                var all = GetCache(CacheQuery());
+                var all = GetCache(CacheQuery() as LambdaQuery<T>);
                 T item;
                 var a = all.TryGetValue(id, out item);
                 if (a)
@@ -279,7 +281,7 @@ namespace CRL
         T QueryFormCacheById(object id)
         {
             var key = id.ToString();
-            var all = GetCache(CacheQuery());
+            var all = GetCache(CacheQuery() as LambdaQuery<T>);
             if (all == null)
             {
                 return null;
@@ -351,10 +353,10 @@ namespace CRL
             query.__ExpireMinute = expMinute;
             string dataCacheKey;
             var list = new Dictionary<string, T>();
-            var a = TypeCache.GetModelKeyCache(type, DBExtend.DatabaseName, out dataCacheKey);
+            var db = DBExtend as AbsDBExtend;
+            var a = TypeCache.GetModelKeyCache(type, db.DatabaseName, out dataCacheKey);
             if (!a)
             {
-                var db = DBExtend;
                 var helper = db.dbContext.DBHelper;
                 foreach(var p in query.QueryParames)
                 {
@@ -366,10 +368,10 @@ namespace CRL
                 lock (lockObj)
                 {
                     string key2;
-                    a = TypeCache.GetModelKeyCache(type, DBExtend.DatabaseName, out key2);
+                    a = TypeCache.GetModelKeyCache(type, db.DatabaseName, out key2);
                     if (!a)
                     {
-                        TypeCache.SetModelKeyCache(type, DBExtend.DatabaseName, dataCacheKey);
+                        TypeCache.SetModelKeyCache(type, db.DatabaseName, dataCacheKey);
                     }
                 }
             }

@@ -44,7 +44,7 @@ namespace CRL
         /// <param name="db"></param>
         /// <param name="item"></param>
         /// <returns></returns>
-        internal static string CreateColumn(AbsDBExtend db, Attribute.FieldAttribute item)
+        internal static string CreateColumn(AbsDBExtend db, Attribute.FieldInnerAttribute item)
         {
             var dbAdapter = db._DBAdapter;
             string result = "";
@@ -92,9 +92,9 @@ namespace CRL
         {
             string result = "";
             var dbAdapter = db._DBAdapter;
-            List<Attribute.FieldAttribute> columns = GetColumns(type, db);
+            List<Attribute.FieldInnerAttribute> columns = GetColumns(type, db);
             string tableName = TypeCache.GetTableName(type, db.dbContext);
-            foreach (Attribute.FieldAttribute item in columns)
+            foreach (Attribute.FieldInnerAttribute item in columns)
             {
                 var sb = new StringBuilder();
                 //string sql = dbAdapter.GetSelectTop(item.MapingName, "from " + dbAdapter.KeyWordFormat(tableName), "", 1);
@@ -115,7 +115,7 @@ namespace CRL
             }
             return result;
         }
-        internal static void SetColumnDbType(DBAdapter.DBAdapterBase dbAdapter, Attribute.FieldAttribute info)
+        internal static void SetColumnDbType(DBAdapter.DBAdapterBase dbAdapter, Attribute.FieldInnerAttribute info)
         {
             //if (info.FieldType != Attribute.FieldType.数据库字段)
             //{
@@ -135,13 +135,13 @@ namespace CRL
         /// 获取列
         /// </summary>
         /// <returns></returns>
-        internal static List<Attribute.FieldAttribute> GetColumns(Type type, AbsDBExtend db)
+        public static List<Attribute.FieldInnerAttribute> GetColumns(Type type, AbsDBExtend db)
         {
             //var dbAdapter = Base.CurrentDBAdapter;
             //Type type = this.GetType();
             string tableName = TypeCache.GetTableName(type, db.dbContext);
             var typeArry = TypeCache.GetProperties(type, true).Values;
-            var columns = new List<CRL.Attribute.FieldAttribute>();
+            var columns = new List<CRL.Attribute.FieldInnerAttribute>();
             foreach (var info in typeArry)
             {
                 //if (info.FieldType != Attribute.FieldType.数据库字段)
@@ -155,8 +155,8 @@ namespace CRL
         {
             var dbAdapter = db._DBAdapter;
             List<string> list2 = new List<string>();
-            List<Attribute.FieldAttribute> columns = GetColumns(type, db);
-            foreach (Attribute.FieldAttribute item in columns)
+            List<Attribute.FieldInnerAttribute> columns = GetColumns(type, db);
+            foreach (Attribute.FieldInnerAttribute item in columns)
             {
                 if (item.FieldIndexType != Attribute.FieldIndexType.无 || item.IsPrimaryKey)
                 {
@@ -185,7 +185,7 @@ namespace CRL
                 var indexs = buld.indexs;
                 foreach(var item in indexs.Index)
                 {
-                    var field = new Attribute.FieldAttribute() { TableName = table.TableName, MapingName = item.Key, FieldIndexType = item.Value == IndexType.Normal ? Attribute.FieldIndexType.非聚集 : Attribute.FieldIndexType.非聚集唯一 };
+                    var field = new Attribute.FieldInnerAttribute() { TableName = table.TableName, MapingName = item.Key, FieldIndexType = item.Value == IndexType.Normal ? Attribute.FieldIndexType.非聚集 : Attribute.FieldIndexType.非聚集唯一 };
                     list2.Add(dbAdapter.GetColumnIndexScript(field));
                 }
                 foreach(var item in indexs.UnionIndex)
@@ -246,7 +246,7 @@ namespace CRL
                 List<string> list = new List<string>();
                 try
                 {
-                    List<Attribute.FieldAttribute> columns = GetColumns(type, db);
+                    List<Attribute.FieldInnerAttribute> columns = GetColumns(type, db);
                     dbAdapter.CreateTable(db.dbContext, columns, tableName);
                     message = string.Format("创建表:{0}\r\n", tableName);
                     CheckIndexExists(type, db);

@@ -124,7 +124,7 @@ namespace CRL.LambdaQuery
             Condition.Append(condition);
             return this;
         }
-        internal override string GetQueryFieldString()
+        public override string GetQueryFieldString()
         {
             GetSelectFieldInfo();
             if (_CurrentSelectFieldCache.mapping.Count() == 0)
@@ -138,7 +138,7 @@ namespace CRL.LambdaQuery
         /// 获取查询条件串,带表名
         /// </summary>
         /// <returns></returns>
-        internal override void GetQueryConditions(StringBuilder part, bool withTableName = true)
+        public override void GetQueryConditions(StringBuilder part, bool withTableName = true)
         {
             
             string where = Condition.ToString();
@@ -174,7 +174,7 @@ namespace CRL.LambdaQuery
         /// 获取排序 带 order by
         /// </summary>
         /// <returns></returns>
-        internal override string GetOrderBy()
+        public override string GetOrderBy()
         {
             string orderBy = "";
             if (GetOrder() == "")
@@ -192,7 +192,7 @@ namespace CRL.LambdaQuery
         /// 获取完整查询
         /// </summary>
         /// <returns></returns>
-        internal override string GetQuery()
+        public override string GetQuery()
         {
             return GetQueryOrigin();
         }
@@ -279,7 +279,7 @@ namespace CRL.LambdaQuery
                 }
             }
             var ts = DateTime.Now - startTime;
-            AnalyticalTime = ts.TotalMilliseconds;
+            base.__AnalyticalTime = ts.TotalMilliseconds;
             return sql.ToString();
         }
     }

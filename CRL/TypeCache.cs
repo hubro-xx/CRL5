@@ -14,10 +14,10 @@ using System.Text;
 
 namespace CRL
 {
-    internal class TypeCache
+    public class TypeCache
     {
         //static object lockObj = new object();
-        internal static ConcurrentDictionary<Type, Attribute.TableAttribute> typeCache = new ConcurrentDictionary<Type, Attribute.TableAttribute>();
+        internal static ConcurrentDictionary<Type, Attribute.TableInnerAttribute> typeCache = new ConcurrentDictionary<Type, Attribute.TableInnerAttribute>();
         /// <summary>
         /// 对象类型缓存
         /// 类型+key
@@ -72,9 +72,9 @@ namespace CRL
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static Attribute.TableAttribute GetTable(Type type)
+        public static Attribute.TableInnerAttribute GetTable(Type type)
         {
-            Attribute.TableAttribute table;
+            Attribute.TableInnerAttribute table;
             var b = typeCache.TryGetValue(type, out table);
             if (b)
             {
@@ -84,17 +84,17 @@ namespace CRL
                 }
             }
             object[] objAttrs = type.GetCustomAttributes(typeof(Attribute.TableAttribute), true);
-            Attribute.TableAttribute des;
+            Attribute.TableInnerAttribute des;
             if (objAttrs == null || objAttrs.Length == 0)
             {
-                des = new Attribute.TableAttribute() { TableName = type.Name };
+                des = new Attribute.TableInnerAttribute() { TableName = type.Name };
             }
             else
             {
-                des = objAttrs[0] as Attribute.TableAttribute;
+                des = (objAttrs[0] as Attribute.TableAttribute).ToType<Attribute.TableInnerAttribute>();
             }
             des.Type = type;
-
+            des.Fields = new List<Attribute.FieldInnerAttribute>();
             if (!typeCache.ContainsKey(type))
             {
                 typeCache.TryAdd(type, des);
@@ -103,33 +103,33 @@ namespace CRL
             {
                 des.TableName = type.Name;
             }
-            des.TableNameFormat = string.Format("[{0}]", des.TableName);
+            //des.TableNameFormat = string.Format("[{0}]", des.TableName);
             InitProperties(des);
             return des;
         }
         /// <summary>
-        /// 获取数据库字段,包函虚拟字段
+        /// 获取数据库字段
         /// </summary>
         /// <param name="type"></param>
         /// <param name="onlyField"></param>
         /// <returns></returns>
-        public static IgnoreCaseDictionary<Attribute.FieldAttribute> GetProperties(Type type, bool onlyField=true)
+        public static IgnoreCaseDictionary<Attribute.FieldInnerAttribute> GetProperties(Type type, bool onlyField=true)
         {
             var table = GetTable(type);
             return table.FieldsDic;
         }
-        static void InitProperties(Attribute.TableAttribute table)
+        static void InitProperties(Attribute.TableInnerAttribute table)
         {
             if (table.Fields.Count > 0)
             {
                 return;
             }
             var type = table.Type;
-            List<Attribute.FieldAttribute> list = new List<CRL.Attribute.FieldAttribute>();
-            var fieldDic = new IgnoreCaseDictionary<Attribute.FieldAttribute>();
+            List<Attribute.FieldInnerAttribute> list = new List<CRL.Attribute.FieldInnerAttribute>();
+            var fieldDic = new IgnoreCaseDictionary<Attribute.FieldInnerAttribute>();
             //string fieldPat = @"^([A-Z][a-z|\d]+)+$";
             int n = 0;
-            Attribute.FieldAttribute keyField = null;
+            Attribute.FieldInnerAttribute keyField = null;
             #region 读取
             var typeArry = table.Type.GetProperties().ToList();
             //移除重复的
@@ -153,7 +153,7 @@ namespace CRL
                     continue;
                 }
                 Type propertyType = info.PropertyType;
-                Attribute.FieldAttribute f = new CRL.Attribute.FieldAttribute();
+                var f = new CRL.Attribute.FieldInnerAttribute();
                 //排除集合类型
                 if (propertyType.FullName.IndexOf("System.Collections") > -1)
                 {
@@ -163,7 +163,9 @@ namespace CRL
                 object[] attrs = info.GetCustomAttributes(typeof(Attribute.FieldAttribute), true);
                 if (attrs != null && attrs.Length > 0)
                 {
-                    f = attrs[0] as Attribute.FieldAttribute;
+                    var atr = attrs[0] as Attribute.FieldAttribute;
+                    atr.MemberName = info.Name;
+                    f = atr.ToType<Attribute.FieldInnerAttribute>();
                 }
                 f.SetPropertyInfo(info);
                 f.PropertyType = propertyType;

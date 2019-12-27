@@ -6,6 +6,7 @@
 * 在线文档 http://crl.changqidongli.com/
 */
 using CRL.DBAccess;
+using CRL.LambdaQuery;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,30 +43,38 @@ namespace CRL
         }
         internal DBHelper GetDBHelper()
         {
-            switch (_DBType)
+            var configBuilder = SettingConfigBuilder.current;
+            var exists = configBuilder.DBHelperRegister.TryGetValue(_DBType, out Type type);
+            if (!exists)
             {
-                case DBType.ACCESS:
-                    return new AccessHelper(_connectionString);
-
-                case DBType.MongoDB:
-                    var lastIndex = _connectionString.LastIndexOf("/");
-                    var DatabaseName = _connectionString.Substring(lastIndex + 1);//like mongodb://localhost:27017/db1
-                    return new MongoDBHelper(_connectionString, DatabaseName);
-
-                case DBType.MSSQL:
-                    return new SqlHelper(_connectionString);
-
-                case DBType.MSSQL2000:
-                    return new Sql2000Helper(_connectionString);
-
-                case DBType.MYSQL:
-                    return new MySqlHelper(_connectionString);
-
-                case DBType.ORACLE:
-                    return new OracleHelper(_connectionString);
-
+                throw new CRLException("未配置对应的数据库类型:" + _DBType);
             }
-            throw new CRLException("未知的类型" + _DBType);
+            var db = System.Activator.CreateInstance(type, _connectionString) as DBHelper;
+            return db;
+            //switch (_DBType)
+            //{
+            //    case DBType.ACCESS:
+            //        return new AccessHelper(_connectionString);
+
+            //    case DBType.MongoDB:
+            //        var lastIndex = _connectionString.LastIndexOf("/");
+            //        var DatabaseName = _connectionString.Substring(lastIndex + 1);//like mongodb://localhost:27017/db1
+            //        return new MongoDBHelper(_connectionString, DatabaseName);
+
+            //    case DBType.MSSQL:
+            //        return new SqlHelper(_connectionString);
+
+            //    case DBType.MSSQL2000:
+            //        return new Sql2000Helper(_connectionString);
+
+            //    case DBType.MYSQL:
+            //        return new MySqlHelper(_connectionString);
+
+            //    case DBType.ORACLE:
+            //        return new OracleHelper(_connectionString);
+
+            //}
+            //throw new CRLException("未知的类型" + _DBType);
         }
     }
     /// <summary>
@@ -73,6 +82,13 @@ namespace CRL
     /// </summary>
     public class SettingConfig
     {
+        static SettingConfig()
+        {
+            var configBuilder = SettingConfigBuilder.current;
+            configBuilder.RegisterDBType<SqlHelper, DBAdapter.MSSQLDBAdapter>(DBType.MSSQL);
+            configBuilder.RegisterDBType<Sql2000Helper, DBAdapter.MSSQL2000DBAdapter>(DBType.MSSQL2000);
+            configBuilder.RegisterDBExtend<CRL.DBExtend.RelationDB.DBExtend>(DBType.MSSQL);
+        }
         #region 委托
         /// <summary>
         /// 获取数据连接
@@ -170,5 +186,40 @@ namespace CRL
         #endregion
     }
 
+
+    public class SettingConfigBuilder
+    {
+        internal Dictionary<DBType, Type> DBHelperRegister = new Dictionary<DBType, Type>();
+        internal Dictionary<DBType, Type> DBAdapterBaseRegister = new Dictionary<DBType, Type>();
+        internal Dictionary<DBType, Type> AbsDBExtendRegister = new Dictionary<DBType, Type>();
+        public SettingConfigBuilder()
+        {
+            current = this;
+        }
+        static SettingConfigBuilder()
+        {
+            current = new SettingConfigBuilder();
+        }
+        internal static SettingConfigBuilder current;
+
+        public SettingConfigBuilder RegisterDBType<T1, T2>(DBType dBType) where T1 : DBHelper
+            where T2 : DBAdapter.DBAdapterBase
+        {
+            if (!DBHelperRegister.ContainsKey(dBType))
+            {
+                DBHelperRegister.Add(dBType, typeof(T1));
+                DBAdapterBaseRegister.Add(dBType, typeof(T2));
+            }
+            return this;
+        }
+        public SettingConfigBuilder RegisterDBExtend<T1>(DBType dBType) where T1 : AbsDBExtend
+        {
+            if (!AbsDBExtendRegister.ContainsKey(dBType))
+            {
+                AbsDBExtendRegister.Add(dBType, typeof(T1));
+            }
+            return this;
+        }
+    }
 
 }

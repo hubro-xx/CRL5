@@ -35,7 +35,7 @@ namespace CRL.Set
             {
                 relationExpression = expression;
             }
-            public override LambdaQuery<T> GetLambdaQuery()
+            public override ILambdaQuery<T> GetLambdaQuery()
             {
                 return base.GetLambdaQuery().Where(relationExpression);
             }
@@ -87,7 +87,7 @@ namespace CRL.Set
         /// 获取查询表达式
         /// </summary>
         /// <returns></returns>
-        public LambdaQuery<T> GetQuery()
+        public ILambdaQuery<T> GetQuery()
         {
             return _BaseProvider.GetLambdaQuery();
         }

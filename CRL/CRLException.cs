@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace CRL
 {
     [Serializable]
-    internal class CRLException : Exception
+    public class CRLException : Exception
     {
         public CRLException()
             : this("发生异常")

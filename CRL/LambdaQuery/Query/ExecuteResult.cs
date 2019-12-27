@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -53,10 +54,11 @@ namespace CRL.LambdaQuery
         public List<dynamic> ToDynamic()
         {
             var db = DBExtendFactory.CreateDBExtend(__DbContext);
-            if (db is DBExtend.MongoDBEx.MongoDBExt)
+            if (__DbContext.DBHelper.CurrentDBType== DBAccess.DBType.MongoDB)
             {
-                var db2 = db as DBExtend.MongoDBEx.MongoDBExt;
-                return db2.QueryDynamic<T>(this);
+                var method = db.GetType().GetMethod("QueryDynamic2", BindingFlags.Public | BindingFlags.Instance);
+                var list = method.MakeGenericMethod(new Type[] { typeof(T) }).Invoke(db, new object[] { this });
+                return list as List<dynamic>;
             }
             return db.QueryDynamic(this);
         }

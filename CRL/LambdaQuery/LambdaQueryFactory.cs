@@ -18,11 +18,16 @@ namespace CRL.LambdaQuery
     {
         public static LambdaQuery<T> CreateLambdaQuery<T>(DbContext _dbContext) where T : IModel, new()
         {
-            if (_dbContext.DBHelper.CurrentDBType != DBType.MongoDB)
+            var _DBType = _dbContext.DBHelper.CurrentDBType;
+            if (_DBType != DBType.MongoDB)
             {
                 return new RelationLambdaQuery<T>(_dbContext);
             }
-            return new MongoDBLambdaQuery<T>(_dbContext);
+            
+            var type = CRL.Core.Extension.Extension.MakeGenericType("CRL.Mongo.MongoDBLambdaQuery", "CRL.Mongo", typeof(T));
+            var query = System.Activator.CreateInstance(type, _dbContext) as LambdaQuery<T>;
+            return query;
+            //return new MongoDBLambdaQuery<T>(_dbContext);
         }
     }
 }

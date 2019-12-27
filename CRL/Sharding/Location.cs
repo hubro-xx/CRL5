@@ -46,16 +46,16 @@ namespace CRL.Sharding
     public class LocationManage
     {
         static ConcurrentDictionaryEx<Type, object> dic = new ConcurrentDictionaryEx<Type, object>();
-        public static void Register<T>(Func<Attribute.TableAttribute, T, Location> func)
+        public static void Register<T>(Func<Attribute.TableInnerAttribute, T, Location> func)
         {
             dic.TryAdd(typeof(T), func);
         }
-        internal static Func<Attribute.TableAttribute, T, Location> Get<T>()
+        internal static Func<Attribute.TableInnerAttribute, T, Location> Get<T>()
         {
             var a = dic.TryGetValue(typeof(T), out object value);
             if(a)
             {
-                return value as Func<Attribute.TableAttribute, T, Location>;
+                return value as Func<Attribute.TableInnerAttribute, T, Location>;
             }
             return null;
         }

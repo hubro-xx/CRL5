@@ -21,7 +21,7 @@ namespace CRL.DBAdapter
             : base(_dbContext)
         {
         }
-        internal override bool CanCompileSP
+        public override bool CanCompileSP
         {
             get
             {
@@ -76,7 +76,7 @@ end", spName, script);
         /// <param name="info"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public override string GetColumnType(Attribute.FieldAttribute info, out string defaultValue)
+        public override string GetColumnType(Attribute.FieldInnerAttribute info, out string defaultValue)
         {
             Type propertyType = info.PropertyType;
             //Dictionary<Type, string> dic = GetFieldMaping();
@@ -133,7 +133,7 @@ end", spName, script);
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        public override string GetCreateColumnScript(Attribute.FieldAttribute field)
+        public override string GetCreateColumnScript(Attribute.FieldInnerAttribute field)
         {
             string str = string.Format("alter table [{0}] add {1} {2}", field.TableName, field.MapingName, field.ColumnType);
             if (!string.IsNullOrEmpty(field.DefaultValue))
@@ -152,7 +152,7 @@ end", spName, script);
         /// </summary>
         /// <param name="filed"></param>
         /// <returns></returns>
-        public override string GetColumnIndexScript(Attribute.FieldAttribute filed)
+        public override string GetColumnIndexScript(Attribute.FieldInnerAttribute filed)
         {
             if (filed.IsPrimaryKey)
             {
@@ -170,13 +170,13 @@ end", spName, script);
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public override void CreateTable(DbContext dbContext, List<Attribute.FieldAttribute> fields, string tableName)
+        public override void CreateTable(DbContext dbContext, List<Attribute.FieldInnerAttribute> fields, string tableName)
         {
             var defaultValues = new List<string>();
             string script = string.Format("create table [{0}] (\r\n", tableName);
             List<string> list2 = new List<string>();
             string primaryKey = "";
-            foreach (Attribute.FieldAttribute item in fields)
+            foreach (Attribute.FieldInnerAttribute item in fields)
             {
                 if (item.IsPrimaryKey)
                 {
@@ -278,7 +278,7 @@ end", spName, script);
             foreach (var item in details)
             {
                 DataRow dr = tempTable.NewRow();
-                foreach (Attribute.FieldAttribute info in typeArry)
+                foreach (Attribute.FieldInnerAttribute info in typeArry)
                 {
                     string name = info.MapingName;
                     object value = info.GetValue(item);
@@ -585,13 +585,13 @@ set  nocount  on
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public override void CreateTable(DbContext dbContext, List<Attribute.FieldAttribute> fields, string tableName)
+        public override void CreateTable(DbContext dbContext, List<Attribute.FieldInnerAttribute> fields, string tableName)
         {
             var helper = dbContext.DBHelper;
             var defaultValues = new List<string>();
             string script = string.Format("create table [{0}] (\r\n", tableName);
             List<string> list2 = new List<string>();
-            foreach (Attribute.FieldAttribute item in fields)
+            foreach (Attribute.FieldInnerAttribute item in fields)
             {
                 string nullStr = item.NotNull ? "NOT NULL" : "";
                 string str = string.Format("[{0}] {1} {2} ", item.MapingName, item.ColumnType, nullStr);

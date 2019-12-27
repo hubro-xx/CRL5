@@ -114,7 +114,7 @@ namespace CRL.DBExtend.RelationDB
             var db = GetDBHelper(DataAccessType.Read);
             int count = Convert.ToInt32(SqlStopWatch.ExecScalar(db, countSql));
             query1.ExecuteTime += db.ExecuteTime;
-            query1.RowCount = count;
+            query1.__RowCount = count;
             if (count == 0)
             {
                 return null;
@@ -230,7 +230,7 @@ namespace CRL.DBExtend.RelationDB
             var db = GetDBHelper(DataAccessType.Read);
             int count = Convert.ToInt32(SqlStopWatch.ExecScalar(db, countSql));
             query1.ExecuteTime += db.ExecuteTime;
-            query1.RowCount = count;
+            query1.__RowCount = count;
             if (count == 0)
             {
                 return null;

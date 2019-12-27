@@ -29,7 +29,7 @@ namespace CRL.DBAdapter
         /// <summary>
         /// 是否支持编译存储过程
         /// </summary>
-        internal virtual bool CanCompileSP
+        public virtual bool CanCompileSP
         {
             get
             {
@@ -50,30 +50,37 @@ namespace CRL.DBAdapter
             {
                 return db;
             }
-            switch (dbContext.DBHelper.CurrentDBType)
-            {
-                case DBType.MSSQL:
-                    db = new MSSQLDBAdapter(dbContext);
-                    break;
-                case DBType.MSSQL2000:
-                    db = new MSSQL2000DBAdapter(dbContext);
-                    break;
-                case DBType.ACCESS:
-                    break;
-                case DBType.MYSQL:
-                    db = new MySQLDBAdapter(dbContext);
-                    break;
-                case DBType.ORACLE:
-                    db = new ORACLEDBAdapter(dbContext);
-                    break;
-                case DBType.MongoDB:
-                    db = new MongoDBAdapter(dbContext);
-                    break;
-            }
-            if (db == null)
+            var configBuilder = SettingConfigBuilder.current;
+            var exists = configBuilder.DBAdapterBaseRegister.TryGetValue(dbContext.DBHelper.CurrentDBType, out Type type);
+            if (!exists)
             {
                 throw new CRLException("找不到对应的DBAdapte" + dbContext.DBHelper.CurrentDBType);
             }
+            db = System.Activator.CreateInstance(type, dbContext) as DBAdapterBase;
+            //switch (dbContext.DBHelper.CurrentDBType)
+            //{
+            //    case DBType.MSSQL:
+            //        db = new MSSQLDBAdapter(dbContext);
+            //        break;
+            //    case DBType.MSSQL2000:
+            //        db = new MSSQL2000DBAdapter(dbContext);
+            //        break;
+            //    case DBType.ACCESS:
+            //        break;
+            //    case DBType.MYSQL:
+            //        db = new MySQLDBAdapter(dbContext);
+            //        break;
+            //    case DBType.ORACLE:
+            //        db = new ORACLEDBAdapter(dbContext);
+            //        break;
+            //    case DBType.MongoDB:
+            //        db = new MongoDBAdapter(dbContext);
+            //        break;
+            //}
+            //if (db == null)
+            //{
+            //    throw new CRLException("找不到对应的DBAdapte" + dbContext.DBHelper.CurrentDBType);
+            //}
             DBAdapterBaseCache[dbContext.DBHelper.CurrentDBType] = db;
             return db;
         }
@@ -84,7 +91,7 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="info"></param>
         /// <returns></returns>
-        public abstract string GetColumnType(CRL.Attribute.FieldAttribute info,out string defaultValue);
+        public abstract string GetColumnType(CRL.Attribute.FieldInnerAttribute info,out string defaultValue);
         /// <summary>
         /// 获取字段类型转换
         /// </summary>
@@ -128,7 +135,7 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="filed"></param>
         /// <returns></returns>
-        public abstract string GetColumnIndexScript(CRL.Attribute.FieldAttribute filed);
+        public abstract string GetColumnIndexScript(CRL.Attribute.FieldInnerAttribute filed);
 
         public abstract string GetColumnUnionIndexScript(string tableName, string indexName, List<string> columns);
 
@@ -137,7 +144,7 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        public abstract string GetCreateColumnScript(CRL.Attribute.FieldAttribute field);
+        public abstract string GetCreateColumnScript(CRL.Attribute.FieldInnerAttribute field);
         /// <summary>
         /// 创建存储过程
         /// </summary>
@@ -150,7 +157,7 @@ namespace CRL.DBAdapter
         /// </summary>
         /// <param name="fields"></param>
         /// <param name="tableName"></param>
-        public abstract void CreateTable(DbContext dbContext, List<Attribute.FieldAttribute> fields, string tableName);
+        public abstract void CreateTable(DbContext dbContext, List<Attribute.FieldInnerAttribute> fields, string tableName);
         #endregion
 
         #region SQL查询
@@ -200,7 +207,7 @@ namespace CRL.DBAdapter
         public abstract object InsertObject<T>(DbContext dbContext, T obj);
 
         static System.Collections.Concurrent.ConcurrentDictionary<string, string> insertSqlCache = new System.Collections.Concurrent.ConcurrentDictionary<string, string>();
-        protected string GetInsertSql(DbContext dbContext, Attribute.TableAttribute table, object obj, bool fillParame = true)
+        protected string GetInsertSql(DbContext dbContext, Attribute.TableInnerAttribute table, object obj, bool fillParame = true)
         {
             Type type = obj.GetType();
             var key = string.Format("{0}_{1}", type, fillParame);
@@ -217,7 +224,7 @@ namespace CRL.DBAdapter
             }
             string sql1 = "";
             string sql2 = "";
-            foreach (Attribute.FieldAttribute info in typeArry)
+            foreach (Attribute.FieldInnerAttribute info in typeArry)
             {
                 string name = info.MapingName;
                 if (info.IsPrimaryKey && !info.KeepIdentity)
@@ -300,7 +307,7 @@ namespace CRL.DBAdapter
         {
             return value;
         }
-        public string FieldNameFormat(Attribute.FieldAttribute field)
+        public string FieldNameFormat(Attribute.FieldInnerAttribute field)
         {
             if (string.IsNullOrEmpty(field.MapingNameFormat))
             {
@@ -308,7 +315,7 @@ namespace CRL.DBAdapter
             }
             return field.MapingNameFormat;
         }
-        public virtual string TableNameFormat(Attribute.TableAttribute table)
+        public virtual string TableNameFormat(Attribute.TableInnerAttribute table)
         {
             return table.TableName;
         }

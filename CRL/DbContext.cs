@@ -37,11 +37,11 @@ namespace CRL
         /// <summary>
         /// 数据库连接定位
         /// </summary>
-        internal DBLocation DBLocation;
+        public DBLocation DBLocation;
         /// <summary>
         /// 数据访问
         /// </summary>
-        internal DBHelper DBHelper;
+        public DBHelper DBHelper;
         /// <summary>
         /// 是否使用分表定位
         /// </summary>

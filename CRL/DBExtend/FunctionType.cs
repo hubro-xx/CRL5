@@ -15,7 +15,7 @@ namespace CRL
     /// <summary>
     /// 函数类型
     /// </summary>
-    internal enum FunctionType
+    public enum FunctionType
     {
         MAX,
         MIN,

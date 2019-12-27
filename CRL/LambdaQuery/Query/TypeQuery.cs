@@ -16,7 +16,7 @@ namespace CRL.LambdaQuery
     /// <summary>
     /// 表示查询的类型
     /// </summary>
-    internal class TypeQuery
+    public class TypeQuery
     {
         public TypeQuery(Type _OriginType)
         {
@@ -54,7 +54,7 @@ namespace CRL.LambdaQuery
         public string queryName2;
         public string InnerQuery;
     }
-    enum TypeQueryEnum
+    public enum TypeQueryEnum
     {
         表,
         查询

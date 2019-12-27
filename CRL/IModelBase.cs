@@ -25,7 +25,7 @@ namespace CRL
         /// <summary>
         /// 自增主键
         /// </summary>
-        [Attribute.Field(IsPrimaryKey = true)]
+        [Attribute.FieldInner(IsPrimaryKey = true)]
         public int Id
         {
             get;

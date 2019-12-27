@@ -58,21 +58,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="MongoDB.Bson, Version=2.4.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MongoDB.Bson.2.4.4\lib\net45\MongoDB.Bson.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver, Version=2.4.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MongoDB.Driver.2.4.4\lib\net45\MongoDB.Driver.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver.Core, Version=2.4.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\MongoDB.Driver.Core.2.4.4\lib\net45\MongoDB.Driver.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MySql.Data, Version=6.9.12.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <HintPath>..\packages\MySql.Data.6.9.12\lib\net45\MySql.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="Oracle.ManagedDataAccess, Version=4.122.19.1, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
-      <HintPath>..\packages\Oracle.ManagedDataAccess.19.5.0\lib\net40\Oracle.ManagedDataAccess.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -87,15 +72,10 @@
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Messaging" />
-    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.InteropServices.RuntimeInformation.4.0.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
-    </Reference>
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -118,18 +98,15 @@
     <Compile Include="CRLDbConnectionScope.cs" />
     <Compile Include="DBExtend\CallBackDataReader.cs" />
     <Compile Include="CRLException.cs" />
-    <Compile Include="DBAccess\AccessHelper.cs" />
     <Compile Include="DBAccess\DBHelper.cs" />
-    <Compile Include="DBAccess\MongoDBHelper.cs" />
-    <Compile Include="DBAccess\MySqlHelper.cs" />
-    <Compile Include="DBAccess\OracleHelper.cs" />
     <Compile Include="DBAccess\SqlHelper.cs" />
-    <Compile Include="DBExtend\MongoDB\ObjContainer.cs" />
+    <Compile Include="DBExtend\IAbsDBExtend.cs" />
     <Compile Include="ExtensionMethod\Compare.cs" />
     <Compile Include="ExtensionMethod\IModelEx.cs" />
     <Compile Include="ExtensionMethod\DateTime.cs" />
     <Compile Include="ExtensionMethod\IsNull.cs" />
     <Compile Include="ExtensionMethod\Length.cs" />
+    <Compile Include="LambdaQuery\Query\ILambdaQuery.cs" />
     <Compile Include="LambdaQuery\Query\LambdaQueryBase\LambdaQueryMethodCreate.cs" />
     <Compile Include="LambdaQuery\Query\LambdaQueryJoin\T2.cs" />
     <Compile Include="LambdaQuery\Query\LambdaQueryJoin\T5.cs" />
@@ -144,23 +121,13 @@
     <Compile Include="ModelCheck.cs" />
     <Compile Include="PropertyBuilder.cs" />
     <Compile Include="ReflectionHelper.cs" />
-    <Compile Include="DBAdapter\MongoDBAdapter.cs" />
     <Compile Include="DBExtend\DataBaseArchitecture.cs" />
     <Compile Include="DBAdapter\DBAdapterBase.cs" />
     <Compile Include="DBAdapter\MSSQLDBAdapter.cs" />
-    <Compile Include="DBAdapter\MySQLDBAdapter.cs" />
-    <Compile Include="DBAdapter\ORACLEDBAdapter.cs" />
     <Compile Include="Base.cs" />
     <Compile Include="BaseProvider.cs" />
-    <Compile Include="Attribute\FieldAttribute.cs" />
+    <Compile Include="Attribute\FieldInnerAttribute.cs" />
     <Compile Include="DbContext.cs" />
-    <Compile Include="DBExtend\MongoDB\MongoDB.cs" />
-    <Compile Include="DBExtend\MongoDB\MongoDBDelete.cs" />
-    <Compile Include="DBExtend\MongoDB\MongoDBInsert.cs" />
-    <Compile Include="DBExtend\MongoDB\MongoDBPage.cs" />
-    <Compile Include="DBExtend\MongoDB\MongoDBQuery.cs" />
-    <Compile Include="DBExtend\MongoDB\MongoDBUpdate.cs" />
-    <Compile Include="DBExtend\MongoDB\NotSupported.cs" />
     <Compile Include="DBExtend\RelationDB\DBExtend.cs" />
     <Compile Include="DBExtend\RelationDB\DBExtendAutoSp.cs" />
     <Compile Include="DBExtend\RelationDB\DBExtendDelete.cs" />
@@ -193,7 +160,6 @@
     <Compile Include="LambdaQuery\CRLExpression\CRLQueryExpression.cs" />
     <Compile Include="LambdaQuery\CRLExpression\MethodCallObj.cs" />
     <Compile Include="LambdaQuery\LambdaQueryFactory.cs" />
-    <Compile Include="LambdaQuery\MongoDBLambdaQuery.cs" />
     <Compile Include="LambdaQuery\Query\ExecuteResult.cs" />
     <Compile Include="LambdaQuery\ExpressionVisitor.cs" />
     <Compile Include="LambdaQuery\Extensions.cs">
@@ -223,7 +189,7 @@
     <Compile Include="Runtime\RunTimeService.cs" />
     <Compile Include="Set\DbSet.cs" />
     <Compile Include="SettingConfig.cs" />
-    <Compile Include="Attribute\TableAttribute.cs" />
+    <Compile Include="Attribute\TableInnerAttribute.cs" />
     <Compile Include="Sharding\BaseProvider.cs" />
     <Compile Include="Sharding\Location.cs" />
     <Compile Include="Sharding\UnionType.cs" />
@@ -237,7 +203,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CRL.Core.RedisProvider\CRL.Core.RedisProvider.csproj">

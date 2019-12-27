@@ -17,7 +17,7 @@ namespace CRL.LambdaQuery.CRLExpression
     /// <summary>
     /// 表示一个方法调用
     /// </summary>
-    internal class MethodCallObj
+    public class MethodCallObj
     {
         /// <summary>
         /// 属性名称
