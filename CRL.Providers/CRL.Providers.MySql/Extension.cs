@@ -10,7 +10,13 @@ namespace CRL.MySql
     {
         public static SettingConfigBuilder UseMySql(this SettingConfigBuilder builder)
         {
-            builder.RegisterDBType<MySqlHelper, MySQLDBAdapter>(DBAccess.DBType.MYSQL);
+            builder.RegisterDBType(DBAccess.DBType.MYSQL, (conn) =>
+            {
+                return new MySqlHelper(conn);
+            }, (context) =>
+            {
+                return new MySQLDBAdapter(context);
+            });
             return builder;
         }
     }

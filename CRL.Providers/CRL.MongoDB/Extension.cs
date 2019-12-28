@@ -10,8 +10,17 @@ namespace CRL.Mongo
     {
         public static SettingConfigBuilder UseMongoDB(this SettingConfigBuilder builder)
         {
-            builder.RegisterDBType<MongoDBHelper, MongoDBAdapter>(DBAccess.DBType.MongoDB);
-            builder.RegisterDBExtend<MongoDBEx.MongoDBExt>(DBAccess.DBType.MongoDB);
+            builder.RegisterDBType(DBAccess.DBType.MongoDB, (conn) =>
+            {
+                return new MongoDBHelper(conn);
+            }, (context) =>
+            {
+                return new MongoDBAdapter(context);
+            });
+            builder.RegisterDBExtend<MongoDBEx.MongoDBExt>(DBAccess.DBType.MongoDB, (context) =>
+            {
+                return new MongoDBEx.MongoDBExt(context);
+            });
             return builder;
         }
     }

@@ -20,22 +20,16 @@ namespace CRL
         {
             var configBuilder = SettingConfigBuilder.current;
             var dbType = _dbContext.DBHelper.CurrentDBType;
-            if (dbType != DBType.MongoDB)
+            if (_dbContext.DataBaseArchitecture == DataBaseArchitecture.Relation)
             {
-                dbType = DBType.MSSQL;
+                return new DBExtend.RelationDB.DBExtend(_dbContext);
             }
-            var a = configBuilder.AbsDBExtendRegister.TryGetValue(dbType, out Type type);
-            if(!a)
+            var a = configBuilder.AbsDBExtendRegister.TryGetValue(dbType, out Func<DbContext, AbsDBExtend> func);
+            if (!a)
             {
                 throw new CRLException($"未找到AbsDBExtend {dbType}");
             }
-            var dbExtend = System.Activator.CreateInstance(type, _dbContext) as AbsDBExtend;
-            return dbExtend;
-            //if (_dbContext.DBHelper.CurrentDBType == DBType.MongoDB)
-            //{
-            //    return new DBExtend.MongoDBEx.MongoDBExt(_dbContext);
-            //}
-            //return new DBExtend.RelationDB.DBExtend(_dbContext);
+            return func(_dbContext);
         }
     }
 }

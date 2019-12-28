@@ -64,7 +64,7 @@ namespace CRLTest
             configBuilder.UseRedis("Server_204@127.0.0.1:6389")
                 .UseRedisSession();
             //自定义定位
-            CRL.Sharding.LocationManage.Register<Code.Sharding.MemberSharding>((t, a) =>
+            builder.RegisterLocation<Code.Sharding.MemberSharding>((t, a) =>
             {
                 var tableName = t.TableName;
                 if (a.Name == "hubro")
@@ -75,7 +75,7 @@ namespace CRLTest
                 //返回定位库和表名
                 return new CRL.Sharding.Location("testdb", tableName);
             });
-            CRL.SettingConfig.RegisterDBAccessBuild(dbLocation=>
+            builder.RegisterDBAccessBuild(dbLocation=>
             {
                 if (dbLocation.ManageName == "mongo")
                 {
@@ -85,7 +85,7 @@ namespace CRLTest
                 }
                 return null;
             });
-            CRL.SettingConfig.RegisterDBAccessBuild(dbLocation =>
+            builder.RegisterDBAccessBuild(dbLocation =>
             {
                 //定位库
                 if (dbLocation.ShardingLocation != null)
@@ -104,7 +104,8 @@ namespace CRLTest
 
         label1:
             //testFormat();
-            MongoDBTestManage.Instance.GroupTest();
+            //MongoDBTestManage.Instance.GroupTest();
+            TestAll();
             Console.ReadLine();
             goto label1;
             Console.ReadLine();

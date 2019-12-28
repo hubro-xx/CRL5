@@ -10,7 +10,13 @@ namespace CRL.Oracle
     {
         public static SettingConfigBuilder UseOracle(this SettingConfigBuilder builder)
         {
-            builder.RegisterDBType<OracleHelper, ORACLEDBAdapter>(DBAccess.DBType.ORACLE);
+            builder.RegisterDBType(DBAccess.DBType.ORACLE, (conn) =>
+            {
+                return new OracleHelper(conn);
+            }, (context) =>
+            {
+                return new ORACLEDBAdapter(context);
+            });
             return builder;
         }
     }

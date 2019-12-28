@@ -91,7 +91,7 @@ namespace CRL.Oracle
 
                 DbCommand cmd = createCmd_(seqSql, conn);
                 conn.Open();
-                //todo 事物控制
+                //todo 事务控制
                 //if (_trans != null)
                 //{
                 //    cmd.Transaction = _trans;

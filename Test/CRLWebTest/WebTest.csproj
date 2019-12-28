@@ -374,11 +374,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CRL.Core\CRL.Core.csproj">
+    <ProjectReference Include="..\..\CRL.Core\CRL.Core.csproj">
       <Project>{1255276c-756e-48aa-a09b-22e92d16d995}</Project>
       <Name>CRL.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CRL\CRL.csproj">
+    <ProjectReference Include="..\..\CRL\CRL.csproj">
       <Project>{221a152b-1136-46a0-bf49-37d8e8ef19a0}</Project>
       <Name>CRL</Name>
     </ProjectReference>

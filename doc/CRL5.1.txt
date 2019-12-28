@@ -1,0 +1,172 @@
+2019-12-28
+最近关于ORM的话题又火了起来,各种重复造轮子的过程一直在进行,轮子都一样是圆的,你的又有什么特点呢?
+抛开常规的增删改查,我们来讲讲与众不同的
+
+PS:CRL虽然写了好多年,但一直在DEBUG状态中, 最近又升级了,分离了数据访问层,不同数据库引用不同的数据访问层,版本升级到5.1
+
+1.与众不同之一,动态数据源,天生适合分库分表
+目前看到的ORM多数访问对象实例化都类似于
+var context = new MsSqlContext(ConnectionString);
+在对象初始时,就绑定上了数据库连接串, 这样写没什么问题,但是不好扩展
+如:需要动态切换库,表,根据租户信息访问不同的数据库,或不同类型的数据库,或是读写分离,这时,急需处理的技术问题就来了,分库分表的解决方案,读写分离的方案
+在数据连接绑定的情况下,这种问题很不好解决
+又或者传入多个连接串,在调用时,手动选择调用的库或表,对于这种方式,只能说耦合太严重,得关心配置,又得关心调用,在CRL之前的版本里,有这样实现过,弃用了
+
+然而根据IOC的理念,这种问题也不是不好解决,让数据访问对象实现抽象化实现就能办到了
+数据查询方法不再直接调用数据访问对象,而是调用数据访问对象创建的抽象方法,由抽象法来实例化访问对象,过程表示为
+
+数据查询方法(组件内) => 抽象方法工厂(组件内) => 抽象方法实现(组件外)
+
+基于这样的理念,CRL在设计之初,就使用了的这样的方式,以代码为例
+
+!数据访问实现
+以下实现了分库分表和mongoDB切换
+以下在程序启动时初始
+var builder = new CRL.SettingConfigBuilder();
+builder.UseMongoDB();//引用CRL.Mongo 使用MongoDB
+//注册自定义定位,按MemberSharding传入数据定义数据源位置
+builder.RegisterLocation<Code.Sharding.MemberSharding>((t, a) =>//注册一
+{
+    var tableName = t.TableName;
+    if (a.Name == "hubro")//当名称为hubro,则定位到库testdb2 表MemberSharding1
+    {
+        tableName = "MemberSharding1";
+        return new CRL.Sharding.Location("testdb2", tableName);
+    }
+    //返回定位库和表名
+    return new CRL.Sharding.Location("testdb", tableName);
+});
+builder.RegisterDBAccessBuild(dbLocation=>//注册二
+{
+    if (dbLocation.ManageName == "mongo")
+    {
+        var conn = CRL.Core.CustomSetting.GetConfigKey("mongodb");
+        return new CRL.DBAccessBuild(DBType.MongoDB, conn);
+    }
+    return null;
+});
+builder.RegisterDBAccessBuild(dbLocation =>//注册三
+{
+    //自定义定位,由注册一传入
+    if (dbLocation.ShardingLocation != null)
+    {
+        return new CRL.DBAccessBuild(DBType.MSSQL, "Data Source=.;Initial Catalog=" + dbLocation.ShardingLocation.DataBaseName + ";User ID=sa;Password=123");
+    }
+    return new CRL.DBAccessBuild(DBType.MSSQL, "server=.;database=testDb; uid=sa;pwd=123;");
+});
+!数据访问类,类似于仓储的形式,根据实际业务实现
+定位使用示例
+ public class MemberManage : CRL.Sharding.BaseProvider<MemberSharding>
+{
+}
+var instance=new MemberManage();
+instance.Add(new MemberSharding(){Name="hubro"});
+根据定位规则 运行到注册一,此数据将会插入到 库testdb2 表MemberSharding1
+
+常规切换示例
+public class MongoDBTestManage : CRL.BaseProvider<MongoDBModel2>
+{
+    public override string ManageName => "mongo";
+}
+var instance=new MongoDBTestManage();
+instance.Add(new MongoDBModel2(){name="hubro"});
+根据数据访问规则,运行到注册二,此数据将会插入mongodb
+
+可以看到,在上面代码中,没有看到任何数据连接串的传入,数据的访问都由初始时动态分配,对于方法调用是不透明的,调用者不用关心数据源的问题
+
+2.与众不同之二,表结构自动维护
+在新技术的支持下,程序和数据库的绑定关系越来越模糊,今天可能是用的SQLSERVER,后天可能改成MySql了,或者改成mongoDB
+依赖数据库开发变成越来越不可取,效率也很低
+再后来出现了DBFirst方式,虽解决了部份问题,但也很麻烦
+如:建立数据库模型=>导入数据库=>T4模版生成代码(修修补补)
+而使用CRL后,过程一步到位
+编写实体类,实现对象访问=>调试运行,自动创建表结构(关键字,长度,索引)
+同时,CRL还提供了手动维护方法,使能够按实体结构重建数据表
+也提供了对象结构文档导出,不用提心文档的问题
+详细介绍看这里
+https://www.cnblogs.com/hubro/p/6038118.html
+
+3.与众不同之三,动态缓存
+使用缓存可以大大提高程序的运行效率,使用REDIS或MONGODB之类的又需要额外维护
+对于单应用程序,程序集内缓存非常有用
+CRL内置了缓存实现和维护
+从数据库查询,到缓存调用,只是一个方法名的区别,创建维护全自动
+如:
+从数据库查
+var item = Code.ProductDataManage.Instance.QueryItem(b => b.Id==1)
+从缓存查
+var item = Code.ProductDataManage.Instance.QueryItemFromCache(b=>b.Id==1);
+查询多项
+var list = Code.ProductDataManage.Instance.QueryFromCache(b => b.Id < 10);
+
+也支持自定义查询缓存
+var query = Code.ProductDataManage.Instance.GetLambdaQuery();
+            //缓存会按条件不同缓存不同的数据,条件不固定时,慎用
+            query.Where(b => b.Id < 700);
+            int exp = 10;//过期分钟
+            query.Expire(exp);
+            var list = query.ToList();
+基于这样的形式,可以将所有查询都走缓存
+详细介绍看这里
+https://www.cnblogs.com/hubro/p/6038540.html
+
+4.与众不同之四,应对复杂查询
+因为没有查询分支的概念,处理复杂的查询,一票ORM估计得退场了,虽然合理的结构设计会减少查询复杂度,但谁能保证呢
+CRL查询分支过程如下
+主查询 => CreateQuery子查询 => 返回匿名对象筛选LambdaQueryResultSelect => 主查询嵌套子查询 => 返回结果
+理论上只要符合调用逻辑,可以无限嵌套
+示例:
+var q1 = Code.OrderManage.Instance.GetLambdaQuery();//主查询
+var q2 = q1.CreateQuery<Code.ProductData>();//创建一个子查询
+q2.Where(b => b.Id > 0);
+var view = q2.CreateQuery<Code.Member>().GroupBy(b => b.Name).Where(b => b.Id > 0).Select(b => new { b.Name, aa = b.Id.COUNT() });//GROUP查询
+var view2 = q2.Join(view, (a, b) => a.CategoryName == b.Name).Select((a, b) => new { ss1 = a.UserId, ss2 = b.aa });//关联GROUP
+q1.Join(view2, (a, b) => a.Id == b.ss1).Select((a, b) => new { a.Id, b.ss1 });//再关联
+var result = view2.ToList();
+var sql = q1.ToString();
+生成SQL打印如下
+SELECT t1.[Id] AS Id,
+       t2.[ss1] AS ss1
+FROM [OrderProduct] t1 with(nolock)
+INNER JOIN
+  (SELECT t2.[UserId] AS ss1,
+          t3.[aa] AS ss2
+   FROM [ProductData] t2 with(nolock)
+   INNER JOIN
+     (SELECT t3.[Name] AS Name,
+             COUNT(t3.Id) AS aa
+      FROM [Member] t3 with(nolock)
+      WHERE (t3.[Id]>@par1)
+      GROUP BY t3.[Name]) t3 ON (t2.[CategoryName]=t3.[Name])
+   WHERE (t2.[Id]>@par0) ) t2 ON (t1.[Id]=t2.[ss1])
+不管是JOIN后再GROUP,还是GROUP后再GROUP,还是GROUP后再JOIN,通通不是问题
+详细介绍看这里
+https://www.cnblogs.com/hubro/p/6096544.html
+
+5.与众不同之五,查询抽象,非关系型数据库支持
+通过对Lambda表达式的解析,可以实现不同的查询转换,如MongoDB,或ElasticSearch
+有人问,这样有什么用呢?
+好处就是,在CRL框架下,一套LambdaQuery走天下,不用写各种差异很大的查询方法了,在动态数据源的支持下,分库分表游刃有余
+
+以MongoDB为例
+CRLLambdaQuery=>CRLExpression=>BsonDocument=>MongoDB
+在[数据访问实现]示例中,演示了如何切换到MongoDB
+代码实现见项目:CRL.Mongo
+
+6.题外之六,请使用仓储模式
+在上文提到,好多框架会直接返回一个数据访问对象,如
+var obj1context.Query<TestEntity>(b=>b.Id==1).ToSingle();
+然而这样会导致滥用,直接在WEB层用,在Service层随意用,如
+var obj2=context.Query<TestEntity2>(b=>b.Id==1).ToSingle();
+var obj3=context.Query<TestEntity3>(b=>b.Id==1).ToSingle();
+某一天,TestEntity3要换库了,查找一下引用,傻眼了,上百个引用(亲身体验过这种痛苦,一个个改)
+好在CRL开始就杜绝了这种情况发生,对据的访问必须通过BaseProvider实现,而BaseProvider就是一个仓储的形式
+
+大概列举了以上几项,还有好多特有的东西,轮子好不好,东西南北滚滚试试
+
+源码地址:https://github.com/hubro-xx/CRL5
+
+CRL目前.NET版本为.net 4.5, .net Core项目用得不多, 有时间了再整理整理netstandard版本
+
+除了ORM,CRL还带 动态API,RPC,WebSocket,api客户端代理实现,微服务注册,发现,调用集成参见:
+https://www.cnblogs.com/hubro/p/11652687.html

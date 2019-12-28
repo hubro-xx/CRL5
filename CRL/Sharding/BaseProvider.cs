@@ -25,7 +25,8 @@ namespace CRL.Sharding
         public BaseProvider<TModel> SetLocation(TModel args)
         {
             var table = TypeCache.GetTable(typeof(TModel));
-            var func = LocationManage.Get<TModel>();
+            var configBuilder = SettingConfigBuilder.current;
+            var func = configBuilder.GetLocation<TModel>();
             if (func == null || args == null)
             {
                 //throw new CRLException($"指定类型{typeof(TModel).Name} 未注册定位方法");
@@ -40,10 +41,10 @@ namespace CRL.Sharding
         }
         internal override DbContext GetDbContext()
         {
-            if (SettingConfig.DbAccessCreaterCache.Count == 0)
-            {
-                throw new CRLException("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
-            }
+            //if (SettingConfig.DbAccessCreaterCache.Count == 0)
+            //{
+            //    throw new CRLException("请配置CRL数据访问对象,实现CRL.SettingConfig.GetDbAccess");
+            //}
             dbLocation.ManageName = ManageName;
             var helper = SettingConfig.GetDBAccessBuild(dbLocation).GetDBHelper();
             var dbContext = new DbContext(helper, dbLocation);

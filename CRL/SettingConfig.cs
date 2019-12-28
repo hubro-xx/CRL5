@@ -7,6 +7,7 @@
 */
 using CRL.DBAccess;
 using CRL.LambdaQuery;
+using CRL.Sharding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,37 +45,12 @@ namespace CRL
         internal DBHelper GetDBHelper()
         {
             var configBuilder = SettingConfigBuilder.current;
-            var exists = configBuilder.DBHelperRegister.TryGetValue(_DBType, out Type type);
+            var exists = configBuilder.DBHelperRegister.TryGetValue(_DBType, out Func<string, DBHelper> func);
             if (!exists)
             {
                 throw new CRLException("未配置对应的数据库类型:" + _DBType);
             }
-            var db = System.Activator.CreateInstance(type, _connectionString) as DBHelper;
-            return db;
-            //switch (_DBType)
-            //{
-            //    case DBType.ACCESS:
-            //        return new AccessHelper(_connectionString);
-
-            //    case DBType.MongoDB:
-            //        var lastIndex = _connectionString.LastIndexOf("/");
-            //        var DatabaseName = _connectionString.Substring(lastIndex + 1);//like mongodb://localhost:27017/db1
-            //        return new MongoDBHelper(_connectionString, DatabaseName);
-
-            //    case DBType.MSSQL:
-            //        return new SqlHelper(_connectionString);
-
-            //    case DBType.MSSQL2000:
-            //        return new Sql2000Helper(_connectionString);
-
-            //    case DBType.MYSQL:
-            //        return new MySqlHelper(_connectionString);
-
-            //    case DBType.ORACLE:
-            //        return new OracleHelper(_connectionString);
-
-            //}
-            //throw new CRLException("未知的类型" + _DBType);
+            return func(_connectionString);
         }
     }
     /// <summary>
@@ -84,20 +60,39 @@ namespace CRL
     {
         static SettingConfig()
         {
+            #region 注册默认数据库类型
             var configBuilder = SettingConfigBuilder.current;
-            configBuilder.RegisterDBType<SqlHelper, DBAdapter.MSSQLDBAdapter>(DBType.MSSQL);
-            configBuilder.RegisterDBType<Sql2000Helper, DBAdapter.MSSQL2000DBAdapter>(DBType.MSSQL2000);
-            configBuilder.RegisterDBExtend<CRL.DBExtend.RelationDB.DBExtend>(DBType.MSSQL);
+            configBuilder.RegisterDBType(DBType.MSSQL, (conn) =>
+             {
+                 return new SqlHelper(conn);
+             }, (context) =>
+             {
+                 return new DBAdapter.MSSQLDBAdapter(context);
+             });
+            configBuilder.RegisterDBType(DBType.MSSQL2000, (conn) =>
+            {
+                return new Sql2000Helper(conn);
+            }, (context) =>
+            {
+                return new DBAdapter.MSSQL2000DBAdapter(context);
+            });
+            configBuilder.RegisterDBExtend<CRL.DBExtend.RelationDB.DBExtend>(DBType.MSSQL, (context) =>
+             {
+                 return new DBExtend.RelationDB.DBExtend(context);
+             });
+            #endregion
         }
         #region 委托
         /// <summary>
         /// 获取数据连接
         /// </summary>
+        [Obsolete("使用SettingConfigBuilder内实现")]
         public static Func<DBLocation, DBAccessBuild> GetDbAccess
         {
             set
             {
-                DbAccessCreaterCache.Add(value);
+                var configBuilder = SettingConfigBuilder.current;
+                configBuilder.DbAccessCreaterCache.Add(value);
             }
         }
         /// <summary>
@@ -105,14 +100,16 @@ namespace CRL
         /// 按优先顺序添加,不成立则返回null
         /// </summary>
         /// <param name="func"></param>
+        [Obsolete("使用SettingConfigBuilder内实现")]
         public static void RegisterDBAccessBuild(Func<DBLocation, DBAccessBuild> func)
         {
-            DbAccessCreaterCache.Add(func);
+            var configBuilder = SettingConfigBuilder.current;
+            configBuilder.DbAccessCreaterCache.Add(func);
         }
-        internal static List<Func<DBLocation, DBAccessBuild>> DbAccessCreaterCache = new List<Func<DBLocation, DBAccessBuild>>();
         internal static DBAccessBuild GetDBAccessBuild(DBLocation location)
         {
-            foreach (var m in DbAccessCreaterCache)
+            var configBuilder = SettingConfigBuilder.current;
+            foreach (var m in configBuilder.DbAccessCreaterCache)
             {
                 var act = m(location);
                 if (act != null)
@@ -120,7 +117,7 @@ namespace CRL
                     return act;
                 }
             }
-            throw new CRLException("未找到对应的数据访问实现");
+            throw new CRLException($"未找到对应的数据访问实现");
         }
 
         #endregion
@@ -189,9 +186,14 @@ namespace CRL
 
     public class SettingConfigBuilder
     {
-        internal Dictionary<DBType, Type> DBHelperRegister = new Dictionary<DBType, Type>();
-        internal Dictionary<DBType, Type> DBAdapterBaseRegister = new Dictionary<DBType, Type>();
-        internal Dictionary<DBType, Type> AbsDBExtendRegister = new Dictionary<DBType, Type>();
+        internal Dictionary<DBType, Func<string, DBHelper>> DBHelperRegister = new Dictionary<DBType, Func<string, DBHelper>>();
+        internal Dictionary<DBType, Func<DbContext, DBAdapter.DBAdapterBase>> DBAdapterBaseRegister = new Dictionary<DBType, Func<DbContext, DBAdapter.DBAdapterBase>>();
+        internal Dictionary<DBType, Func<DbContext, AbsDBExtend>> AbsDBExtendRegister = new Dictionary<DBType, Func<DbContext, AbsDBExtend>>();
+
+        internal List<Func<DBLocation, DBAccessBuild>> DbAccessCreaterCache = new List<Func<DBLocation, DBAccessBuild>>();
+
+        internal Dictionary<Type, object> LocationRegister = new Dictionary<Type, object>();
+
         public SettingConfigBuilder()
         {
             current = this;
@@ -202,23 +204,55 @@ namespace CRL
         }
         internal static SettingConfigBuilder current;
 
-        public SettingConfigBuilder RegisterDBType<T1, T2>(DBType dBType) where T1 : DBHelper
-            where T2 : DBAdapter.DBAdapterBase
+        public SettingConfigBuilder RegisterDBType(DBType dBType, Func<string, DBHelper> funcDb, Func<DbContext, DBAdapter.DBAdapterBase> funcDBAdapter)
         {
             if (!DBHelperRegister.ContainsKey(dBType))
             {
-                DBHelperRegister.Add(dBType, typeof(T1));
-                DBAdapterBaseRegister.Add(dBType, typeof(T2));
+                DBHelperRegister.Add(dBType, funcDb);
+                DBAdapterBaseRegister.Add(dBType, funcDBAdapter);
             }
             return this;
         }
-        public SettingConfigBuilder RegisterDBExtend<T1>(DBType dBType) where T1 : AbsDBExtend
+        public SettingConfigBuilder RegisterDBExtend<T1>(DBType dBType, Func<DbContext, AbsDBExtend> func) where T1 : AbsDBExtend
         {
             if (!AbsDBExtendRegister.ContainsKey(dBType))
             {
-                AbsDBExtendRegister.Add(dBType, typeof(T1));
+                AbsDBExtendRegister.Add(dBType, func);
             }
             return this;
+        }
+
+        /// <summary>
+        /// 获取数据连接
+        /// </summary>
+        public Func<DBLocation, DBAccessBuild> GetDbAccess
+        {
+            set
+            {
+                DbAccessCreaterCache.Add(value);
+            }
+        }
+        /// <summary>
+        /// 注册数据访问实现
+        /// 按优先顺序添加,不成立则返回null
+        /// </summary>
+        /// <param name="func"></param>
+        public void RegisterDBAccessBuild(Func<DBLocation, DBAccessBuild> func)
+        {
+            DbAccessCreaterCache.Add(func);
+        }
+        public void RegisterLocation<T>(Func<Attribute.TableInnerAttribute, T, Location> func)
+        {
+            LocationRegister.Add(typeof(T), func);
+        }
+        internal Func<Attribute.TableInnerAttribute, T, Location> GetLocation<T>()
+        {
+            var a = LocationRegister.TryGetValue(typeof(T), out object value);
+            if (a)
+            {
+                return value as Func<Attribute.TableInnerAttribute, T, Location>;
+            }
+            return null;
         }
     }
 

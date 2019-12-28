@@ -51,38 +51,12 @@ namespace CRL.DBAdapter
                 return db;
             }
             var configBuilder = SettingConfigBuilder.current;
-            var exists = configBuilder.DBAdapterBaseRegister.TryGetValue(dbContext.DBHelper.CurrentDBType, out Type type);
+            var exists = configBuilder.DBAdapterBaseRegister.TryGetValue(dbContext.DBHelper.CurrentDBType, out Func<DbContext, DBAdapter.DBAdapterBase> func);
             if (!exists)
             {
                 throw new CRLException("找不到对应的DBAdapte" + dbContext.DBHelper.CurrentDBType);
             }
-            db = System.Activator.CreateInstance(type, dbContext) as DBAdapterBase;
-            //switch (dbContext.DBHelper.CurrentDBType)
-            //{
-            //    case DBType.MSSQL:
-            //        db = new MSSQLDBAdapter(dbContext);
-            //        break;
-            //    case DBType.MSSQL2000:
-            //        db = new MSSQL2000DBAdapter(dbContext);
-            //        break;
-            //    case DBType.ACCESS:
-            //        break;
-            //    case DBType.MYSQL:
-            //        db = new MySQLDBAdapter(dbContext);
-            //        break;
-            //    case DBType.ORACLE:
-            //        db = new ORACLEDBAdapter(dbContext);
-            //        break;
-            //    case DBType.MongoDB:
-            //        db = new MongoDBAdapter(dbContext);
-            //        break;
-            //}
-            //if (db == null)
-            //{
-            //    throw new CRLException("找不到对应的DBAdapte" + dbContext.DBHelper.CurrentDBType);
-            //}
-            DBAdapterBaseCache[dbContext.DBHelper.CurrentDBType] = db;
-            return db;
+            return func(dbContext);
         }
         public abstract DBType DBType { get; }
         #region 创建结构

@@ -43,21 +43,4 @@ namespace CRL.Sharding
             return string.Format("在库[{0}],表[{1}]", DataBaseName, TablePartName);
         }
     }
-    public class LocationManage
-    {
-        static ConcurrentDictionaryEx<Type, object> dic = new ConcurrentDictionaryEx<Type, object>();
-        public static void Register<T>(Func<Attribute.TableInnerAttribute, T, Location> func)
-        {
-            dic.TryAdd(typeof(T), func);
-        }
-        internal static Func<Attribute.TableInnerAttribute, T, Location> Get<T>()
-        {
-            var a = dic.TryGetValue(typeof(T), out object value);
-            if(a)
-            {
-                return value as Func<Attribute.TableInnerAttribute, T, Location>;
-            }
-            return null;
-        }
-    }
 }
