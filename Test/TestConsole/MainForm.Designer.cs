@@ -41,6 +41,8 @@ namespace TestConsole
             this.txtResult = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.labTip = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // button1
@@ -59,7 +61,7 @@ namespace TestConsole
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 21);
             this.textBox1.TabIndex = 1;
-            this.textBox1.Text = "50000";
+            this.textBox1.Text = "5000";
             // 
             // button2
             // 
@@ -93,17 +95,37 @@ namespace TestConsole
             this.labTip.AutoSize = true;
             this.labTip.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.labTip.ForeColor = System.Drawing.Color.SeaGreen;
-            this.labTip.Location = new System.Drawing.Point(273, 23);
+            this.labTip.Location = new System.Drawing.Point(9, 327);
             this.labTip.Name = "labTip";
             this.labTip.Size = new System.Drawing.Size(120, 16);
             this.labTip.TabIndex = 4;
             this.labTip.Text = "初始数据中...";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(213, 21);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(251, 12);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "一次性返回多条数据,统计重点为对象映射速度";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(213, 45);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(251, 12);
+            this.label2.TabIndex = 5;
+            this.label2.Text = "多次循环参数化查询,统计总点为参数解析速度";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(546, 352);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.labTip);
             this.Controls.Add(this.txtResult);
             this.Controls.Add(this.button2);
@@ -127,5 +149,7 @@ namespace TestConsole
         private System.Windows.Forms.TextBox txtResult;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label labTip;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
     }
 }

@@ -163,7 +163,7 @@ var obj1context.Query<TestEntity>(b=>b.Id==1).ToSingle();
 然而这样会导致滥用,直接在WEB层用,在Service层随意用,如
 var obj2=context.Query<TestEntity2>(b=>b.Id==1).ToSingle();
 var obj3=context.Query<TestEntity3>(b=>b.Id==1).ToSingle();
-某一天,TestEntity3要换库了,查找一下引用,傻眼了,上百个引用(亲身体验过这种痛苦,一个个改)
+某一天,TestEntity3要换库了,查找一下引用,傻眼了,上百个引用(接手别人的项目,亲身体验过这种痛苦,一个个改)
 好在CRL开始就杜绝了这种情况发生,对据的访问必须通过BaseProvider实现,而BaseProvider就是一个仓储的形式
 
 大概列举了以上几项,还有好多特有的东西,轮子好不好,东西南北滚滚试试
