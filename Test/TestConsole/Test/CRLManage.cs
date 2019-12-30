@@ -38,7 +38,7 @@ namespace TestConsole
         protected override System.Collections.IList GetInitData()
         {
             var list = new List<TestEntityCRL>();
-            for (int i = 0; i < 500000; i++)
+            for (int i = 0; i < 5000; i++)
             {
                 list.Add(new TestEntityCRL() { F_Bool = true, F_Byte = 1, F_DateTime = DateTime.Now, F_Decimal = 100.23M, F_Double = 23.22, F_Float = 1.22F, F_Guid = System.Guid.NewGuid(), F_Int16 = 22, F_Int32 = 333, F_Int64 = 333, F_String = "string" + i });
             }
