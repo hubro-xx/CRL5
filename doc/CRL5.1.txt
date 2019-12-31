@@ -1,8 +1,8 @@
-2019-12-28
-最近关于ORM的话题又火了起来,各种重复造轮子的过程一直在进行,轮子都一样是圆的,你的又有什么特点呢?
+
+最近关于ORM的话题又多了起来,各种重复造轮子的过程一直在进行,轮子都一样是圆的,你的又有什么特点呢?
 抛开常规的增删改查,我们来讲讲与众不同的
 
-CRL开发框架虽然写了好多年,但一直在DEBUG状态中, 最近又升级了,分离了数据访问层,不同数据库引用不同的数据访问层,数据访问层实现也很简单,只需要写两个文件,如MySql,实现MySqlHelper和MySQLDBAdapter
+CRL开发框架虽然写好长时间,但一直在DEBUG状态中, 最近又升级了,分离了数据访问层,不同数据库引用不同的数据访问层,数据访问层实现也很简单,只需要写两个文件,如MySql,实现MySqlHelper和MySQLDBAdapter
 见:https://github.com/hubro-xx/CRL5/tree/master/CRL.Providers/CRL.MySql
 同时,版本也升级到5.1,项目结构发生了改变
 
@@ -27,7 +27,8 @@ var context = new MsSqlContext(ConnectionString);
 var builder = new CRL.SettingConfigBuilder();
 builder.UseMongoDB();//引用CRL.Mongo 使用MongoDB
 //注册自定义定位,按MemberSharding传入数据定义数据源位置
-builder.RegisterLocation<Code.Sharding.MemberSharding>((t, a) =>//注册一
+//注册一
+builder.RegisterLocation<Code.Sharding.MemberSharding>((t, a) =>
 {
     var tableName = t.TableName;
     if (a.Name == "hubro")//当名称为hubro,则定位到库testdb2 表MemberSharding1
@@ -38,7 +39,8 @@ builder.RegisterLocation<Code.Sharding.MemberSharding>((t, a) =>//注册一
     //返回定位库和表名
     return new CRL.Sharding.Location("testdb", tableName);
 });
-builder.RegisterDBAccessBuild(dbLocation=>//注册二
+//注册二
+builder.RegisterDBAccessBuild(dbLocation=>
 {
     if (dbLocation.ManageName == "mongo")
     {
@@ -47,7 +49,8 @@ builder.RegisterDBAccessBuild(dbLocation=>//注册二
     }
     return null;
 });
-builder.RegisterDBAccessBuild(dbLocation =>//注册三
+//注册三
+builder.RegisterDBAccessBuild(dbLocation =>
 {
     //自定义定位,由注册一传入
     if (dbLocation.ShardingLocation != null)
@@ -77,13 +80,13 @@ instance.Add(new MongoDBModel2(){name="hubro"});
 可以看到,在上面代码中,没有看到任何数据连接串的传入,数据的访问都由初始时动态分配,对于方法调用是不透明的,调用者不用关心数据源的问题
 
 2.与众不同之二,表结构自动维护
-在新技术的支持下,程序和数据库的绑定关系越来越模糊,今天可能是用的SQLSERVER,后天可能改成MySql了,或者改成mongoDB
+在新技术的支持下,程序和数据库的绑定关系越来越模糊,现在可能是用的SQLSERVER,回头可能改成MySql了,或者改成mongoDB
 依赖数据库开发变成越来越不可取,效率也很低
 再后来出现了DBFirst方式,虽解决了部份问题,但也很麻烦
 如:建立数据库模型=>导入数据库=>T4模版生成代码(修修补补)
 而使用CRL后,过程一步到位
 编写实体类,实现对象访问=>调试运行,自动创建表结构(关键字,长度,索引)
-同时,CRL还提供了手动维护方法,使能够按实体结构重建数据表
+同时,CRL还提供了手动维护方法,使能够按实体结构重建/检查数据表
 也提供了对象结构文档导出,不用提心文档的问题
 详细介绍看这里
 https://www.cnblogs.com/hubro/p/6038118.html
@@ -92,23 +95,23 @@ https://www.cnblogs.com/hubro/p/6038118.html
 使用缓存可以大大提高程序的运行效率,使用REDIS或MONGODB之类的又需要额外维护
 对于单应用程序,程序集内缓存非常有用
 CRL内置了缓存实现和维护
-从数据库查询,到缓存调用,只是一个方法名的区别,创建维护全自动
+只需按方法调用就行了,缓存创建维护全自动
 如:
 从数据库查
-var item = Code.ProductDataManage.Instance.QueryItem(b => b.Id==1)
+var item = instance.QueryItem(b => b.Id==1)
 从缓存查
-var item = Code.ProductDataManage.Instance.QueryItemFromCache(b=>b.Id==1);
+var item = instance.QueryItemFromCache(b=>b.Id==1);
 查询多项
-var list = Code.ProductDataManage.Instance.QueryFromCache(b => b.Id < 10);
+var list = instance.QueryFromCache(b => b.Id < 10);
 
-也支持自定义查询缓存
+也支持按查询自定义缓存
 var query = Code.ProductDataManage.Instance.GetLambdaQuery();
             //缓存会按条件不同缓存不同的数据,条件不固定时,慎用
             query.Where(b => b.Id < 700);
             int exp = 10;//过期分钟
             query.Expire(exp);
             var list = query.ToList();
-基于这样的形式,可以将所有查询都走缓存,再也不用担心数据库超时了
+基于这样的形式,可以将所有查询都走缓存,再也不用担心数据库查询效率了
 详细介绍看这里
 https://www.cnblogs.com/hubro/p/6038540.html
 
@@ -172,6 +175,7 @@ var obj3=context.Query<TestEntity3>(b=>b.Id==1).ToSingle();
 
 CRL目前.NET版本为.net 4.5, .net Core项目用得不多, 有时间了再整理整理netstandard版本
 
-除了ORM,CRL还带 动态API,RPC,WebSocket,api客户端代理实现,微服务注册,发现,调用集成参见:
+除了ORM,CRL还带 动态API,RPC,WebSocket,api客户端代理实现
 https://www.cnblogs.com/hubro/p/11652687.html
+微服务注册,发现,调用集成参见:
 https://github.com/hubro-xx/CRL5/blob/master/Consul/ConsulTest/Program.cs

@@ -125,7 +125,10 @@ namespace CRL.LambdaQuery
         {
             TakeNum = pageSize;
             SkipPage = pageIndex;
-            __CompileSp = pageSize > 0 && SettingConfig.CompileSp;
+            if (__CompileSp)
+            {
+                __CompileSp = pageSize > 0;
+            }
             return this;
         }
         /// <summary>

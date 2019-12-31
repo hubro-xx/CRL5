@@ -47,7 +47,7 @@ namespace CRL.LambdaQuery
         /// <summary>
         /// 是否编译为存储过程
         /// </summary>
-        internal bool __CompileSp;
+        internal bool __CompileSp = SettingConfig.CompileSp;
         /// <summary>
         /// 获取记录条数
         /// </summary>

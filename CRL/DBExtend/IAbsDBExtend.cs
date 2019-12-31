@@ -15,7 +15,6 @@ namespace CRL
 {
     public interface IAbsDBExtend
     {
-        bool OnUpdateNotifyCacheServer { get; set; }
 
         void AddOutParam(string name, object value = null);
 

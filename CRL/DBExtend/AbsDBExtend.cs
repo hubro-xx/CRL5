@@ -77,7 +77,7 @@ namespace CRL
         /// <summary>
         /// 对象被更新时,是否通知缓存服务器
         /// </summary>
-        public bool OnUpdateNotifyCacheServer
+        internal bool OnUpdateNotifyCacheServer
         {
             get;
             set;

@@ -85,7 +85,7 @@ namespace TestConsole
                     counter.Start(kv.Key, () =>
                     {
                         method(n);
-                    }, 1);
+                    }, 3);
                     txt = counter.ToString() + "\r\n";
                     this.BeginInvoke(new Action(() =>
                     {

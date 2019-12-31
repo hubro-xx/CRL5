@@ -88,7 +88,7 @@ namespace TestConsole
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(100, 21);
             this.textBox2.TabIndex = 1;
-            this.textBox2.Text = "200";
+            this.textBox2.Text = "400";
             // 
             // labTip
             // 
@@ -117,7 +117,7 @@ namespace TestConsole
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(251, 12);
             this.label2.TabIndex = 5;
-            this.label2.Text = "多次循环参数化查询,统计总点为参数解析速度";
+            this.label2.Text = "多次循环参数化查询,统计重点为参数解析速度";
             // 
             // MainForm
             // 
