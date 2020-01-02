@@ -336,31 +336,6 @@ namespace CRL.LambdaQuery
         static object lockObj = new object();
         public static string ExpressionTypeCast(ExpressionType expType)
         {
-            //if (expressionTypeCache == null)
-            //{
-            //    lock (lockObj)
-            //    {
-            //        expressionTypeCache = new ConcurrentDictionary<ExpressionType, string>();
-            //        expressionTypeCache.TryAdd(ExpressionType.And, "&");
-            //        expressionTypeCache.TryAdd(ExpressionType.AndAlso, " AND ");
-            //        expressionTypeCache.TryAdd(ExpressionType.Equal, "=");
-            //        expressionTypeCache.TryAdd(ExpressionType.GreaterThan, ">");
-            //        expressionTypeCache.TryAdd(ExpressionType.GreaterThanOrEqual, ">=");
-            //        expressionTypeCache.TryAdd(ExpressionType.LessThan, "<");
-            //        expressionTypeCache.TryAdd(ExpressionType.LessThanOrEqual, "<=");
-            //        expressionTypeCache.TryAdd(ExpressionType.NotEqual, "<>");
-            //        expressionTypeCache.TryAdd(ExpressionType.Or, "|");
-            //        expressionTypeCache.TryAdd(ExpressionType.OrElse, " OR ");
-            //        expressionTypeCache.TryAdd(ExpressionType.Add, "+");
-            //        expressionTypeCache.TryAdd(ExpressionType.AddChecked, "+");
-            //        expressionTypeCache.TryAdd(ExpressionType.Subtract, "-");
-            //        expressionTypeCache.TryAdd(ExpressionType.SubtractChecked, "-");
-            //        expressionTypeCache.TryAdd(ExpressionType.Multiply, "*");
-            //        expressionTypeCache.TryAdd(ExpressionType.MultiplyChecked, "*");
-            //        expressionTypeCache.TryAdd(ExpressionType.Divide, "/");
-            //        expressionTypeCache.TryAdd(ExpressionType.Not, "!=");
-            //    }
-            //}
             string type;
             var a = expressionTypeCache.TryGetValue(expType, out type);
             if (a)

@@ -163,7 +163,8 @@ namespace TestConsole
 
             if (takeCount == 1)
             {
-                var first = fsql.Select<TestEntity>().Where(b => b.Id < id2 && b.Id > id).OrderBy(b => b.Id).Take(takeCount).ToList();
+                var select = fsql.Select<TestEntity>().Where(b => b.Id < id2 && b.Id > id).OrderBy(b => b.Id).Take(takeCount);
+                var result = select.ToList();
 
             }
             else

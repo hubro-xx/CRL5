@@ -10,7 +10,7 @@ namespace TestConsole
     class CounterWatch
     {
 
-        long ElapsedMilliseconds;
+        public long ElapsedMilliseconds;
         double UsedMemory;
         int count;
         string name;

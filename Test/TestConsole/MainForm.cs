@@ -87,6 +87,14 @@ namespace TestConsole
                         method(n);
                     }, 3);
                     txt = counter.ToString() + "\r\n";
+                    if (count1.ContainsKey(kv.Key))
+                    {
+                        count1[kv.Key] += counter.ElapsedMilliseconds;
+                    }
+                    else
+                    {
+                        count1.Add(kv.Key, counter.ElapsedMilliseconds);
+                    }
                     this.BeginInvoke(new Action(() =>
                     {
                         txtResult.AppendText(txt);
@@ -96,11 +104,13 @@ namespace TestConsole
                 {
                     button1.Enabled = true;
                     button2.Enabled = true;
+                    showTotal(dataGridView1, count1);
                 }));
             });
             
         }
-
+        Dictionary<string, long> count1 = new Dictionary<string, long>();
+        Dictionary<string, long> count2 = new Dictionary<string, long>();
         private async void button2_Click(object sender, EventArgs e)
         {
             button1.Enabled = false;
@@ -122,7 +132,14 @@ namespace TestConsole
                         item(1);
                     }, n);
                     txt = counter.ToString() + "\r\n";
-
+                    if (count2.ContainsKey(kv.Key))
+                    {
+                        count2[kv.Key] += counter.ElapsedMilliseconds;
+                    }
+                    else
+                    {
+                        count2.Add(kv.Key, counter.ElapsedMilliseconds);
+                    }
                     this.BeginInvoke(new Action(() =>
                     {
                         txtResult.AppendText(txt);
@@ -133,8 +150,19 @@ namespace TestConsole
                 {
                     button1.Enabled = true;
                     button2.Enabled = true;
+                    showTotal(dataGridView2, count2);
                 }));
             });
+        }
+
+        void showTotal(DataGridView dv, Dictionary<string, long> dic)
+        {
+            var data = new List<dynamic>();
+            foreach (var kv in dic)
+            {
+                data.Add(new { name = kv.Key, value = kv.Value });
+            }
+            dv.DataSource = data;
         }
     }
 }

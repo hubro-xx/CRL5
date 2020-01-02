@@ -382,6 +382,10 @@
       <Project>{221a152b-1136-46a0-bf49-37d8e8ef19a0}</Project>
       <Name>CRL</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CRLTest\CRLTest.csproj">
+      <Project>{dd47cb0d-8ed7-44e8-b267-be6ce1d8f49c}</Project>
+      <Name>CRLTest</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="DBConnection\mongodb.config">
