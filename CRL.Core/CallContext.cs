@@ -39,7 +39,7 @@ namespace CRL.Core
     /// </summary>
     public class CallContext2
     {
-        static ThreadLocal<Dictionary<string, object>> caches = new ThreadLocal<Dictionary<string, object>>();
+        static ThreadLocal<Dictionary<string, object>> caches = new ThreadLocal<Dictionary<string, object>>(() => new Dictionary<string, object>());
         public static T GetData<T>(string contextName)
         {
             var a = caches.Value.TryGetValue(contextName, out object v);

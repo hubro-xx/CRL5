@@ -40,38 +40,38 @@ namespace CRL.Mongo.MongoDBEx
 
        
 
-        public override Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql, params Type[] types)
+        public override Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql)
         {
             throw new NotSupportedException();//不支持
         }
 
-        public override List<dynamic> ExecDynamicList(string sql, params Type[] types)
+        public override List<dynamic> ExecDynamicList(string sql)
         {
             throw new NotSupportedException();//不支持
         }
 
-        public override List<T> ExecList<T>(string sql, params Type[] types)
+        public override List<T> ExecList<T>(string sql)
         {
             throw new NotSupportedException();//不支持
         }
 
 
-        public override T ExecObject<T>(string sql, params Type[] types)
+        public override T ExecObject<T>(string sql)
         {
             throw new NotSupportedException();//不支持
         }
 
-        public override object ExecScalar(string sql, params Type[] types)
+        public override object ExecScalar(string sql)
         {
             throw new NotSupportedException();//不支持
         }
 
-        public override T ExecScalar<T>(string sql, params Type[] types)
+        public override T ExecScalar<T>(string sql)
         {
             throw new NotSupportedException();//不支持
         }
 
-        public override int Execute(string sql, params Type[] types)
+        public override int Execute(string sql)
         {
             throw new NotSupportedException();//不支持
         }

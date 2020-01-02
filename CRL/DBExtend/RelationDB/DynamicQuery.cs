@@ -24,11 +24,11 @@ namespace CRL.DBExtend.RelationDB
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public override List<dynamic> ExecDynamicList(string sql, params Type[] types)
+        public override List<dynamic> ExecDynamicList(string sql)
         {
             var list = SqlStopWatch.ReturnData(() =>
             {
-                return GetDataReader(sql, types);
+                return GetDataReader(sql);
 
             }, (r) =>
             {

@@ -105,7 +105,8 @@ namespace CRLTest
         label1:
             //testFormat();
             //MongoDBTestManage.Instance.GroupTest();
-            TestAll();
+            //TestAll();
+            testCallContext("data3");
             Console.ReadLine();
             goto label1;
             Console.ReadLine();
@@ -197,6 +198,12 @@ namespace CRLTest
                 }
                 return true;
             }, 0.3);
+        }
+        static void testCallContext(string v)
+        {
+            CallContext2.SetData("testData", v);
+            var value = CallContext2.GetData<string>("testData");
+            Console.WriteLine(value);
         }
     }
 }

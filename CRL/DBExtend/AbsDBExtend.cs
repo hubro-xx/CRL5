@@ -287,14 +287,11 @@ namespace CRL
             }
             if (!OnUpdateNotifyCacheServer)
                 return;
-            System.Threading.Tasks.Task.Run(() =>
+            var client = CacheServerSetting.GetCurrentClient(typeof(TModel));
+            if (client != null)
             {
-                var client = CacheServerSetting.GetCurrentClient(typeof(TModel));
-                if (client != null)
-                {
-                    client.Update(newObj);
-                }
-            });
+                client.Update(newObj);
+            }
         }
         #endregion
         /// <summary>
@@ -489,7 +486,7 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public abstract Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql, params Type[] types);
+        public abstract Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql);
         /// <summary>
         /// 返回字典
         /// </summary>
@@ -513,7 +510,7 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public abstract List<dynamic> ExecDynamicList(string sql, params Type[] types);
+        public abstract List<dynamic> ExecDynamicList(string sql);
         /// <summary>
         /// 返回自定义类型
         /// </summary>
@@ -521,7 +518,7 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public abstract List<T> ExecList<T>(string sql, params Type[] types) where T : class, new();
+        public abstract List<T> ExecList<T>(string sql) where T : class, new();
         /// <summary>
         /// 返回自定义类型
         /// </summary>
@@ -529,14 +526,14 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public abstract T ExecObject<T>(string sql, params Type[] types) where T : class, new();
+        public abstract T ExecObject<T>(string sql) where T : class, new();
         /// <summary>
         /// 返回首行首个结果
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public abstract object ExecScalar(string sql, params Type[] types);
+        public abstract object ExecScalar(string sql);
         /// <summary>
         /// 返回首行首个结果
         /// </summary>
@@ -544,14 +541,14 @@ namespace CRL
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public abstract T ExecScalar<T>(string sql, params Type[] types);
+        public abstract T ExecScalar<T>(string sql);
         /// <summary>
         /// 执行一条语句
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public abstract int Execute(string sql, params Type[] types);
+        public abstract int Execute(string sql);
         #endregion
 
         #region 函数
@@ -843,10 +840,7 @@ namespace CRL
             var query = CreateLambdaQuery<TModel>();
             query.Where(expression);
             var n = Update(query, setValue);
-            System.Threading.Tasks.Task.Run(() =>
-            {
-                UpdateCacheItem<TModel>(expression, setValue);
-            });
+            UpdateCacheItem<TModel>(expression, setValue);
             return n;
         }
 

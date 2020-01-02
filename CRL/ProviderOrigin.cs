@@ -293,14 +293,6 @@ namespace CRL
             var query = LambdaQueryFactory.CreateLambdaQuery<T>(db.dbContext);
             return query;
         }
-        ///// <summary>
-        ///// 获取Mongo查询
-        ///// </summary>
-        ///// <returns></returns>
-        //public IMongoQueryable<T> GetMongoQueryable()
-        //{
-        //    return DBExtend.GetMongoQueryable<T>();
-        //}
         /// <summary>
         /// 指定查询条件创建表达式实例
         /// </summary>
@@ -406,7 +398,7 @@ namespace CRL
         /// </summary>
         /// <param name="message"></param>
         /// <param name="type"></param>
-        public void Log(string message, string type = "CRL")
+        void Log(string message, string type = "CRL")
         {
             EventLog.Log(message, type, false);
         }
@@ -570,13 +562,10 @@ namespace CRL
             var obj = list.First();
             if (obj.UseRedis())
             {
-                System.Threading.Tasks.Task.Run(() =>
+                foreach (var item in list)
                 {
-                    foreach (var item in list)
-                    {
-                        SetToRedis(item);
-                    }
-                });
+                    SetToRedis(item);
+                }
             }
         }
         #endregion
@@ -896,59 +885,6 @@ namespace CRL
         }
         #endregion
 
-        #region 格式化命令查询
-
-        /// <summary>
-        /// 指定格式化查询列表[基本方法]
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="sql"></param>
-        /// <param name="parame"></param>
-        /// <param name="types"></param>
-        /// <returns></returns>
-        protected List<T> ExecListWithFormat<T>(string sql, ParameCollection parame, params Type[] types) where T : class, new()
-        {
-            var db = DBExtend;
-            foreach (var p in parame)
-            {
-                db.AddParam(p.Key, p.Value);
-            }
-            return db.ExecList<T>(sql, types);
-        }
-        /// <summary>
-        /// 指定格式化更新[基本方法]
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parame"></param>
-        /// <param name="types"></param>
-        /// <returns></returns>
-        protected int ExecuteWithFormat(string sql, ParameCollection parame, params Type[] types)
-        {
-            var db = DBExtend;
-            foreach (var p in parame)
-            {
-                db.AddParam(p.Key, p.Value);
-            }
-            return db.Execute(sql, types);
-        }
-        /// <summary>
-        /// 指定格式化返回单个结果[基本方法]
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parame"></param>
-        /// <param name="types"></param>
-        /// <returns></returns>
-        protected T ExecScalarWithFormat<T>(string sql, ParameCollection parame, params Type[] types)
-        {
-            var db = DBExtend;
-            foreach (var p in parame)
-            {
-                db.AddParam(p.Key, p.Value);
-            }
-            return db.ExecScalar<T>(sql, types);
-        }
-
-        #endregion
 
         #region 导入导出
         /// <summary>

@@ -44,19 +44,19 @@ namespace CRL
 
         int Delete<TModel>(object id) where TModel : IModel, new();
 
-        Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql, params Type[] types);
+        Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql);
 
-        List<dynamic> ExecDynamicList(string sql, params Type[] types);
+        List<dynamic> ExecDynamicList(string sql);
 
-        List<T> ExecList<T>(string sql, params Type[] types) where T : class, new();
+        List<T> ExecList<T>(string sql) where T : class, new();
 
-        T ExecObject<T>(string sql, params Type[] types) where T : class, new();
+        T ExecObject<T>(string sql) where T : class, new();
 
-        object ExecScalar(string sql, params Type[] types);
+        object ExecScalar(string sql);
 
-        T ExecScalar<T>(string sql, params Type[] types);
+        T ExecScalar<T>(string sql);
 
-        int Execute(string sql, params Type[] types);
+        int Execute(string sql);
 
         //TType GetFunction<TType, TModel>(Expression<Func<TModel, bool>> expression, Expression<Func<TModel, TType>> selectField, FunctionType functionType, bool compileSp = false) where TModel : IModel, new();
         object GetOutParam(string name);

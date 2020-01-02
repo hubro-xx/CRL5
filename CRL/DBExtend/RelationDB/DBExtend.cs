@@ -37,64 +37,6 @@ namespace CRL.DBExtend.RelationDB
         }
 
 
-        /// <summary>
-        /// 通过关键类型,格式化SQL语句
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="args">格式化SQL语句的关键类型</param>
-        /// <returns></returns>
-        string AutoFormat(string sql, params Type[] args)
-        {
-            if (args == null)
-            {
-                return sql;
-            }
-            if (args.Length == 0)
-            {
-                return sql;
-            }
-            //System.Object
-            Regex r = new Regex(@"\$(\w+)", RegexOptions.IgnoreCase);//like $table
-            Match m;
-            List<string> pars = new List<string>();
-            for (m = r.Match(sql); m.Success; m = m.NextMatch())
-            {
-                string par = m.Groups[1].ToString();
-                if (!pars.Contains(par))
-                {
-                    pars.Add(par);
-                }
-            }
-            foreach (string par in pars)
-            {
-                foreach (Type type in args)
-                {
-                    string tableName = TypeCache.GetTableName(type,null);
-                    //string fullTypeName = type.FullName.Replace("+", ".") + ".";//like classA+classB
-                    string fullTypeName = GetTypeFullName(type);
-                    if (fullTypeName.IndexOf("." + par + ".") > -1)
-                    {
-                        sql = sql.Replace("$" + par, tableName);
-                    }
-                }
-            }
-            if (sql.IndexOf("$") > -1)
-            {
-                throw new CRLException("格式化SQL语句时发生错误,表名未被替换:" + sql);
-            }
-            return sql;
-        }
-        static string GetTypeFullName(Type type)
-        {
-            string str = "";
-            while (type != typeof(IModel))
-            {
-                str += "." + type.FullName + ".;";
-                type = type.BaseType;
-            }
-            return str;
-        }
-
         #region 语句查询
         /// <summary>
         /// 指定替换对象查询,并返回对象列表
@@ -103,11 +45,11 @@ namespace CRL.DBExtend.RelationDB
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public override List<T> ExecList<T>(string sql, params Type[] types)
+        public override List<T> ExecList<T>(string sql)
         {
             var list = SqlStopWatch.ReturnData(() =>
             {
-                return GetDataReader(sql, types);
+                return GetDataReader(sql);
 
             }, (r) =>
             {
@@ -126,9 +68,8 @@ namespace CRL.DBExtend.RelationDB
             //var list = ObjectConvert.DataReaderToSpecifiedList<T>(reader, queryInfo);
         }
 
-        CallBackDataReader GetDataReader(string sql,  params Type[] types)
+        CallBackDataReader GetDataReader(string sql)
         {
-            sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
             var db = GetDBHelper(DataAccessType.Read);
             sql = _DBAdapter.ReplaceParameter(db, sql);
@@ -136,14 +77,14 @@ namespace CRL.DBExtend.RelationDB
             ClearParame();
             return new CallBackDataReader(reader, null, sql);
         }
-        public override Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql, params Type[] types)
+        public override Dictionary<TKey, TValue> ExecDictionary<TKey, TValue>(string sql)
         {
             //var reader = GetDataReader(sql, types);
             //return ObjectConvert.DataReadToDictionary<TKey, TValue>(reader);
 
             var dic = SqlStopWatch.ReturnData(() =>
             {
-                return GetDataReader(sql, types);
+                return GetDataReader(sql);
 
             }, (r) =>
             {
@@ -157,11 +98,9 @@ namespace CRL.DBExtend.RelationDB
         /// 指定替换对象更新
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="types"></param>
         /// <returns></returns>
-        public override int Execute(string sql, params Type[] types)
+        public override int Execute(string sql)
         {
-            sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
             var db = GetDBHelper();
             sql = _DBAdapter.ReplaceParameter(db, sql);
@@ -175,9 +114,8 @@ namespace CRL.DBExtend.RelationDB
         /// <param name="sql"></param>
         /// <param name="types">格式化SQL语句的关键类型</param>
         /// <returns></returns>
-        public override object ExecScalar(string sql, params Type[] types)
+        public override object ExecScalar(string sql)
         {
-            sql = AutoFormat(sql, types);
             sql = _DBAdapter.SqlFormat(sql);
             var db = GetDBHelper(DataAccessType.Read);
             sql = _DBAdapter.ReplaceParameter(db, sql);
@@ -190,11 +128,10 @@ namespace CRL.DBExtend.RelationDB
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
-        /// <param name="types"></param>
         /// <returns></returns>
-        public override T ExecScalar<T>(string sql, params Type[] types)
+        public override T ExecScalar<T>(string sql)
         {
-            var obj = ExecScalar(sql, types);
+            var obj = ExecScalar(sql);
             return ObjectConvert.ConvertObject<T>(obj);
         }
         /// <summary>
@@ -204,9 +141,9 @@ namespace CRL.DBExtend.RelationDB
         /// <param name="sql"></param>
         /// <param name="types"></param>
         /// <returns></returns>
-        public override T ExecObject<T>(string sql, params Type[] types)
+        public override T ExecObject<T>(string sql)
         {
-            var list = ExecList<T>(sql, types);
+            var list = ExecList<T>(sql);
             if (list.Count == 0)
                 return null;
             return list[0];
