@@ -53,23 +53,9 @@ namespace CRL.Core.Request
         /// <returns></returns>
         public static string HttpGet(string url, string proxyHost, Encoding enc)
         {
-            Stream myStream = null;
-            HttpWebRequest request = null;
-            try
-            {
-                myStream = HttpGet(url, proxyHost, out request);
-                StreamReader sr = new StreamReader(myStream, enc);
-                var strResult = sr.ReadToEnd();
-                sr.Close();
-                myStream.Close();
-                return strResult;
-            }
-            catch (Exception ero)
-            {
-                myStream?.Close();
-                request?.Abort();
-                throw ero;
-            }
+            var requestInstance = new ImitateWebRequest(new Uri(url).Host, enc);
+            requestInstance.ProxyHost = proxyHost;
+            return requestInstance.Get(url);
         }
         /// <summary>
         /// 返回流

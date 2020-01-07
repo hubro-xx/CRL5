@@ -70,9 +70,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebTest", "Test\CRLWebTest\WebTest.csproj", "{5B1E144D-0586-4B80-B4E6-F90C81E9CDB7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{D36480A5-351D-4350-87AC-58676BAA80CA}"
-	ProjectSection(SolutionItems) = preProject
-		doc\CRL5.1.txt = doc\CRL5.1.txt
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CRL.MySql", "CRL.Providers\CRL.MySql\CRL.MySql.csproj", "{A9A0476D-E1C8-4488-ABC7-A19AA12509DD}"
 EndProject
