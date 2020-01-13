@@ -292,14 +292,23 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         /// <returns></returns>
         public override void GetSelectTop(StringBuilder sb, string fields, Action<StringBuilder> query,string sort, int top)
         {
-            //if (!query.ToLower().Contains("where"))
-            //{
-            //    query += " where 1=1 ";
-            //}
+  
             sb.Append("select ");
             sb.Append(fields);
             query(sb);
-            sb.Append(top == 0 ? "" : " and ROWNUM<=" + top);
+            if (top > 0)
+            {
+                if (sb.ToString().ToLower().Contains("where"))
+                {
+                    sb.Append(" and ROWNUM<=" + top);
+                }
+                else
+                {
+                    sb.Append(" where ROWNUM<=" + top);
+                }
+            }
+
+        
             sb.Append(sort);
 
             //string sql = string.Format("select {0} {1} {2} {3}", fields, query, top == 0 ? "" : " and ROWNUM<=" + top,sort);

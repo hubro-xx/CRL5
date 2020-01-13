@@ -36,6 +36,7 @@ namespace CRLTest.Code
         }
         public void Test()
         {
+            var list2 = GetLambdaQuery().Top(10).ToList();
             Add(new OracleModel() { Numbrer = DateTime.Now.Second, OrderId = "ttt" });
             var list = GetLambdaQuery().Where(b => b.Id > 1).Page(1,1).ToList();
             Console.WriteLine(list.Count);
