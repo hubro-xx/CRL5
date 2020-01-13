@@ -201,7 +201,7 @@ namespace CRL.DBAdapter
             foreach (Attribute.FieldInnerAttribute info in typeArry)
             {
                 string name = info.MapingName;
-                if (info.IsPrimaryKey && !info.KeepIdentity)
+                if (info.IsPrimaryKey && !info.KeepIdentity && DBType != DBType.ORACLE)
                 {
                     continue;
                 }

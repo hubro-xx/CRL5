@@ -50,7 +50,7 @@ namespace CRL.LambdaQuery
         /// <returns></returns>
         public override string ToString()
         {
-            return PrintQuery();
+            return GetQuery();
         }
         #region 字段
 

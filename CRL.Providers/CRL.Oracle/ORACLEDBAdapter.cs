@@ -186,7 +186,7 @@ namespace CRL.Oracle
             script += ")";
             string sequenceName = string.Format("{0}_sequence", tableName);
             string triggerName = string.Format("{0}_trigge", tableName);
-            string sequenceScript = string.Format("Create Sequence {0} MINVALUE 1  MAXVALUE 99999 INCREMENT BY 1 START WITH 1 NOCACHE CYCLE", sequenceName);
+            string sequenceScript = string.Format("Create Sequence {0} MINVALUE 1  MAXVALUE 999999999999 INCREMENT BY 1 START WITH 1 NOCACHE CYCLE", sequenceName);
             string triggerScript = string.Format(@"
 create or replace trigger {0}
   before insert on {1}   
@@ -265,6 +265,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
                 string sequenceName = string.Format("{0}_sequence", table.TableName);
                 var sqlGetIndex = string.Format("select {0}.nextval from dual", sequenceName);//oracle不能同时执行多条语句
                 id = SqlStopWatch.ExecScalar(helper, sqlGetIndex);
+                primaryKey.SetValue(obj, Convert.ChangeType(id, primaryKey.PropertyType));
             }
             
             var sql = GetInsertSql(dbContext, table, obj);
@@ -297,7 +298,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
             //}
             sb.Append("select ");
             sb.Append(fields);
-            sb.Append(query);
+            query(sb);
             sb.Append(top == 0 ? "" : " and ROWNUM<=" + top);
             sb.Append(sort);
 
@@ -371,61 +372,6 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         }
         #endregion
 
-
-        public override string SubstringFormat(string field, int index, int length)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string StringLikeFormat(string field, string parName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string StringNotLikeFormat(string field, string parName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string StringContainsFormat(string field, string parName)
-        {
-            throw new NotImplementedException();
-        }
-        public virtual string StringNotContainsFormat(string field, string parName)
-        {
-            return string.Format("CHARINDEX({1},{0})<=0", field, parName);
-        }
-        public override string BetweenFormat(string field, string parName, string parName2)
-        {
-            throw new NotImplementedException();
-        }
-        public virtual string NotBetweenFormat(string field, string parName, string parName2)
-        {
-            return string.Format("{0} not between {1} and {2}", field, parName, parName2);
-        }
-        public override string DateDiffFormat(string field, string format, string parName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string InFormat(string field, string parName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string NotInFormat(string field, string parName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override string CastField(string field, Type fieldType)
-        {
-            throw new NotImplementedException();
-        }
-        public override string GetParamName(string name, object index)
-        {
-            return string.Format("@{0}{1}", name, index);
-        }
         public override string GetColumnUnionIndexScript(string tableName, string indexName, List<string> columns)
         {
             var script = string.Format("create index {1} on {0} ({2}) TABLESPACE users", tableName, indexName, string.Join(",", columns.ToArray()));
@@ -435,5 +381,175 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         {
             throw new NotImplementedException();
         }
+
+        #region 函数语法
+        public override string SubstringFormat(string field, int index, int length)
+        {
+            return string.Format(" substr({0},{1},{2})", field, index, length);
+        }
+
+        public override string StringLikeFormat(string field, string parName)
+        {
+            return string.Format("{0} LIKE {1}", field, parName);
+        }
+
+        public override string StringNotLikeFormat(string field, string parName)
+        {
+            return string.Format("{0} NOT LIKE {1}", field, parName);
+        }
+
+        public override string StringContainsFormat(string field, string parName)
+        {
+            return string.Format("CHARINDEX({1},{0})>0", field, parName);
+        }
+        public override string StringNotContainsFormat(string field, string parName)
+        {
+            return string.Format("CHARINDEX({1},{0})<=0", field, parName);
+        }
+
+        public override string BetweenFormat(string field, string parName, string parName2)
+        {
+            return string.Format("{0} between {1} and {2}", field, parName, parName2);
+        }
+        public override string NotBetweenFormat(string field, string parName, string parName2)
+        {
+            return string.Format("{0} not between {1} and {2}", field, parName, parName2);
+        }
+        public override string DateDiffFormat(string field, string format, string parName)
+        {
+            //todo
+            return string.Format("DateDiff({0},{1},{2})", format, field, parName);
+        }
+
+        public override string InFormat(string field, string parName)
+        {
+            return string.Format("{0} IN ({1})", field, parName);
+        }
+        public override string NotInFormat(string field, string parName)
+        {
+            return string.Format("{0} NOT IN ({1})", field, parName);
+        }
+        public override string CastField(string field, Type fieldType)
+        {
+            var dic = FieldMaping();
+            if (!dic.ContainsKey(fieldType))
+            {
+                throw new CRLException(string.Format("没找到对应类型的转换{0} 在字段{1}", fieldType, field));
+            }
+            var type = dic[fieldType];
+            type = string.Format(type, 100);
+            return string.Format("CAST({0} as {1})", field, type);
+        }
+        public override string IsNotFormat(bool isNot)
+        {
+            return isNot ? " is not " : " is ";
+        }
+        public override string ToUpperFormat(string field)
+        {
+            return string.Format("upper({0})", field);
+        }
+        public override string ToLowerFormat(string field)
+        {
+            return string.Format("lower({0})", field);
+        }
+        public override string IsNull(string field, object value)
+        {
+            return string.Format("isnull({0},{1})", field, value);
+        }
+        public override string LengthFormat(string field)
+        {
+            return string.Format("len({0})", field);
+        }
+        public override string Trim(string field)
+        {
+            return string.Format("ltrim(rtrim({0})) ", field);
+        }
+        public override string TrimStart(string field)
+        {
+            return string.Format("ltrim({0}) ", field);
+        }
+        public override string TrimEnd(string field)
+        {
+            return string.Format("rtrim({0}) ", field);
+        }
+        public override string Replace(string field, string find, string rep)
+        {
+            return string.Format("replace({0},{1},{2}) ", field, find, rep);
+        }
+        public override string Distinct(string field)
+        {
+            return string.Format("Distinct({0}) ", field);
+        }
+        public override string DistinctCount(string field)
+        {
+            return string.Format("count(Distinct({0})) ", field);
+        }
+        #endregion
+
+        /// <summary>
+        /// 分页SQL 默认为MSSQL
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="fields"></param>
+        /// <param name="rowOver"></param>
+        /// <param name="condition"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
+        public override string PageSqlFormat(DBHelper db, string fields, string rowOver, string condition, int start, int end, string sort)
+        {
+            string sql = "SELECT * FROM (select {0},ROW_NUMBER() OVER ( Order by {1} ) AS RowNumber {2}) T WHERE T.RowNumber BETWEEN {3} AND {4} order by RowNumber";
+            return string.Format(sql, fields, rowOver, condition, start, end);
+            //return $"select T.* from (select *,rownum rn {condition} order by {sort}) T where rn between {start} and {end};";
+        }
+        /// <summary>
+        /// 获取关联更新语名
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <param name="condition"></param>
+        /// <param name="setValue"></param>
+        /// <returns></returns>
+        public override string GetRelationUpdateSql(string t1, string t2, string condition, string setValue, LambdaQuery.LambdaQueryBase query)
+        {
+            string table = string.Format("{0} t1", KeyWordFormat(t1), KeyWordFormat(t2));
+            string sql = string.Format("update t1 set {0} from {1} {2}", setValue, table, condition);
+            return sql;
+        }
+        /// <summary>
+        /// 获取关联删除语句
+        /// </summary>
+        /// <param name="t1"></param>
+        /// <param name="t2"></param>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        public override string GetRelationDeleteSql(string t1, string t2, string condition, LambdaQuery.LambdaQueryBase query)
+        {
+            string table = string.Format("{0} t1", KeyWordFormat(t1), KeyWordFormat(t2));
+            string sql = string.Format("delete t1 from {0} {1}", table, condition);
+            return sql;
+        }
+        public override string GetFieldConcat(string field, object value, Type type)
+        {
+            string str;
+            if (type == typeof(string))
+            {
+                str = string.Format("{0}+'{1}'", field, value);
+            }
+            else
+            {
+                str = string.Format("{0}+{1}", field, value);
+            }
+            return str;
+        }
+        /// <summary>
+        /// 参数名
+        /// </summary>
+        public override string GetParamName(string name, object index)
+        {
+            return string.Format(":{0}{1}", name, index);
+        }
+
     }
 }

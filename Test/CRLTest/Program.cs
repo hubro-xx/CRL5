@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using CRL.Core.Extension;
 using CRL.Core.RedisProvider;
 using CRL.Mongo;
+using CRL.Oracle;
 namespace CRLTest
 {
     #region obj
@@ -59,7 +60,7 @@ namespace CRLTest
         {
             var builder = new CRL.SettingConfigBuilder();
             builder.UseMongoDB();
-
+            builder.UseOracle();
             var configBuilder = new CRL.Core.ConfigBuilder();
             configBuilder.UseRedis("Server_204@127.0.0.1:6389")
                 .UseRedisSession();
@@ -92,6 +93,10 @@ namespace CRLTest
                 {
                     return new CRL.DBAccessBuild(DBType.MSSQL, "Data Source=.;Initial Catalog=" + dbLocation.ShardingLocation.DataBaseName + ";User ID=sa;Password=123");
                 }
+                if(dbLocation.ManageType==typeof(Code.OracleModelManage))
+                {
+                    return new CRL.DBAccessBuild(DBType.ORACLE, "User Id=test;Password=test123;Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=orcl)))");
+                }
                 return new CRL.DBAccessBuild(DBType.MSSQL, "server=.;database=testDb; uid=sa;pwd=123;");
             });
 
@@ -105,8 +110,9 @@ namespace CRLTest
         label1:
             //testFormat();
             //MongoDBTestManage.Instance.GroupTest();
-            //TestAll();
-            testCallContext("data3");
+            //testSpeed();
+            Code.OracleModelManage.Instance.Test();
+            //testCallContext("data3");
             Console.ReadLine();
             goto label1;
             Console.ReadLine();
@@ -204,6 +210,19 @@ namespace CRLTest
             CallContext2.SetData("testData", v);
             var value = CallContext2.GetData<string>("testData");
             Console.WriteLine(value);
+        }
+        static void testSpeed()
+        {
+            var instance = Code.ProductDataManage.Instance;
+            int id = 12;
+            for (int i = 0; i < 100; i++)
+            {
+                var query = instance.GetLambdaQuery();
+                query.Where(b => b.Id == id);
+                var sql = query.ToSingle();
+            }
+            Console.WriteLine("ok");
+
         }
     }
 }

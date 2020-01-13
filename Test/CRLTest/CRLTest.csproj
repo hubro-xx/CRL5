@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>CRLTest</RootNamespace>
     <AssemblyName>CRLTest</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -49,6 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\OracleModel.cs" />
     <Compile Include="CounterWatch.cs" />
     <Compile Include="Code\Member.cs" />
     <Compile Include="Code\MemberManage.cs" />
@@ -91,6 +92,10 @@
     <ProjectReference Include="..\..\CRL.Providers\CRL.MongoDB\CRL.Mongo.csproj">
       <Project>{61c36869-9489-4eb7-b8eb-7ad5f7dc9b1a}</Project>
       <Name>CRL.Mongo</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\CRL.Providers\CRL.Oracle\CRL.Oracle.csproj">
+      <Project>{f3a4dcc4-196b-411c-b3ac-02177a58d071}</Project>
+      <Name>CRL.Oracle</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\CRL\CRL.csproj">
       <Project>{221a152b-1136-46a0-bf49-37d8e8ef19a0}</Project>
