@@ -286,7 +286,8 @@ namespace CRL.LambdaQuery
             var field = methodInfo.MemberQueryName;
             var nodeType = methodInfo.ExpressionType;
             var args = methodInfo.Args;
-            if(args.First() is IEnumerable)//如果是集合,按in
+            var firstArgs = args.First();
+            if (firstArgs is IEnumerable && firstArgs.GetType() != typeof(string))//如果是集合,按in
             {
                 return In(methodInfo, ref parIndex, addParame);
             }

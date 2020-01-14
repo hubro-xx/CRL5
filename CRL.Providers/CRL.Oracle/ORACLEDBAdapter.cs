@@ -225,7 +225,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         #region SQL查询
         public override string GetTableFields(string tableName)
         {
-            throw new NotImplementedException();
+            return $"select column_name,column_name from user_tab_columns where Table_Name='{tableName.ToUpper()}';";
         }
         /// <summary>
         /// 批量插入,mysql不支持批量插入
@@ -292,7 +292,6 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         /// <returns></returns>
         public override void GetSelectTop(StringBuilder sb, string fields, Action<StringBuilder> query,string sort, int top)
         {
-  
             sb.Append("select ");
             sb.Append(fields);
             query(sb);
@@ -307,10 +306,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
                     sb.Append(" where ROWNUM<=" + top);
                 }
             }
-
-        
             sb.Append(sort);
-
             //string sql = string.Format("select {0} {1} {2} {3}", fields, query, top == 0 ? "" : " and ROWNUM<=" + top,sort);
             //return sql;
         }
@@ -341,10 +337,9 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
             }
             return string.Format(str, name, type);
         }
-
+        static string keyWords = " ACCESS  ADD  ALL  ALTER  AND  ANY  AS  ASC  AUDIT  BETWEEN  BY  CHAR CHECK  CLUSTER  COLUMN  COMMENT  COMPRESS  CONNECT  CREATE  CURRENT DATE  DECIMAL  DEFAULT  DELETE  DESC  DISTINCT  DROP  ELSE  EXCLUSIVE EXISTS  FILE  FLOAT FOR  FROM  GRANT  GROUP  HAVING  IDENTIFIED IMMEDIATE  IN  INCREMENT  INDEX  INITIAL  INSERT  INTEGER  INTERSECT INTO  IS  LEVEL  LIKE  LOCK  LONG  MAXEXTENTS  MINUS  MLSLABEL  MODE MODIFY  NOAUDIT  NOCOMPRESS  NOT  NOWAIT  NULL  NUMBER  OF  OFFLINE ON  ONLINE  OPTION  OR  ORDER P CTFREE PRIOR PRIVILEGES PUBLIC RAW RENAME RESOURCE REVOKE ROW ROWID ROWNUM ROWS SELECT SESSION SET SHARE SIZE SMALLINT START SUCCESSFUL SYNONYM SYSDATE TABLE THEN TO TRIGGER UID UNION UNIQUE UPDATE USER VALIDATE VALUES VARCHAR VARCHAR2 VIEW WHENEVER WHERE WITH ";
         public override string KeyWordFormat(string value)
         {
-            string keyWords = " ACCESS  ADD  ALL  ALTER  AND  ANY  AS  ASC  AUDIT  BETWEEN  BY  CHAR CHECK  CLUSTER  COLUMN  COMMENT  COMPRESS  CONNECT  CREATE  CURRENT DATE  DECIMAL  DEFAULT  DELETE  DESC  DISTINCT  DROP  ELSE  EXCLUSIVE EXISTS  FILE  FLOAT FOR  FROM  GRANT  GROUP  HAVING  IDENTIFIED IMMEDIATE  IN  INCREMENT  INDEX  INITIAL  INSERT  INTEGER  INTERSECT INTO  IS  LEVEL  LIKE  LOCK  LONG  MAXEXTENTS  MINUS  MLSLABEL  MODE MODIFY  NOAUDIT  NOCOMPRESS  NOT  NOWAIT  NULL  NUMBER  OF  OFFLINE ON  ONLINE  OPTION  OR  ORDER P CTFREE PRIOR PRIVILEGES PUBLIC RAW RENAME RESOURCE REVOKE ROW ROWID ROWNUM ROWS SELECT SESSION SET SHARE SIZE SMALLINT START SUCCESSFUL SYNONYM SYSDATE TABLE THEN TO TRIGGER UID UNION UNIQUE UPDATE USER VALIDATE VALUES VARCHAR VARCHAR2 VIEW WHENEVER WHERE WITH ";
             //keyword 
             if (keyWords.Contains(" " + value.ToUpper() + " "))
             {
@@ -388,7 +383,7 @@ end ;", triggerName, tableName, sequenceName, primaryKey);
         }
         public override string DateTimeFormat(string field, string format)
         {
-            throw new NotImplementedException();
+            return string.Format("to_date({0},'{1}')", field, format);
         }
 
         #region 函数语法
