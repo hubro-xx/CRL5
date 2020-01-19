@@ -203,7 +203,7 @@ namespace CRL.Core.ApiProxy
             {
                 Service = controlName,
                 Method = binder.Name,
-                Token = clientConnect.Token
+                Token = clientConnect.TokenInfo.Token
             };
             request.Args = args.ToList();
             object response = null;
